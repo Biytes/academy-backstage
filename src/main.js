@@ -11,10 +11,15 @@ import '@/assets/icon/iconfont.css'
 
 import $ from './assets/jquery-vender'
 
+// uEditor
+import '@static/plugins/utf8-jsp/ueditor.config.js'
+import '@static/plugins/utf8-jsp/ueditor.all.min.js'
+import '@static/plugins/utf8-jsp/lang/zh-cn/zh-cn.js'
+import '@static/plugins/utf8-jsp/ueditor.parse.min.js'
+
 Vue.use(ElementUI)
 Vue.config.productionTip = false
 /* eslint-disable no-new */
-
 new Vue({
   el: '#app',
   router,

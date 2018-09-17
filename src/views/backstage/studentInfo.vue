@@ -73,6 +73,9 @@
       <el-input v-model="ruleForm.content"></el-input>
     </el-form-item>
     <el-form-item>
+      <div id="editor" style="text-align:left"></div>
+    </el-form-item>
+    <el-form-item>
       <el-button v-show="!isAdd" type="success" @click="editSubmitForm('ruleForm')">完成</el-button>
       <el-button v-show="isAdd" type="success" @click="addItemSubmit('ruleForm')">添加</el-button>
       <el-button type="danger" @click="resetForm('ruleForm')">重置</el-button>
@@ -84,8 +87,42 @@
 </template>
 
 <script>
+import E from 'wangeditor'
 export default {
   mounted () {
+    var editor = new E('#editor')
+    editor.customConfig.showLinkImg = false
+    editor.customConfig.onchange = (html) => {
+      this.editorContent = html
+    }
+    editor.customConfig.zIndex = 100
+    editor.customConfig.uploadFileName = 'pic'
+    editor.customConfig.uploadImgServer = '/src/assets/img/upload-img'
+    editor.customConfig.uploadImgHooks = {
+      before: function (xhr, editor, files) {
+      },
+      success: function (xhr, editor, result) {
+        // 图片上传并返回结果，图片插入成功之后触发
+        // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，result 是服务器端返回的结果
+      },
+      fail: function (xhr, editor, result) {
+        alert('fail')
+      },
+      error: function (xhr, editor) {
+        alert('error')
+        alert(xhr)
+      },
+      timeout: function (xhr, editor) {
+        alert('time out')
+      },
+      // 如果服务器端返回的不是 {errno:0, data: [...]} 这种格式，可使用该配置
+      // （但是，服务器端返回的必须是一个 JSON 格式字符串！！！否则会报错）
+      customInsert: function (insertImg, result, editor) {
+        var url = result.url
+        insertImg(url)
+      }
+    }
+    editor.create()
   },
   created () {
   },
@@ -218,13 +255,20 @@ export default {
       this.isAdd = false
     },
     changeTimeFormat () {
-      var date = new Date(this.ruleForm.date)
-      var y = date.getFullYear() // 获取年
-      var m = date.getMonth() + 1 // 获取月
-      var d = date.getDate() // 获取日
+      let date = new Date(this.ruleForm.date)
+      let now = new Date()
+      let y = date.getFullYear() // 获取年
+      let m = date.getMonth() + 1 // 获取月
+      let d = date.getDate() // 获取日
+      let h = now.getHours() // 获取小时
+      let mm = now.getMinutes() // 获取分钟
+      let s = now.getSeconds() + 1 // 获取秒
       m = m < 10 ? '0' + m : m // 判断月是否大于10
       d = d < 10 ? ('0' + d) : d // 判断日期是否大10
-      this.ruleForm.date = y + '-' + m + '-' + d // 返回时间格式
+      h = h < 10 ? '0' + h : h // 判断小时是否大10
+      mm = mm < 10 ? '0' + mm : mm // 判断分钟是否大10
+      s = s < 10 ? '0' + s : s // 判断秒数是否大10
+      this.ruleForm.date = y + '-' + m + '-' + d + ' ' + h + ':' + mm + ':' + s // 返回时间格式
     },
     uploadData () {
       // 完成更新数据

@@ -7,6 +7,8 @@ const state = {
   client: '1', // 1为老师 0为学生
   menu: false, // 菜单的出现
   status: false, // 控制登陆是否成功
+  ueContent: 'abc',
+  ueText: 'ueText',
   testData: {
     currentImg: '',
     imgPage: false,
@@ -43,7 +45,7 @@ const state = {
         briefContent: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, dolorem consequatur a repudiandae voluptate dolores. Ex voluptatum doloremque cumque aperiam ad, dolorum, voluptates dolore hic fuga atque cere quas vel inventore sed perferendis.',
         content: '普陀区1'
       }, {
-        date: '2016-05-03',
+        date: '2016-05-03 12:24:30',
         title: '王小虎',
         briefContent: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, dolorem consequatur a repudiandae voluptate dolores. Ex voluptatum doloremque cumque aperiam ad, dolorum, voluptates dolore hic fuga atque officia. Pcere quas vel inventore sed perferendis.',
         content: '普陀区'
@@ -206,6 +208,214 @@ const state = {
         briefContent: '为培养和激励我校写程解决问题的能力',
         startTime: 'Mon Jul 05 2018 10:40:35 GMT+0800 (台北标准时间)',
         endTime: 'Mon Jul 30 2018 10:40:35 GMT+0800 (台北标准时间)'
+      }
+    ],
+    type: [
+      {
+        grade: '2014',
+        major: [
+          {
+            name: '计算机科学与技术',
+            banJi: [
+              {
+                value: 1,
+                label: '1班'
+              }, {
+                value: 2,
+                label: '2班'
+              }, {
+                value: 3,
+                label: '3班'
+              }, {
+                value: 4,
+                label: '4班'
+              }
+            ]
+          },
+          {
+            name: '软件工程',
+            banJi: [
+              {
+                value: 1,
+                label: '1班'
+              }, {
+                value: 2,
+                label: '2班'
+              }, {
+                value: 3,
+                label: '3班'
+              }, {
+                value: 4,
+                label: '4班'
+              }
+            ]
+          },
+          {
+            name: '网络工程',
+            banJi: [
+              {
+                value: 1,
+                label: '1班'
+              }, {
+                value: 2,
+                label: '2班'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        grade: '2015',
+        major: [
+          {
+            name: '计算机科学与技术',
+            banJi: [
+              {
+                value: 1,
+                label: '1班'
+              }, {
+                value: 2,
+                label: '2班'
+              }, {
+                value: 3,
+                label: '3班'
+              }
+            ]
+          },
+          {
+            name: '软件工程',
+            banJi: [
+              {
+                value: 1,
+                label: '1班'
+              }, {
+                value: 2,
+                label: '2班'
+              }, {
+                value: 3,
+                label: '3班'
+              }, {
+                value: 4,
+                label: '4班'
+              }
+            ]
+          },
+          {
+            name: '网络工程',
+            banJi: [
+              {
+                value: 1,
+                label: '1班'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        grade: '2016',
+        major: [
+          {
+            name: '计算机科学与技术',
+            banJi: [
+              {
+                value: 1,
+                label: '1班'
+              }, {
+                value: 2,
+                label: '2班'
+              }, {
+                value: 3,
+                label: '3班'
+              }, {
+                value: 4,
+                label: '4班'
+              }, {
+                value: 5,
+                label: '5班'
+              }, {
+                value: 6,
+                label: '6班'
+              }
+            ]
+          },
+          {
+            name: '软件工程',
+            banJi: [
+              {
+                value: 1,
+                label: '1班'
+              }, {
+                value: 2,
+                label: '2班'
+              }, {
+                value: 3,
+                label: '3班'
+              }
+            ]
+          },
+          {
+            name: '网络工程',
+            banJi: [
+              {
+                value: 1,
+                label: '1班'
+              }, {
+                value: 2,
+                label: '2班'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        grade: '2017',
+        major: [
+          {
+            name: '计算机科学与技术',
+            banJi: [
+              {
+                value: 1,
+                label: '1班'
+              }, {
+                value: 2,
+                label: '2班'
+              }, {
+                value: 3,
+                label: '3班'
+              }, {
+                value: 4,
+                label: '4班'
+              }
+            ]
+          },
+          {
+            name: '软件工程',
+            banJi: [
+              {
+                value: 1,
+                label: '1班'
+              }, {
+                value: 2,
+                label: '2班'
+              }, {
+                value: 3,
+                label: '3班'
+              }
+            ]
+          },
+          {
+            name: '网络工程',
+            banJi: [
+              {
+                value: 1,
+                label: '1班'
+              }, {
+                value: 2,
+                label: '2班'
+              }
+            ]
+          }
+        ]
       }
     ]
   }

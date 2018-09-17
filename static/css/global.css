@@ -4,3 +4,9 @@
   padding: 0 10px;
   margin-top: 30px;
 }
+.w-e-toolbar{
+  display: block;
+}
+.w-e-toolbar .w-e-menu{
+  display: inline-block;
+}

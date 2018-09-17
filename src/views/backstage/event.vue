@@ -234,9 +234,9 @@ export default {
     },
     changeTimeFormat: (row, column) => {
       let date = new Date(row[column.property])
-      var y = date.getFullYear() // 获取年
-      var m = date.getMonth() + 1 // 获取月
-      var d = date.getDate() // 获取日
+      let y = date.getFullYear() // 获取年
+      let m = date.getMonth() + 1 // 获取月
+      let d = date.getDate() // 获取日
       return y + '-' + m + '-' + d
     },
     changeStartTimeFormat (time) {

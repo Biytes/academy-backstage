@@ -45,10 +45,10 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- @size-change="handleSizeChange" -->
+    <!-- @current-change="handleCurrentChange" -->
     <el-pagination
     background
-    @size-change="handleSizeChange"
-    @current-change="handleCurrentChange"
     :current-page="pagination.currentPage"
     :page-sizes="[5,6,8,10]"
     :page-size="pagination.pageSize"
@@ -166,18 +166,8 @@ export default {
       })
     },
     handleClick (row) { // 打开编辑页面
-      this.rowNow = {
-        name: row.name,
-        imgUrl: row.imgUrl,
-        position: row.position,
-        brief: row.brief,
-        tel: row.tel,
-        email: row.email,
-        socialPosition: row.socialPosition,
-        educationBackground: row.educationBackground,
-        workingExperience: row.workingExperience,
-        studyDirection: row.studyDirection,
-        achievement: row.achievement
+      for (let key in this.rowNow) {
+        this.rowNow[key] = row[key]
       }
       this.isEdit = true
       console.log(this.rowNow)

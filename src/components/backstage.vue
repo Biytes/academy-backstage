@@ -3,6 +3,7 @@
     <showImg></showImg>
     <backstageHeader></backstageHeader>
     <div id="content-layout">
+      <!-- <uEditor :defaultMsg=defaultMsg :config=config ref="ue"></uEditor> -->
       <backstageMenuNav></backstageMenuNav>
       <section id="content">
         <router-view></router-view>
@@ -13,6 +14,7 @@
 <script>
 import backstageHeader from '@/components/backstageHeader'
 import backstageMenuNav from '@/components/backstageMenu'
+// import uEditor from '@/components/uEditor'
 import showImg from '@/components/showImg'
 import '@css/topBar.css'
 import '@css/customInput.css'
@@ -25,15 +27,30 @@ export default {
   },
   data () {
     return {
+      defaultMsg: '这里是UE测试',
+      config: {
+        initialFrameWidth: 500,
+        initialFrameHeight: 350
+      }
     }
   },
   components: {
     backstageHeader,
     backstageMenuNav,
     showImg
+    // uEditor
   },
   methods: {
     resetStatus () {
+    },
+    getUEContent () {
+      let content = this.$refs.ue.getUEContent()
+      this.$notify({
+        title: '获取成功，可在控制台查看！',
+        message: content,
+        type: 'success'
+      })
+      console.log(content)
     }
   }
 }
