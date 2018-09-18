@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="">
+  <div>
     <el-row>
       <el-row :gutter="20" class="m-t">
         <el-col :span="18" :offset="3">

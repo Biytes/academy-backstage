@@ -1,21 +1,13 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import App from './App'
-import router from './router'
+import App from '@/App'
+import router from '@/router'
 import ElementUI from 'element-ui'
 import 'babel-polyfill'
-import store from './store'
+import store from '@/store'
 import 'element-ui/lib/theme-chalk/index.css'
-import '@/assets/icon/iconfont.css'
-
-import $ from './assets/jquery-vender'
-
-// uEditor
-import '@static/plugins/utf8-jsp/ueditor.config.js'
-import '@static/plugins/utf8-jsp/ueditor.all.min.js'
-import '@static/plugins/utf8-jsp/lang/zh-cn/zh-cn.js'
-import '@static/plugins/utf8-jsp/ueditor.parse.min.js'
+import $ from '@/assets/jquery-vender'
 
 Vue.use(ElementUI)
 Vue.config.productionTip = false

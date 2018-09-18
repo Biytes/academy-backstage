@@ -100,6 +100,7 @@ export default {
     editor.customConfig.uploadImgServer = '/src/assets/img/upload-img'
     editor.customConfig.uploadImgHooks = {
       before: function (xhr, editor, files) {
+
       },
       success: function (xhr, editor, result) {
         // 图片上传并返回结果，图片插入成功之后触发

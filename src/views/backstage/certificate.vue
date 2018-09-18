@@ -106,18 +106,6 @@ export default {
   },
   data () {
     return {
-      // editShelfItem: {
-      //   Items: {
-      //     name: '',
-      //     owner: '',
-      //     awardTime: '',
-      //     imgUrl: require(+'../assets/img/testImage/1.jpg'),
-      //     tags: {
-      //       ACM: false,
-      //       LQB: true
-      //     }
-      //   }
-      // },
       gradeType: {
         options: [{
           value: '2014',
