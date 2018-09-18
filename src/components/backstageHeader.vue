@@ -1,8 +1,8 @@
 <template lang="html">
   <div id="backstage-header">
     <div class="backstage-logo left">
-      <img src="../assets/img/logo/logo.png" alt="">
-      <img src="../assets/img/logo/学院.png" alt="">
+      <img src="@img/logo/logo.png" alt="">
+      <img src="@img/logo/学院.png" alt="">
     </div>
     <div class="backstage-header-menu right" :class="{'header-menu-hover':subMenu}" @click.stop="showSubMenu">
       <i class="iconfont icon-down"></i>

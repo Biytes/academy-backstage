@@ -41,8 +41,9 @@
       <el-table-column
         prop="clientType"
         label="账户类型"
-        width="80"
-        :formatter="changeClientTypeFormat">
+        width="130"
+        :formatter="changeClientTypeFormat"
+        sortable>
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -66,7 +67,7 @@
       </div>
       <div class="editPage" v-show="isAdd^isEdit">
         <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-          <el-form-item label="日期" prop="createDate">
+          <!-- <el-form-item label="日期" prop="createDate">
             <el-date-picker
             v-model="ruleForm.createDate"
             align="right"
@@ -76,45 +77,53 @@
             @change = "changeTimeFormat(ruleForm.createDate)"
             :picker-options="datePicker">
             </el-date-picker>
-          </el-form-item>
-          <el-form-item label="年级" prop="grade">
-            <el-select v-model="ruleForm.grade" placeholder="请选择" size="medium">
-              <el-option
-                v-for="item in gradeType.options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="专业" prop="major">
-            <el-select v-model="ruleForm.major" placeholder="请选择" size="medium">
-              <el-option
-                v-for="item in majorType.options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="班级" prop="banJi">
-            <el-input v-model="ruleForm.banJi" required></el-input>
-          </el-form-item>
-          <el-form-item label="账号" prop="username">
-            <el-input v-model="ruleForm.username" required></el-input>
-          </el-form-item>
-          <el-form-item label="密码" prop="password">
-            <el-input v-model="ruleForm.password" required></el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="账户类型" prop="clientType">
             <el-select v-model="ruleForm.clientType" placeholder="请选择" size="medium">
               <el-option
                 v-for="item in clientType.options"
                 :key="item.value"
                 :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="年级" prop="grade" v-if="!ruleForm.clientType">
+            <el-select v-model="ruleForm.grade" placeholder="请选择" size="medium" @change="selectTypeChange(ruleForm.grade, ruleForm.major)">
+              <el-option
+                v-for="item in gradeType"
+                :key="item.grade"
+                :label="item.grade"
+                :value="item.grade">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="专业" prop="major" v-if="!ruleForm.clientType">
+            <el-select v-model="ruleForm.major" placeholder="请选择" size="medium" @change="selectTypeChange(ruleForm.grade, ruleForm.major)">
+              <el-option
+                v-for="item in majorType"
+                :key="item.name"
+                :label="item.name"
+                :value="item.name">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="班级" prop="banJi" v-if="!ruleForm.clientType">
+            <el-select v-model="ruleForm.banJi" placeholder="请选择" size="medium">
+              <el-option
+                v-for="item in banJiType"
+                :key="item.value"
+                :label="item.label"
                 :value="item.value">
               </el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item label="账号" prop="username">
+            <el-input v-model="ruleForm.username" required></el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="ruleForm.password" required></el-input>
           </el-form-item>
         <el-form-item>
           <el-button v-show="!isAdd" type="success" @click="editSubmitForm('ruleForm')">完成</el-button>
@@ -130,42 +139,15 @@
 <script>
 export default {
   mounted () {
+    this.setDefaultForm()
   },
   created () {
   },
   data () {
     return {
-      gradeType: {
-        options: [{
-          value: '2014',
-          label: '2014'
-        }, {
-          value: '2015',
-          label: '2015'
-        }, {
-          value: '2016',
-          label: '2016'
-        }, {
-          value: '2017',
-          label: '2017'
-        }, {
-          value: '2018',
-          label: '2018'
-        }],
-        value: ''
-      },
       majorType: {
-        options: [{
-          value: '计算机科学与技术',
-          label: '计算机科学与技术'
-        }, {
-          value: '软件工程',
-          label: '软件工程'
-        }, {
-          value: '网络工程',
-          label: '网络工程'
-        }],
-        value: ''
+      },
+      banJiType: {
       },
       clientType: {
         options: [{
@@ -174,8 +156,7 @@ export default {
         }, {
           value: 1,
           label: '老师'
-        }],
-        value: ''
+        }]
       },
       ruleForm: {
         createDate: '',
@@ -184,7 +165,7 @@ export default {
         grade: '',
         major: '',
         banJi: '',
-        clientType: ''
+        clientType: 0
       },
       pagination: {
         currentPage: 1,
@@ -227,10 +208,43 @@ export default {
     },
     totalDataNumber () {
       return this.$store.state.testData.Users.length
+    },
+    type () {
+      return this.$store.state.testData.type
+    },
+    gradeType () {
+      return this.$store.state.testData.type.filter(grade => grade.grade)
     }
   },
   methods: {
+    selectTypeChange (grade, major) { // 年级和班级选择器改变的时候
+      for (let i in this.gradeType) {
+        if (this.gradeType[i].grade === grade) {
+          this.majorType = this.gradeType[i].major
+          break
+        }
+      }
+      for (let i in this.majorType) {
+        if (this.majorType[i].name === major) {
+          this.banJiType = this.majorType[i].banJi
+          this.ruleForm.banJi = this.banJiType[0].label
+          break
+        }
+      }
+    },
+    setDefaultForm () { // 设置默认的表单属性
+      // 设置默认的ruleForm
+      this.ruleForm.clientType = 0
+      let now = new Date()
+      let y = now.getFullYear() - 1 // 获取年
+      this.ruleForm.grade = `${y}` // 初始化年份
+      this.ruleForm.major = '计算机科学与技术' // 初始化专业
+      this.majorType = this.type[this.type.length - 1].major // 初始化专业类型
+      this.banJiType = this.majorType[0].banJi // 初始化专业的班级数量
+      this.ruleForm.banJi = this.banJiType[0].label // 初始化班级 #1班#
+    },
     addItem () {
+      this.setDefaultForm()
       this.isAdd = true
       this.isEdit = false
     },
@@ -243,23 +257,102 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.Users.push({
-          createDate: this.ruleForm.createDate,
-          username: this.ruleForm.username,
-          password: this.ruleForm.password,
-          grade: this.ruleForm.grade,
-          major: this.ruleForm.major,
-          banJi: this.ruleForm.banJi,
-          clientType: this.ruleForm.clientType
-        })
-        // uploadData
-        this.resetRuleForm()
-        this.$message({
-          type: 'success',
-          message: '添加成功'
-        })
+        if (this.validateForm()) {
+          this.createTimeFormat()
+          this.Users.push({
+            createDate: this.ruleForm.createDate,
+            username: this.ruleForm.username,
+            password: this.ruleForm.password,
+            grade: this.ruleForm.grade,
+            major: this.ruleForm.major,
+            banJi: this.ruleForm.banJi,
+            clientType: this.ruleForm.clientType
+          })
+          // uploadData
+          this.resetRuleForm()
+          this.$message({
+            type: 'success',
+            message: '添加成功'
+          })
+        } else {
+          this.$message({
+            type: 'error',
+            message: '添加失败'
+          })
+        }
       }).catch(() => {
+        console.log('add error!!')
       })
+    },
+    validateForm () { // 验证表单 还没写***********
+      // 老师 1 学生 0
+      if (this.ruleForm.clientType) { // 选项为老师的时候
+        // 验证账号密码长度
+        let username = this.ruleForm.username.length
+        if (username < 3 && username > 15) { // 判断用户名长度
+          this.$message({
+            type: 'error',
+            message: '用户名不符合规格(3-15)'
+          })
+          return false
+        } else {
+          let password = this.ruleForm.password.length
+          if (password < 3 && password > 15) {
+            this.$message({
+              type: 'error',
+              message: '密码不符合规格(3-15)'
+            })
+            return false
+          } else {
+            return true // 符合规格
+          }
+        }
+      } else { // 选项为学生的时候
+        // 验证账号密码长度
+        let username = this.ruleForm.username.length
+        if (username < 3 && username > 15) { // 判断用户名长度
+          this.$message({
+            type: 'error',
+            message: '用户名不符合规格(3-15)'
+          })
+          return false
+        } else {
+          let password = this.ruleForm.password.length
+          if (password < 3 && password > 15) { // 判断密码长度
+            this.$message({
+              type: 'error',
+              message: '密码不符合规格(3-15)'
+            })
+            return false
+          } else {
+            if (!this.ruleForm.grade) { // 当年级为空的时候
+              this.$message({
+                type: 'error',
+                message: '年级不能为空'
+              })
+              return false
+            } else {
+              if (!this.ruleForm.major) { // 专业为空时
+                this.$message({
+                  type: 'error',
+                  message: '专业不能为空'
+                })
+                return false
+              } else {
+                if (!this.ruleForm.banJi) { // 班级为空时
+                  this.$message({
+                    type: 'error',
+                    message: '班级不能为空'
+                  })
+                  return false
+                } else {
+                  return true // 班级 专业 年级都不为空
+                }
+              }
+            }
+          }
+        }
+      }
     },
     editRow (row, index) { // 打开编辑页面
       this.isEdit = true
@@ -277,6 +370,7 @@ export default {
         rows.splice(index, 1) // 从rows数据里删除一个
         // uploadData
       }).catch(() => {
+        console.log('delete error!!')
       })
     },
     editSubmitForm (formName) {
@@ -285,17 +379,20 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        for (let key in this.ruleForm) {
-          this.Users[this.editingRow][key] = this.ruleForm[key]
+        if (this.validateForm()) {
+          for (let key in this.ruleForm) {
+            this.Users[this.editingRow][key] = this.ruleForm[key]
+          }
+          // uploadData
+          this.resetRuleForm()
+          this.$message({
+            type: 'success',
+            message: '修改成功'
+          })
+        } else {
         }
-        // uploadData
-        this.resetRuleForm()
-        this.$message({
-          type: 'success',
-          message: '修改成功'
-        })
       }).catch(() => {
-        console.log('error submit!!')
+        console.log('edit error!!')
         return false
       })
     },
@@ -309,14 +406,20 @@ export default {
       this.isEdit = false
       this.isAdd = false
     },
-    changeTimeFormat (time) {
-      var date = new Date(time)
-      var y = date.getFullYear() // 获取年
-      var m = date.getMonth() + 1 // 获取月
-      var d = date.getDate() // 获取日
+    createTimeFormat () {
+      let now = new Date()
+      let y = now.getFullYear() // 获取年
+      let m = now.getMonth() + 1 // 获取月
+      let d = now.getDate() // 获取日
+      let h = now.getHours() // 获取小时
+      let mm = now.getMinutes() // 获取分钟
+      let s = now.getSeconds() + 1 // 获取秒
       m = m < 10 ? '0' + m : m // 判断月是否大于10
       d = d < 10 ? ('0' + d) : d // 判断日期是否大10
-      this.ruleForm.createDate = y + '-' + m + '-' + d // 返回时间格式
+      h = h < 10 ? '0' + h : h // 判断小时是否大10
+      mm = mm < 10 ? '0' + mm : mm // 判断分钟是否大10
+      s = s < 10 ? '0' + s : s // 判断秒数是否大10
+      this.ruleForm.createDate = y + '-' + m + '-' + d + ' ' + h + ':' + mm + ':' + s // 返回时间格式
     },
     changeClientTypeFormat: (row, column) => {
       let type = row[column.property]

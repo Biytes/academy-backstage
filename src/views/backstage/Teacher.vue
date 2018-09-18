@@ -45,10 +45,10 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- @size-change="handleSizeChange" -->
+    <!-- @current-change="handleCurrentChange" -->
     <el-pagination
     background
-    @size-change="handleSizeChange"
-    @current-change="handleCurrentChange"
     :current-page="pagination.currentPage"
     :page-sizes="[5,6,8,10]"
     :page-size="pagination.pageSize"
@@ -166,18 +166,8 @@ export default {
       })
     },
     handleClick (row) { // 打开编辑页面
-      this.rowNow = {
-        name: row.name,
-        imgUrl: row.imgUrl,
-        position: row.position,
-        brief: row.brief,
-        tel: row.tel,
-        email: row.email,
-        socialPosition: row.socialPosition,
-        educationBackground: row.educationBackground,
-        workingExperience: row.workingExperience,
-        studyDirection: row.studyDirection,
-        achievement: row.achievement
+      for (let key in this.rowNow) {
+        this.rowNow[key] = row[key]
       }
       this.isEdit = true
       console.log(this.rowNow)
@@ -251,7 +241,7 @@ export default {
       isAdd: false,
       headmasters: [
         {
-          imgUrl: require('../../assets/img/teacher/tec1.jpg'),
+          imgUrl: require('@img/teacher/tec1.jpg'),
           name: '李仲麟',
           position: '计算机学院顾问',
           brief: '期从事计算机专业的科研、教学和教学管理工作，主要研究方向为计算机信息管理、计算机控制、信息指导硕士研究生30',
@@ -278,7 +268,7 @@ export default {
           workingExperience: '1970年本科毕业于清华大学自动控制系，分配到天津煤矿专用设备厂工作，1973年底调往大港油田地调指挥部研究大队计算站从事计算机硬件维护工作，1979年到1982年在天津大学计算机系读研究生，获硕士学位，1982年毕业分配到华南理工大学计算机系任教。2000年被评聘为教授。1991年起历任华南理工大学计算机系副主任、电子与信息学院副院长、计算机科学与工程学院副院长，主管教学、实验室等工作。现任华南理工大学广州学院计算机工程学院顾问。'
         },
         {
-          imgUrl: require('../../assets/img/teacher/tec2.jpg'),
+          imgUrl: require('@img/teacher/tec2.jpg'),
           name: '邓春晖',
           position: '计算机学院院长',
           brief: '曾先后任职于电子部上海51所、电子部海南电子集团公司、海南旭龙股份有限公司',
@@ -289,7 +279,7 @@ export default {
           workingExperience: '1970年本科毕业于清华大学自动控制系，分配到天津煤矿专用设备厂工作，1973年底调往大港油田地调指挥部研究大队计算站从事计算机硬件维护工作，1979年到1982年在天津大学计算机系读研究生，获硕士学位，1982年毕业分配到华南理工大学计算机系任教。2000年被评聘为教授。1991年起历任华南理工大学计算机系副主任、电子与信息学院副院长、计算机科学与工程学院副院长，主管教学、实验室等工作。现任华南理工大学广州学院计算机工程学院顾问。'
         },
         {
-          imgUrl: require('../../assets/img/teacher/tec3.jpg'),
+          imgUrl: require('@img/teacher/tec3.jpg'),
           name: '岑有文',
           position: '计算机学院副院长',
           brief: '长期从事学生教育与管理工作及毕业生就业指导和党务管理工作，曾在国家核心刊物和其他刊物发表论文10余篇。',
@@ -301,7 +291,7 @@ export default {
           workingExperience: '1970年本科毕业于清华大学自动控制系，分配到天津煤矿专用设备厂工作，1973年底调往大港油田地调指挥部研究大队计算站从事计算机硬件维护工作，1979年到1982年在天津大学计算机系读研究生，获硕士学位，1982年毕业分配到华南理工大学计算机系任教。2000年被评聘为教授。1991年起历任华南理工大学计算机系副主任、电子与信息学院副院长、计算机科学与工程学院副院长，主管教学、实验室等工作。现任华南理工大学广州学院计算机工程学院顾问。'
         },
         {
-          imgUrl: require('../../assets/img/teacher/tec4.jpg'),
+          imgUrl: require('@img/teacher/tec4.jpg'),
           name: '蔡沂',
           position: '计算机学院副院长',
           brief: '曾获得青年教师课堂教学竞赛三等奖、校级优秀示范课教师等荣誉。',
@@ -314,7 +304,7 @@ export default {
       ],
       teachers: [
         {
-          imgUrl: require('../../assets/img/teacher/tec1.jpg'),
+          imgUrl: require('@img/teacher/tec1.jpg'),
           name: '李仲麟',
           position: '计算机学院顾问',
           brief: '期从事计算机专业的科研、教学和教学管理工作，主要研究方向为计算机信息管理、计算机控制、信息指导硕士研究生30',
@@ -341,7 +331,7 @@ export default {
           workingExperience: '1970年本科毕业于清华大学自动控制系，分配到天津煤矿专用设备厂工作，1973年底调往大港油田地调指挥部研究大队计算站从事计算机硬件维护工作，1979年到1982年在天津大学计算机系读研究生，获硕士学位，1982年毕业分配到华南理工大学计算机系任教。2000年被评聘为教授。1991年起历任华南理工大学计算机系副主任、电子与信息学院副院长、计算机科学与工程学院副院长，主管教学、实验室等工作。现任华南理工大学广州学院计算机工程学院顾问。'
         },
         {
-          imgUrl: require('../../assets/img/teacher/tec2.jpg'),
+          imgUrl: require('@img/teacher/tec2.jpg'),
           name: '邓春晖',
           position: '计算机学院院长',
           brief: '曾先后任职于电子部上海51所、电子部海南电子集团公司、海南旭龙股份有限公司',
@@ -354,7 +344,7 @@ export default {
           workingExperience: '1970年本科毕业于清华大学自动控制系，分配到天津煤矿专用设备厂工作，1973年底调往大港油田地调指挥部研究大队计算站从事计算机硬件维护工作，1979年到1982年在天津大学计算机系读研究生，获硕士学位，1982年毕业分配到华南理工大学计算机系任教。2000年被评聘为教授。1991年起历任华南理工大学计算机系副主任、电子与信息学院副院长、计算机科学与工程学院副院长，主管教学、实验室等工作。现任华南理工大学广州学院计算机工程学院顾问。'
         },
         {
-          imgUrl: require('../../assets/img/teacher/tec3.jpg'),
+          imgUrl: require('@img/teacher/tec3.jpg'),
           name: '岑有文',
           position: '计算机学院副院长',
           brief: '长期从事学生教育与管理工作及毕业生就业指导和党务管理工作，曾在国家核心刊物和其他刊物发表论文10余篇。',
@@ -367,7 +357,7 @@ export default {
           workingExperience: '1970年本科毕业于清华大学自动控制系，分配到天津煤矿专用设备厂工作，1973年底调往大港油田地调指挥部研究大队计算站从事计算机硬件维护工作，1979年到1982年在天津大学计算机系读研究生，获硕士学位，1982年毕业分配到华南理工大学计算机系任教。2000年被评聘为教授。1991年起历任华南理工大学计算机系副主任、电子与信息学院副院长、计算机科学与工程学院副院长，主管教学、实验室等工作。现任华南理工大学广州学院计算机工程学院顾问。'
         },
         {
-          imgUrl: require('../../assets/img/teacher/tec4.jpg'),
+          imgUrl: require('@img/teacher/tec4.jpg'),
           name: '蔡沂',
           position: '计算机学院副院长',
           brief: '曾获得青年教师课堂教学竞赛三等奖、校级优秀示范课教师等荣誉。',
@@ -381,7 +371,7 @@ export default {
         },
         {
           name: '周小明',
-          imgUrl: require('../../assets/img/teacher/tec5.jpg'),
+          imgUrl: require('@img/teacher/tec5.jpg'),
           educationBackground: '国防科学技术大学，工学学士西南交通大学，工学硕士',
           position: '计算机科学与技术教研室副主任，讲师',
           brief: '',
@@ -394,7 +384,7 @@ export default {
         },
         {
           name: '王素丽',
-          imgUrl: require('../../assets/img/teacher/tec6.jpg'),
+          imgUrl: require('@img/teacher/tec6.jpg'),
           educationBackground: '硕士研究生',
           position: '计算机科学与技术教研室副主任/讲师',
           brief: '',
@@ -407,7 +397,7 @@ export default {
         },
         {
           name: '胡赟',
-          imgUrl: require('../../assets/img/teacher/tec7.jpg'),
+          imgUrl: require('@img/teacher/tec7.jpg'),
           educationBackground: '解放军信息工程大学，本科国防科技大学，工学博士',
           position: '副教授',
           brief: '',
@@ -420,7 +410,7 @@ export default {
         },
         {
           name: '林煜东',
-          imgUrl: require('../../assets/img/teacher/tec8.jpg'),
+          imgUrl: require('@img/teacher/tec8.jpg'),
           educationBackground: '华南农业大学，工学硕士西南交通大学，工学博士',
           position: '计算机教研室老师',
           brief: '',
@@ -433,7 +423,7 @@ export default {
         },
         {
           name: '邓一星',
-          imgUrl: require('../../assets/img/teacher/tec9.jpg'),
+          imgUrl: require('@img/teacher/tec9.jpg'),
           educationBackground: '桂林电子工业学院（现桂林电子科技大学）计算机应用技术专业，工学硕士',
           position: '计算机科学与技术教研室副主任，讲师/高级工程师',
           brief: '',
@@ -446,7 +436,7 @@ export default {
         },
         {
           name: '郑馥丹',
-          imgUrl: require('../../assets/img/teacher/tec10.jpg'),
+          imgUrl: require('@img/teacher/tec10.jpg'),
           educationBackground: '中山大学信息科学与技术学院（计算机软件与理论专业），工学硕士',
           position: '软件工程教研室副主任，副教授',
           brief: '',
@@ -459,7 +449,7 @@ export default {
         },
         {
           name: '袁俐萍',
-          imgUrl: require('../../assets/img/teacher/tec11.jpg'),
+          imgUrl: require('@img/teacher/tec11.jpg'),
           educationBackground: '硕士研究生',
           position: '副教授',
           brief: '',
@@ -472,7 +462,7 @@ export default {
         },
         {
           name: '秦映波',
-          imgUrl: require('../../assets/img/teacher/tec12.jpg'),
+          imgUrl: require('@img/teacher/tec12.jpg'),
           educationBackground: '硕士研究生',
           position: '讲师',
           brief: '',
@@ -485,7 +475,7 @@ export default {
         },
         {
           name: '余小华',
-          imgUrl: require('../../assets/img/teacher/tec13.jpg'),
+          imgUrl: require('@img/teacher/tec13.jpg'),
           educationBackground: '华南师范大学，工学硕士',
           position: '网络工程教研室主任，副教授',
           brief: '',
@@ -498,7 +488,7 @@ export default {
         },
         {
           name: '肖皇培',
-          imgUrl: require('../../assets/img/teacher/tec14.jpg'),
+          imgUrl: require('@img/teacher/tec14.jpg'),
           educationBackground: '郑州信息工程大学理学学士、华南理工大学工学博士',
           position: '副研究员',
           brief: '',
@@ -511,7 +501,7 @@ export default {
         },
         {
           name: '吴丽镐',
-          imgUrl: require('../../assets/img/teacher/tec15.jpg'),
+          imgUrl: require('@img/teacher/tec15.jpg'),
           educationBackground: '华南师范大学数学科学学院，理学硕士',
           position: '数学/信息与计算科学教研室副主任，副教授',
           brief: '',
@@ -524,7 +514,7 @@ export default {
         },
         {
           name: '卢珍',
-          imgUrl: require('../../assets/img/teacher/tec16.jpg'),
+          imgUrl: require('@img/teacher/tec16.jpg'),
           educationBackground: '中山大学数学与计算科学学院，理学硕士',
           position: '数学/信息与计算科学专业教研室副主任，讲师',
           brief: '',
@@ -537,7 +527,7 @@ export default {
         },
         {
           name: '阳平华',
-          imgUrl: require('../../assets/img/teacher/tec17.jpg'),
+          imgUrl: require('@img/teacher/tec17.jpg'),
           educationBackground: '天津大学、北京理工大学',
           position: '教授',
           brief: '',
@@ -550,7 +540,7 @@ export default {
         },
         {
           name: '罗世庄',
-          imgUrl: require('../../assets/img/teacher/tec18.jpg'),
+          imgUrl: require('@img/teacher/tec18.jpg'),
           educationBackground: '大学本科',
           position: '副教授',
           brief: '',
@@ -563,7 +553,7 @@ export default {
         },
         {
           name: '詹涌强',
-          imgUrl: require('../../assets/img/teacher/tec19.jpg'),
+          imgUrl: require('@img/teacher/tec19.jpg'),
           educationBackground: '暨南大学，理学硕士',
           position: '副教授',
           brief: '',
@@ -576,7 +566,7 @@ export default {
         },
         {
           name: '杨柱学',
-          imgUrl: require('../../assets/img/teacher/tec20.jpg'),
+          imgUrl: require('@img/teacher/tec20.jpg'),
           educationBackground: '',
           position: '计算机学院顾问',
           brief: '',
@@ -598,7 +588,7 @@ export default {
         },
         {
           name: '李成炼',
-          imgUrl: require('../../assets/img/teacher/tec21.jpg'),
+          imgUrl: require('@img/teacher/tec21.jpg'),
           educationBackground: '广东工业大学，工学学士',
           position: '计算机实验中心副主任，实验师',
           brief: '',
@@ -611,7 +601,7 @@ export default {
         },
         {
           name: '韦婷',
-          imgUrl: require('../../assets/img/teacher/tec22.jpg'),
+          imgUrl: require('@img/teacher/tec22.jpg'),
           educationBackground: '华南理工大学计算机科学与工程学院，工学硕士',
           position: '计算机公共基础课程教研室副主任，讲师',
           brief: '',
