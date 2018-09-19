@@ -44,7 +44,6 @@
     layout="total, sizes, prev, pager, next, jumper"
     :total="totalDataNumber">
     </el-pagination>
-    {{$router.params.id}}
       </div>
       <div class="editPage" v-show="isAdd^isEdit">
         <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">

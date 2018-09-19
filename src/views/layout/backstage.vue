@@ -12,10 +12,9 @@
   </div>
 </template>
 <script>
-import backstageHeader from '@/components/backstageHeader'
-import backstageMenuNav from '@/components/backstageMenu'
-// import uEditor from '@/components/uEditor'
-import showImg from '@/components/showImg'
+import backstageHeader from '@views/layout/backstageHeader'
+import backstageMenuNav from '@views/layout/backstageMenu'
+import showImg from '@views/layout/showImg'
 import '@css/topBar.css'
 import '@css/customInput.css'
 import '@css/global.css'

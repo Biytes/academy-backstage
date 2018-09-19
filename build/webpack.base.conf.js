@@ -37,9 +37,11 @@ module.exports = {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
       '@img': resolve('src/assets/img'),
-      '@views': resolve('src/views/backstage'),
+      '@views': resolve('src/views'),
       '@css': resolve('static/css'),
-      '@static': resolve('static')
+      '@static': resolve('static'),
+      '@store': resolve('src/store'),
+      '@router': resolve('src/router')
     }
   },
   module: {
@@ -62,6 +64,10 @@ module.exports = {
           limit: 10000,
           name: utils.assetsPath('img/[name].[hash:7].[ext]')
         }
+      },
+      {
+        test: /\.scss$/,
+        loaders: ["style", "css", "sass"]
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,

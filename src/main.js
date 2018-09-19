@@ -1,27 +1,21 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from '@/App'
 import router from '@/router'
-import ElementUI from 'element-ui'
-import 'babel-polyfill'
-import store from '@/store'
-import 'element-ui/lib/theme-chalk/index.css'
-import $ from '@/assets/jquery-vender'
 
-Vue.use(ElementUI)
-Vue.config.productionTip = false
+import store from '@/store'
+
+require('./bootstrap')
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
+  store,
   components: {
     App
   },
-  store: store,
   template: '<App></App>'
 })
-
 $(document).ready(function () {
   $('.second-nav-menu-right ul li').on('mouseover', function () {
     let hoverText = $(this).find('p').text()
