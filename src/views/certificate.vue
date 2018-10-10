@@ -234,11 +234,9 @@ export default {
     },
     readMode (shelf) {
       shelf.editShelfMode = false
-      console.log(shelf.editShelfMode)
     },
     editMode (shelf) {
       shelf.editShelfMode = true
-      console.log(shelf.editShelfMode)
     },
     showShelfAddItemPage (shelf) {
       this.$confirm('添加新证书', {
@@ -366,13 +364,7 @@ export default {
       this.editingShelfId = ''
     },
     contains (arr, obj) {
-      var i = arr.length
-      while (i--) {
-        if (arr[i] === obj) {
-          return true
-        }
-      }
-      return false
+      return arr.some(item => item === obj)
     },
     changepic (e) {
       console.log(e)
@@ -443,7 +435,7 @@ export default {
 }
 </script>
 
-<style lang="css">
+<style lang="scss">
 #shelves{
   text-align: left;
 }
@@ -453,15 +445,15 @@ export default {
   padding: 10px;
   width:90%;
   margin: 0 auto;
-}
-.shelf ul{
-  list-style:none;
-  margin: 0;
-  padding:0;
-  text-align: left;
-}
-.shelf a{
-  text-decoration: none;
+  ul {
+    list-style:none;
+    margin: 0;
+    padding:0;
+    text-align: left;
+  }
+  a{
+    text-decoration: none;
+  }
 }
 .shelf-name{
   font-size: 24px;
@@ -485,9 +477,7 @@ export default {
   background: rgb(230, 121, 52);
   color:#fff;
 }
-.shelf-inner{
 
-}
 .shelf-item{
   display: inline-block;
   vertical-align: top;

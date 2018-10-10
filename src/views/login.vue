@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { getTestData } from '@api/index'
 export default {
   data () {
     return {
@@ -26,8 +27,18 @@ export default {
         password: '',
         type: '老师'
       },
+      users: '',
       userVerification: true
     }
+  },
+  async mounted () {
+    // let res = await getTestData()
+    // this.users = res.data.data
+    getTestData().then(res => {
+      this.users = res.data.data
+    }).catch(error => {
+      console.log(error)
+    })
   },
   computed: {
     Users () {
@@ -36,43 +47,26 @@ export default {
   },
   methods: {
     loginSubmit () {
-      if (this.formData.type === '老师') {
-        this.$store.state.clientType = 1
-      } else if (this.formData.type === '学生') {
-        this.$store.state.clientType = 0
-      }
-      for (var i in this.Users) {
-        if (this.formData.username === this.Users[i].username) {
-          this.userVerification = true
-          console.log(1)
-          if (this.formData.password === this.Users[i].password) {
-            this.userVerification = true
-            console.log(2)
-            if (this.$store.state.clientType === this.Users[i].clientType) {
-              this.userVerification = true
-              console.log(3)
-              if (this.Users[i].clientType === 1) {
-                this.$router.push({ path: '/schoolInfo/about' })
-              } else if (this.Users[i].clientType === 0) {
-                this.$router.push({ path: '/shelf' })
-              }
-              this.$store.state.menu = true
-              this.$store.state.status = true
-              break
-            } else {
-              console.log(4)
-              this.userVerification = false
-            }
-          } else {
-            console.log(5)
-            this.userVerification = false
-          }
-        } else {
-          console.log(6)
-          this.userVerification = false
-        }
-      }
-      if (!this.userVerification) {
+      let formData = this.formData
+
+      // 判断用户选的类型 不是老师就行学生
+      this.$store.state.clientType = formData.type === '老师' ? 1 : 0
+
+      let clientType = this.$store.state.clientType
+
+      // 根据账户类型来判断push到哪个地址
+      let path = clientType ? '/schoolInfo/about' : '/certificate'
+
+      // 筛选出账号密码和类型相符的账号
+      let result = this.Users.filter(item => formData.username === item.username && formData.password === item.password && clientType === item.clientType)
+
+      if (result.length) {
+        // 匹配到符合的账号
+        this.$router.push({ path: path })
+        this.$store.state.menu = true
+        this.$store.state.status = true
+      } else {
+        // 没有匹配到符合的账号
         this.$message({
           type: 'error',
           message: '用户信息错误'

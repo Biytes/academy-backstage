@@ -41,7 +41,10 @@ module.exports = {
       '@css': resolve('static/css'),
       '@static': resolve('static'),
       '@store': resolve('src/store'),
-      '@router': resolve('src/router')
+      '@router': resolve('src/router'),
+      '@components': resolve('src/components'),
+      '@mock': resolve('src/mock'),
+      '@api': resolve('src/runtime/api')
     }
   },
   module: {

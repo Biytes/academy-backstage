@@ -1,21 +1,5 @@
-import Vue from 'vue'
-import App from '@/App'
-import router from '@/router'
-
-import store from '@/store'
-
 require('./bootstrap')
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  store,
-  components: {
-    App
-  },
-  template: '<App></App>'
-})
 $(document).ready(function () {
   $('.second-nav-menu-right ul li').on('mouseover', function () {
     let hoverText = $(this).find('p').text()
