@@ -8,11 +8,14 @@
       <i class="iconfont icon-down"></i>
       <i class="iconfont icon-accessibility"></i>
     </div>
-    <div class="backstage-search-icon right">
-      <input type="email" v-show="searchInput" class="custom__input" placeholder="Search Something ..." />
-      <i class="iconfont icon-search" @click="showSearchInput()"></i>
+    <div class="backstage-search right">
+      <customInput type="text"
+                   label="Search"
+                   pattern="clean"
+                   placeholder="Search Something ...">
+                   </customInput>
     </div>
-    <ul class="sub-dropdown-menu" v-show="subMenu && loginStatus">
+    <ul class="sub-dropdown-menu" v-show="subMenu && isLogin">
       <li><a href="#"><i class="iconfont icon-person"></i>My Profile</a></li>
       <li><a href="#"><i class="iconfont icon-setting"></i>Setting</a></li>
       <li class="divider"></li>
@@ -29,8 +32,8 @@ export default {
     }
   },
   computed: {
-    loginStatus () {
-      return this.$store.state.status
+    isLogin () {
+      return this.$store.state.isLogin
     }
   },
   created () {
@@ -57,7 +60,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$store.state.menu = false
+        this.$store.state.isLogin = false
         this.$router.push({ path: '/' })
         this.$message({
           type: 'warning',
@@ -95,19 +98,9 @@ export default {
   right: 20px;
   line-height: 1.5;
 }
-.backstage-search-icon{
+.backstage-search{
   height:100%;
-  cursor: pointer;
-  right: 20px;
-  padding:30px 30px 0px 0px;
-}
-.backstage-search-icon i{
-  font-size: 34px;
-  color:#777;
-  padding: 5px;
-}
-.backstage-search-icon i:hover{
-  color:#fff;
+  margin-right: 20px;
 }
 .backstage-header-menu:hover{
   background-color: #080808;

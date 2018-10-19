@@ -5,8 +5,8 @@ import VueAxios from 'vue-axios'
 
 Vue.use(VueAxios, axios)
 
+// 处理get方法的参数转换成url (待优化)
 const stringify = function (url, params) {
-  url += '?'
   for (var i in params) {
     url += `${i}=${params[i]}&`
   }
@@ -15,13 +15,10 @@ const stringify = function (url, params) {
 
 Vue.prototype.$axios = axios
 
-const get = (url, params) => {
-  url = params ? stringify(url, params) : url
-  return axios.get(url)
-}
+const get = (url, params = []) => axios.get(stringify(url, params))
 
-const post = (url, params) => {
-  return axios.post(url, params)
-}
+const post = (url, params) => axios.post(url, params)
 
-export { get, post }
+const patch = (url, params) => axios.patch(url, params)
+
+export { get, post, patch }

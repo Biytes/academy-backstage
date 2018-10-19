@@ -1,93 +1,61 @@
 <template lang="html">
-  <div >
-    <showImg></showImg>
-    <backstageHeader></backstageHeader>
-    <div id="content-layout">
-      <!-- <uEditor :defaultMsg=defaultMsg :config=config ref="ue"></uEditor> -->
-      <backstageMenuNav></backstageMenuNav>
-      <section id="content">
+  <div class="wrapper">
+    <show-img></show-img>
+    <el-row>
+      <backstage-header></backstage-header>
+    </el-row>
+    <el-row class="wrapper-inner">
+      <el-col class="wrapper-inner__menu"
+              :span="isLogin ? 3 : 0">
+        <backstage-menu></backstage-menu>
+      </el-col>
+      <el-col class="wrapper-inner__content"
+              :span="isLogin ? 19 : 24"
+              :push="isLogin ? 1 : 0">
         <router-view></router-view>
-      </section>
-    </div>
+      </el-col>
+    </el-row>
   </div>
 </template>
 <script>
 import backstageHeader from '@views/layout/backstageHeader'
-import backstageMenuNav from '@views/layout/backstageMenu'
+import backstageMenu from '@views/layout/backstageMenu'
 import showImg from '@views/layout/showImg'
 import '@css/topBar.css'
 import '@css/customInput.css'
 import '@css/global.css'
+
 export default {
-  created () {
+  computed: {
+    isLogin () {
+      return this.$store.state.isLogin
+    }
   },
   mounted () {
     this.resetStatus()
   },
   data () {
     return {
-      defaultMsg: '这里是UE测试',
-      config: {
-        initialFrameWidth: 500,
-        initialFrameHeight: 350
-      }
     }
   },
   components: {
     backstageHeader,
-    backstageMenuNav,
+    backstageMenu,
     showImg
     // uEditor
   },
   methods: {
     resetStatus () {
-    },
-    getUEContent () {
-      let content = this.$refs.ue.getUEContent()
-      this.$notify({
-        title: '获取成功，可在控制台查看！',
-        message: content,
-        type: 'success'
-      })
-      console.log(content)
     }
   }
 }
 </script>
 
-<style lang="css">
-.left{
-  float:left;
+<style lang="scss">
+.el-row {
+  margin-bottom: 0;
 }
-.right{
-  float:right;
-}
-#content-layout{
-  width:100%;
-  height:auto;
+.wrapper-inner {
   position: relative;
-}
-#content{
-  width:-moz-calc(100% - (305px));
-  width:-webkit-calc(100% - (305px));
-  width: calc(100% - (305px));
-  min-width: 1000px;
-  height: auto;
-  min-height:900px;
-  position: absolute;
-  text-align: center;
-  right:0;
-}
-#content{
-  background-color: rgb(190, 190, 172);
-    /*background: url("../assets/img/background/background.png");*/
-    background: #fff;
-    z-index: 1;
-    height: 100%;
-}
-@media (min-width: 1200px) and (max-width: 1366px) {
-  #content{
-    width: calc(100% - 195.555px);
-  }
 }
 </style>

@@ -1,9 +1,9 @@
 export default {
-  client: '1', // 1为老师 0为学生
-  menu: false, // 菜单的出现
-  status: false, // 控制登陆是否成功
+  client: '0', // 0为管理员 1为老师 2为学生
+  isLogin: false, // 是否登录成功
   ueContent: 'abc',
   ueText: 'ueText',
+  token: '',
   testData: {
     currentImg: '',
     imgPage: false,

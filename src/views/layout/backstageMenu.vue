@@ -1,43 +1,40 @@
 <template lang="html">
-  <div id="backstage-menu">
-    <el-col :span="12" v-show="menu">
-        <el-menu
-          default-active="2"
-          class="el-menu-vertical-demo"
-          @open="handleOpen"
-          @close="handleClose"
-          background-color="#404040"
-          text-color="#fff"
-          active-text-color="#FFB266">
-          <section v-show="clientType">
-            <el-submenu v-for="elMenuItem in elParentMenuItems" :key="`${elMenuItem.index}`" :index="elMenuItem.index">
-              <template slot="title">
-                <i class="el-icon-location"></i>
-                <span>{{elMenuItem.linkTitle}}</span>
-              </template>
-              <el-menu-item-group>
-                <el-menu-item v-for="subMenuItem in elMenuItem.subMenuItems" :index="subMenuItem.index" :key="`${subMenuItem.index}`" >
-                  <router-link :to="subMenuItem.router">{{subMenuItem.linkTitle}}</router-link>
-                </el-menu-item>
-              </el-menu-item-group>
-            </el-submenu>
-            <el-menu-item v-for="elMenuItem in elSingleMenuItems" :key="`${elMenuItem.index}`" :index="elMenuItem.index">
-              <router-link :to="elMenuItem.router">
-                <i class="el-icon-menu"></i>
-                <span>{{elMenuItem.linkTitle}}</span>
-              </router-link>
-            </el-menu-item>
-          </section>
-          <section class="student-menu" v-show="!clientType">
-            <el-menu-item style="border-radius:8px" :index="'shelf'">
-              <router-link to="/shelf">
-                <i class="el-icon-menu"></i>
-                <span>学院证书</span>
-              </router-link>
-            </el-menu-item>
-          </section>
-        </el-menu>
-      </el-col>
+  <div id="backstage-menu" v-show="isLogin">
+    <el-col>
+      <el-menu
+        default-active="2"
+        class="el-menu-vertical-demo"
+        @open="handleOpen"
+        @close="handleClose"
+        background-color="#404040"
+        text-color="#fff"
+        active-text-color="#409EFF"
+        :default-active="$route.path"
+        router>
+        <section v-show="clientType">
+          <el-submenu v-for="elMenuItem in elParentMenuItems" :key="`${elMenuItem.index}`" :index="elMenuItem.index">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>{{elMenuItem.linkTitle}}</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item v-for="subMenuItem in elMenuItem.subMenuItems" :index="subMenuItem.router" :key="`${subMenuItem.index}`" >
+                {{subMenuItem.linkTitle}}
+              </el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+          <el-menu-item v-for="elMenuItem in elSingleMenuItems" :key="`${elMenuItem.index}`" :index="elMenuItem.router">
+            <span>{{elMenuItem.linkTitle}}</span>
+          </el-menu-item>
+        </section>
+        <section class="student-menu" v-show="!clientType">
+          <el-menu-item style="border-radius:8px" index="/shelf">
+            <i class="el-icon-menu"></i>
+            <span>学院证书</span>
+          </el-menu-item>
+        </section>
+      </el-menu>
+    </el-col>
   </div>
 </template>
 
@@ -237,8 +234,8 @@ export default {
     clientType () {
       return this.$store.state.client
     },
-    menu () {
-      return this.$store.state.menu
+    isLogin () {
+      return this.$store.state.isLogin
     }
   },
   methods: {
@@ -250,49 +247,58 @@ export default {
 }
 </script>
 
-<style lang="css">
-.el-menu-vertical-demo:not(.el-menu--collapse){
-    min-height: 800px;
-    width: 275px;
-  }
-#backstage-menu{
-  background-color: #404040;
-  max-width: 24em;
-  position: absolute;
-  left:0;
-  z-index: 2;
-  margin-left: 20px;
-  margin-top: 15px;
-}
-.el-menu{
-  text-align: left;
-  font-weight: bold;
-}
-#backstage-menu,.el-submenu,.el-submenu__title,.el-menu-vertical-demo:not(.el-menu--collapse){
-  border-radius: 8px;
-}
-.student-menu .el-submenu__title{
-  border-radius: 8px;
-}
-.is-open .el-submenu__title{
-  color: #FFB266;
-}
-li[role="menuitem"]{
-  border-bottom:1px solid #4b4a5e;
-}
-li[role="menuitem"]:hover .el-submenu__title{
-  color:#FFB266;
-  background-color: #CD7373;
-}
-.el-submenu__icon-arrow{
-  font-size: 16px;
-  font-weight: 800;
-}
-.el-menu-item a{
-  text-decoration: none;
-  color:#fff;
+<style lang="scss">
+$height: 810px;
+// 响应式 更改height就行了
+
+// scroll bar
+#backstage-menu::-webkit-scrollbar {
+    width: 5px;
+    height: 8px;
+    background-color: #655d5d;
 }
 
+#backstage-menu::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    background-color: #f4f4f4;
+}
+
+#backstage-menu::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #655d5d;
+}
+
+#backstage-menu{
+  max-width: 28em;
+  left:0;
+  margin: 10px 0 0 10px;
+  height: $height;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  border-radius: 8px;
+
+  & > .el-col{
+    height: 100%;
+  }
+  .el-menu{
+    text-align: left;
+    font-weight: bold;
+    height: 100%;
+  }
+
+  .el-submenu__icon-arrow{
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .el-menu-item a{
+    text-decoration: none;
+    color:#fff;
+  }
+
+}
 @media (min-width: 1200px) and (max-width: 1366px) {
   .el-submenu .el-menu-item{
     width: 195.555px;

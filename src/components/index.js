@@ -9,12 +9,11 @@
 
 import Vue from 'vue'
 // import CbIconfont from './iconfont'
+import customInput from './input'
 
 const components = [
-  // CbIconfont,
+  customInput
 ]
 
 // 注册组件
-components.forEach(item => {
-  Vue.component(item.name, item)
-})
+components.forEach(item => Vue.component(item.name, item))

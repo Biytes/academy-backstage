@@ -8,8 +8,6 @@ import App from '@/App'
 
 require('@api/axios')
 
-require('@mock')
-
 require('@components')
 
 Vue.config.productionTip = false
