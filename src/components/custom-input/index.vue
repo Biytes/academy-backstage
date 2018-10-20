@@ -42,7 +42,7 @@ $input-color: #377D6A;
 $input-background-color: #efefef;
 $label-color: #fff;
 $label-background-color: #7AB893;
-$input-width: 300px;
+$input-width: 310px;
 $text-indent: 100px;
 
 .customInput{

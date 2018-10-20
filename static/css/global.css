@@ -1,14 +1,33 @@
+* {
+  box-sizing: border-box;
+}
+
 .container{
   width: 100%;
-  margin: auto;
-  padding: 0 10px;
-  margin-top: 30px;
 }
-.w-e-toolbar{
-  display: block;
+
+.page-container {
+  overflow: auto;
+  height: 740px;
+  padding: 10px;
 }
-.w-e-toolbar .w-e-menu{
-  display: inline-block;
+
+.page-container::-webkit-scrollbar {
+  width: 5px;
+  height: 8px;
+  background-color: #655d5d;
+}
+
+.page-container::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #f4f4f4;
+}
+
+.page-container::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+  background-color: #655d5d;
 }
 
 .left{
@@ -17,4 +36,8 @@
 
 .right {
   float: right;
+}
+
+.pointer {
+  cursor: pointer;
 }

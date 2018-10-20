@@ -1,8 +1,8 @@
 export default {
   client: '0', // 0为管理员 1为老师 2为学生
   isLogin: false, // 是否登录成功
-  ueContent: 'abc',
-  ueText: 'ueText',
+  loading: false,
+  isShowHeaderSubMenu: false,
   token: '',
   testData: {
     currentImg: '',
@@ -68,6 +68,21 @@ export default {
         date: '2016-05-03',
         title: '王小虎',
         briefContent: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, dolorem consequatur a repudiandae voluptate dolores. am ad, dolorum, voluptates dolore hic fuga atque vel inventore sed perferendis.',
+        content: '普陀区'
+      }, {
+        date: '2016-05-03',
+        title: '王小虎',
+        briefContent: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, dolorem consequatur a repudiandae voluptateue ocere quas vel inventore sed perferendis.',
+        content: '普陀区'
+      }, {
+        date: '2016-05-03',
+        title: '王小虎',
+        briefContent: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, dolorem consequatur a repudiandae voluptateue ocere quas vel inventore sed perferendis.',
+        content: '普陀区'
+      }, {
+        date: '2016-05-03',
+        title: '王小虎',
+        briefContent: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, dolorem consequatur a repudiandae voluptateue ocere quas vel inventore sed perferendis.',
         content: '普陀区'
       }, {
         date: '2016-05-03',

@@ -1,128 +1,121 @@
 <template lang="html">
-  <div class="whole-wrapper">
+  <div class="page">
+
     <div class="top-bar">
-      <el-button @click="addItem" type="text" size="small"  style="float:right;cursor:pointer;margin-right:10px;"><i class="iconfont icon-plus" style="font-size:24px"></i></el-button>
-      <el-button @click="back" type="text" size="small" style="float:left;cursor:pointer;margin-left:10px;color:#333;"><i class="iconfont icon-arrowsleftline" style="font-size:24px"></i></el-button>
+      <el-button @click="addItem"
+                 type="text"
+                 size="small"
+                 class="top-bar-button-right right pointer"><i class="iconfont icon-plus"></i></el-button>
+      <el-button @click="back"
+                 type="text"
+                 size="small"
+                 class="top-bar-button-left left pointer"><i class="iconfont icon-arrowsleftline"></i></el-button>
     </div>
-    <div class="container">
+
+    <el-card class="page-container">
+
       <div class="tablePage" v-show="!isEdit && !isAdd">
         <el-table
-      :data="tableData"
-      border
-      style="width: 100%;color:#333;">
-      <el-table-column
-        fixed
-        prop="date"
-        label="日期"
-        sortable>
-      </el-table-column>
-      <el-table-column
-        prop="title"
-        label="标题">
-      </el-table-column>
-      <el-table-column
-        prop="briefContent"
-        label="内容简介"
-        min-width="350">
-      </el-table-column>
-      <el-table-column
-        fixed="right"
-        label="操作">
-        <template slot-scope="scope">
-          <el-button @click.native.prevent="deleteRow(scope.$index, tableData)" type="text" size="small"><i class="iconfont icon-delete" style="color:red;font-size:30px;"></i></el-button>
-          <el-button @click="editRow(scope.row, scope.$index)" type="text" size="small"><i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i></el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <!-- @size-change="handleSizeChange"
-    @current-change="handleCurrentChange" -->
-    <el-pagination
-    background
-    :current-page="pagination.currentPage"
-    :page-sizes="[5,6,8,10]"
-    :page-size="pagination.pageSize"
-    layout="total, sizes, prev, pager, next, jumper"
-    :total="totalDataNumber">
-    </el-pagination>
+          :data="tableData"
+          border
+          style="width: 100%;color:#333;">
+          <el-table-column
+            fixed
+            prop="date"
+            label="日期"
+            align="center"
+            sortable>
+          </el-table-column>
+          <el-table-column
+            prop="title"
+            label="标题"
+            align="center">
+          </el-table-column>
+          <el-table-column
+            prop="briefContent"
+            label="内容简介"
+            min-width="350"
+            align="left">
+          </el-table-column>
+          <el-table-column
+            fixed="right"
+            label="操作"
+            width="150"
+            align="center">
+            <template slot-scope="scope">
+              <el-button
+                @click.native.prevent="deleteRow(scope.$index, tableData)"
+                type="text"
+                size="small">
+                <i class="iconfont icon-delete table-button-delete"></i>
+              </el-button>
+              <el-button
+                @click="editRow(scope.row, scope.$index)"
+                type="text"
+                size="small">
+                <i class="iconfont icon-edit06 table-button-edit"></i>
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!-- @size-change="handleSizeChange"
+        @current-change="handleCurrentChange" -->
+        <el-pagination
+        background
+        :current-page="pagination.currentPage"
+        :page-sizes="[5,6,8,10]"
+        :page-size="pagination.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="totalDataNumber">
+        </el-pagination>
       </div>
+
       <div class="editPage" v-show="isAdd^isEdit">
         <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-          <el-form-item label="日期" prop="date" style="text-align: left;">
+          <el-form-item label="日期" prop="date" align="left">
             <el-date-picker
-            v-model="ruleForm.date"
-            align="right"
-            type="date"
-            placeholder="选择日期"
-            format="yyyy 年 MM 月 dd 日"
-            @change = "changeTimeFormat()"
-            :picker-options="datePicker">
+              v-model="ruleForm.date"
+              align="right"
+              type="date"
+              placeholder="选择日期"
+              format="yyyy 年 MM 月 dd 日"
+              @change = "changeTimeFormat()"
+              :picker-options="datePicker">
             </el-date-picker>
           </el-form-item>
-    <el-form-item label="标题" prop="title">
-      <el-input v-model="ruleForm.title" required></el-input>
-    </el-form-item>
-    <el-form-item label="内容简介" prop="briefContent">
-      <el-input
-  type="textarea"
-  :autosize="{ minRows: 6, maxRows: 6}"
-  placeholder="请输入内容"
-  v-model="ruleForm.briefContent">
-</el-input>
-    </el-form-item>
-    <el-form-item label="简介" prop="content">
-      <el-input v-model="ruleForm.content"></el-input>
-    </el-form-item>
-    <el-form-item>
-      <div id="editor" style="text-align:left"></div>
-    </el-form-item>
-    <el-form-item>
-      <el-button v-show="!isAdd" type="success" @click="editSubmitForm('ruleForm')">完成</el-button>
-      <el-button v-show="isAdd" type="success" @click="addItemSubmit('ruleForm')">添加</el-button>
-      <el-button type="danger" @click="resetForm('ruleForm')">重置</el-button>
-    </el-form-item>
-  </el-form>
+          <el-form-item label="标题" prop="title">
+            <el-input v-model="ruleForm.title"></el-input>
+          </el-form-item>
+          <el-form-item label="内容简介" prop="briefContent">
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 6, maxRows: 6}"
+              placeholder="请输入内容"
+              v-model="ruleForm.briefContent">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="简介" prop="content">
+            <el-input v-model="ruleForm.content"></el-input>
+          </el-form-item>
+          <el-form-item class="wang-editor">
+            <wang-editor></wang-editor>
+          </el-form-item>
+          <el-form-item>
+            <el-button v-show="!isAdd" type="success" @click="editSubmitForm('ruleForm')">完成</el-button>
+            <el-button v-show="isAdd" type="success" @click="addItemSubmit('ruleForm')">添加</el-button>
+            <el-button type="danger" @click="resetForm('ruleForm')">重置</el-button>
+          </el-form-item>
+        </el-form>
       </div>
-    </div>
-    </div>
+
+    </el-card>
+  </div>
 </template>
 
 <script>
-import E from 'wangeditor'
 export default {
   mounted () {
-    var editor = new E('#editor')
-    editor.customConfig.showLinkImg = false
-    editor.customConfig.onchange = (html) => {
-      this.editorContent = html
-    }
-    editor.customConfig.zIndex = 100
-    editor.customConfig.uploadFileName = 'pic'
-    editor.customConfig.uploadImgServer = '/src/assets/img/upload-img'
-    editor.customConfig.uploadImgHooks = {
-      before: function (xhr, editor, files) {
-      },
-      success: function (xhr, editor, result) {
-        // 图片上传并返回结果，图片插入成功之后触发
-        // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，result 是服务器端返回的结果
-      },
-      fail: function (xhr, editor, result) {
-        alert('fail')
-      },
-      error: function (xhr, editor) {
-        alert('error')
-        alert(xhr)
-      },
-      timeout: function (xhr, editor) {
-        alert('time out')
-      },
-      // 如果服务器端返回的不是 {errno:0, data: [...]} 这种格式，可使用该配置
-      // （但是，服务器端返回的必须是一个 JSON 格式字符串！！！否则会报错）
-      customInsert: function (insertImg, result, editor) {
-        var url = result.url
-        insertImg(url)
-      }
-    }
-    editor.create()
+
   },
   created () {
   },
@@ -277,26 +270,10 @@ export default {
 }
 </script>
 
-<style lang="css">
-.w-e-toolbar{
-  display: block;
-}
-.w-e-toolbar .w-e-menu{
-  display: inline-block;
-}
-.whole-wrapper{
-  width:100%;
-}
-.el-table th{
-  text-align: center;
-}
+<style lang="scss" scoped>
 .el-pagination{
   margin-top: 20px;
   margin-bottom: 10px;
-}
-.el-table--border{
-  box-shadow: 0px 0px 8px rgba(66, 61, 61, 0.76);
-  border-radius: 8px;
 }
 .el-table__header-wrapper{
   border-bottom: 1px solid grey;
@@ -321,4 +298,13 @@ div[tabindex="0"].el-upload--picture-card{
   }
 }
 
+.table-button-delete{
+  color:red;
+  font-size:25px;
+}
+
+.table-button-edit{
+  color:rgb(84, 80, 218);
+  font-size:25px;
+}
 </style>

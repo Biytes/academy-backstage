@@ -10,8 +10,8 @@
         <backstage-menu></backstage-menu>
       </el-col>
       <el-col class="wrapper-inner__content"
-              :span="isLogin ? 19 : 24"
-              :push="isLogin ? 1 : 0">
+              :span="isLogin ? 20 : 24"
+              v-loading="loading">
         <router-view></router-view>
       </el-col>
     </el-row>
@@ -25,14 +25,14 @@ import '@css/topBar.css'
 import '@css/customInput.css'
 import '@css/global.css'
 
+import { mapState } from 'vuex'
+
 export default {
   computed: {
-    isLogin () {
-      return this.$store.state.isLogin
-    }
-  },
-  mounted () {
-    this.resetStatus()
+    ...mapState([
+      'isLogin',
+      'loading'
+    ])
   },
   data () {
     return {
@@ -42,20 +42,23 @@ export default {
     backstageHeader,
     backstageMenu,
     showImg
-    // uEditor
   },
   methods: {
-    resetStatus () {
-    }
   }
 }
 </script>
 
 <style lang="scss">
+
 .el-row {
   margin-bottom: 0;
 }
+
 .wrapper-inner {
   position: relative;
+
+  &__content {
+    margin-left: 2.4%;
+  }
 }
 </style>

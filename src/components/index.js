@@ -9,10 +9,12 @@
 
 import Vue from 'vue'
 // import CbIconfont from './iconfont'
-import customInput from './input'
+import customInput from './custom-input'
+import wangEditor from './wang-editor'
 
 const components = [
-  customInput
+  customInput,
+  wangEditor
 ]
 
 // 注册组件

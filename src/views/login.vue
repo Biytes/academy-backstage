@@ -22,6 +22,8 @@
 
 <script>
 import { checkAuth } from '@api/index'
+import { mapState, mapMutations } from 'vuex'
+
 export default {
   data () {
     return {
@@ -34,6 +36,10 @@ export default {
 
   },
   computed: {
+    ...mapState([
+      'isLogin',
+      'client'
+    ])
   },
   methods: {
     async loginSubmit () {
@@ -46,23 +52,28 @@ export default {
       checkAuth(params)
         .then(res => {
           res = res.data // 把数据取出来
-          this.$store.state.clientType = res.type
+
+          // 存储信息
+          this.saveUserType(res.type)
+          this.saveToken(res.token)
+          this.loginControl()
 
           let path = res.type === '2' ? '/certificate' : '/schoolInfo/about'
-          // 保存token
-          this.$store.state.token = res.token
-          this.$router.push({ path: path })
 
-          this.$store.state.isLogin = true
-          console.log(res)
+          this.$router.push({ path: path })
         })
-        .catch(error => {
+        .catch(_ => {
           this.$message({
             type: 'error',
-            message: error
+            message: '用户信息不正确'
           })
         })
-    }
+    },
+    ...mapMutations([
+      'loginControl',
+      'saveUserType',
+      'saveToken'
+    ])
   }
 }
 

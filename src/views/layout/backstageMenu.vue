@@ -1,8 +1,8 @@
 <template lang="html">
   <div id="backstage-menu" v-show="isLogin">
+
     <el-col>
       <el-menu
-        default-active="2"
         class="el-menu-vertical-demo"
         @open="handleOpen"
         @close="handleClose"
@@ -11,7 +11,8 @@
         active-text-color="#409EFF"
         :default-active="$route.path"
         router>
-        <section v-show="clientType">
+
+        <section v-show="client !== '2'">
           <el-submenu v-for="elMenuItem in elParentMenuItems" :key="`${elMenuItem.index}`" :index="elMenuItem.index">
             <template slot="title">
               <i class="el-icon-location"></i>
@@ -24,21 +25,28 @@
             </el-menu-item-group>
           </el-submenu>
           <el-menu-item v-for="elMenuItem in elSingleMenuItems" :key="`${elMenuItem.index}`" :index="elMenuItem.router">
+            <i class="el-icon-menu"></i>
             <span>{{elMenuItem.linkTitle}}</span>
           </el-menu-item>
         </section>
-        <section class="student-menu" v-show="!clientType">
-          <el-menu-item style="border-radius:8px" index="/shelf">
+
+        <section class="student-menu">
+          <el-menu-item index="/shelf">
             <i class="el-icon-menu"></i>
             <span>学院证书</span>
           </el-menu-item>
         </section>
+
       </el-menu>
     </el-col>
+
   </div>
 </template>
 
 <script>
+
+import { mapState } from 'vuex'
+
 export default {
   data () {
     return {
@@ -231,12 +239,10 @@ export default {
     }
   },
   computed: {
-    clientType () {
-      return this.$store.state.client
-    },
-    isLogin () {
-      return this.$store.state.isLogin
-    }
+    ...mapState([
+      'isLogin',
+      'client'
+    ])
   },
   methods: {
     handleOpen (key, keyPath) {
