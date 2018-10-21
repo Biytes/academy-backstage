@@ -1,8 +1,10 @@
 import {
   LOADING_CONTROL,
-  LOGIN_CONTROL,
-  SAVE_TOKEN,
-  SAVE_USER_TYPE
+  LOGIN,
+  SAVE_USER_INFO,
+  LOGOUT,
+  SHOW_IMAGE_PAGE,
+  HIDE_IMAGE_PAGE
 } from './mutations-type'
 
 export default {
@@ -13,17 +15,31 @@ export default {
   },
 
   // 控制登陆状态
-  [LOGIN_CONTROL] (state) {
+  [LOGIN] (state) {
     state.isLogin = !state.isLogin
   },
 
-  // 保存Token
-  [SAVE_TOKEN] (state, token) {
-    state.token = token
+  // 保存用户信息Token
+  [SAVE_USER_INFO] (state, userInfo) {
+    state.userInfo = userInfo
   },
 
-  // 保存账户类型
-  [SAVE_USER_TYPE] (state, type) {
-    state.type = type
+  // 登出 logout 清除状态
+  [LOGOUT] (state) {
+    state.userInfo = {
+      token: '',
+      type: '0'
+    }
+  },
+
+  // 切换图片
+  [SHOW_IMAGE_PAGE] (state, image) {
+    state.showImage.currentImg = image
+    state.showImage.imagePage = true
+  },
+
+  // 关闭显示图片页面
+  [HIDE_IMAGE_PAGE] (state) {
+    state.showImage.imagePage = false
   }
 }

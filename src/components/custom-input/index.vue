@@ -49,6 +49,7 @@ $text-indent: 100px;
   position: relative;
   display: inline-block;
   margin: 30px 10px;
+
   .basic {
     @extend %basic-slide;
   }

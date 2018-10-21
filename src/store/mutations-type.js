@@ -1,9 +1,13 @@
 // export const
 
-export const LOADING_CONTROL = 'loadingControl'
+export const LOADING_CONTROL = 'loading'
 
-export const LOGIN_CONTROL = 'loginControl'
+export const LOGIN = 'login'
 
-export const SAVE_TOKEN = 'saveToken'
+export const SAVE_USER_INFO = 'saveUserInfo'
 
-export const SAVE_USER_TYPE = 'saveUserType'
+export const LOGOUT = 'logout'
+
+export const SHOW_IMAGE_PAGE = 'showImagePage'
+
+export const HIDE_IMAGE_PAGE = 'hideImagePage'

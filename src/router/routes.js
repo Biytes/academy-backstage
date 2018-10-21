@@ -36,7 +36,7 @@ export default [{
       component: _import('friendlyLink')
     }, {
       path: '/news',
-      component: _import('news')
+      component: _import('newsInfo')
     }, {
       path: '/reportBlog',
       component: _import('reportBlog')

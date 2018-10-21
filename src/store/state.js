@@ -1,12 +1,15 @@
 export default {
-  client: '0', // 0为管理员 1为老师 2为学生
+  userInfo: {
+    type: '0', // 0为管理员 1为老师 2为学生
+    token: ''
+  },
   isLogin: false, // 是否登录成功
   loading: false,
-  isShowHeaderSubMenu: false,
-  token: '',
-  testData: {
+  showImage: {
     currentImg: '',
-    imgPage: false,
+    imagePage: false
+  },
+  testData: {
     Users: [
       {
         createDate: '',

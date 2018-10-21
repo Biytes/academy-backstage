@@ -33,12 +33,12 @@ export default {
     }
   },
   mounted () {
-
+    // TODO: 解决back到login页面清除状态
+    // this.logout() 
   },
   computed: {
     ...mapState([
-      'isLogin',
-      'client'
+      'isLogin'
     ])
   },
   methods: {
@@ -53,10 +53,14 @@ export default {
         .then(res => {
           res = res.data // 把数据取出来
 
+          let userInfo = {
+            token: res.token,
+            type: res.type
+          }
           // 存储信息
-          this.saveUserType(res.type)
-          this.saveToken(res.token)
-          this.loginControl()
+          this.saveUserInfo(userInfo)
+
+          this.login()
 
           let path = res.type === '2' ? '/certificate' : '/schoolInfo/about'
 
@@ -70,9 +74,9 @@ export default {
         })
     },
     ...mapMutations([
-      'loginControl',
-      'saveUserType',
-      'saveToken'
+      'login',
+      'saveUserInfo',
+      'logout'
     ])
   }
 }

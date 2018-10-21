@@ -21,4 +21,6 @@ const post = (url, params) => axios.post(url, params)
 
 const patch = (url, params) => axios.patch(url, params)
 
-export { get, post, patch }
+const remove = url => axios.delete(url)
+
+export { get, post, patch, remove }

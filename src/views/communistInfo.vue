@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="page">
+  <div class="page communist-info" v-if="isLogin">
 
     <div class="top-bar">
       <el-button @click="addItem"
@@ -113,6 +113,9 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
+import { getCommunistInfo, addCommunistInfo, updateCommunistInfo, deleteCommunistInfo } from '@api/index'
+
 export default {
   mounted () {
 
@@ -131,10 +134,10 @@ export default {
         currentPage: 1,
         pageSize: 6
       },
+      pageTableData: [],
       editingRow: '',
       isEdit: false,
       isAdd: false,
-      imgCount: 0,
       datePicker: {
         disabledDate (time) {
           return time.getTime() > Date.now()
@@ -168,6 +171,9 @@ export default {
     },
     totalDataNumber () {
       return this.$store.state.testData.tableData.length
+    },
+    isLogin () {
+      return this.$store.state.isLogin
     }
   },
   methods: {
@@ -183,21 +189,25 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.tableData.push({
-          title: this.ruleForm.title,
-          date: this.ruleForm.date,
-          briefContent: this.ruleForm.briefContent,
-          content: this.ruleForm.content
-        })
-        // uploadData
-        this.resetRuleForm()
-        this.$message({
-          type: 'success',
-          message: '添加成功'
-        })
-      }).catch(() => {
       })
+        .then(() => {
+          // TODO 添加一条信息
+          // this.addCommunistInfo()
+          this.tableData.push({
+            title: this.ruleForm.title,
+            date: this.ruleForm.date,
+            briefContent: this.ruleForm.briefContent,
+            content: this.ruleForm.content
+          })
+          // uploadData
+          this.resetRuleForm()
+          this.$message({
+            type: 'success',
+            message: '添加成功'
+          })
+        })
+        .catch(() => {
+        })
     },
     editRow (row, index) { // 打开编辑页面
       this.isEdit = true
@@ -212,6 +222,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        // TODO deleteCommunistInfo() 传id
         rows.splice(index, 1) // 从rows数据里删除一个
         // uploadData
       }).catch(() => {
@@ -223,6 +234,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        // TODO updateCommunistInfo(params) 传id 和各个数据
         for (let key in this.ruleForm) {
           this.tableData[this.editingRow][key] = this.ruleForm[key]
         }
@@ -263,41 +275,21 @@ export default {
       s = s < 10 ? '0' + s : s // 判断秒数是否大10
       this.ruleForm.date = y + '-' + m + '-' + d + ' ' + h + ':' + mm + ':' + s // 返回时间格式
     },
-    uploadData () {
-      // 完成更新数据
-    }
+    ...mapMutations([
+      'loading'
+    ])
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.el-pagination{
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-.el-table__header-wrapper{
-  border-bottom: 1px solid grey;
-}
-.el-table thead{
-  color: #333;
-}
-ul.el-upload-list > li.el-upload-list__item
-{
-  width: 155px;
-  height:155px;
-  float: left;
-}
-div[tabindex="0"].el-upload--picture-card{
-  width: 155px;
-  height:155px;
-  float: left;
-}
-@media (min-width: 1200px) and (max-width: 1366px) {
-  .container{
-    width: calc(100% - 165px)
+
+.page.communist-info {
+  .el-pagination{
+    margin-top: 20px;
+    margin-bottom: 10px;
   }
 }
-
 .table-button-delete{
   color:red;
   font-size:25px;

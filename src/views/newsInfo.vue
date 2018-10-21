@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="page education-info" v-if="isLogin">
+  <div class="page news-info" v-if="isLogin">
 
     <div class="top-bar">
       <el-button @click="addItem"
@@ -114,7 +114,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
-import { getEducationInfo, addEducationInfo, updateEducationInfo, deleteEducationInfo } from '@api/index'
+import { getNewsInfo, addNewsInfo, updateNewsInfo, deleteNewsInfo } from '@api/index'
 
 export default {
   mounted () {
@@ -192,7 +192,7 @@ export default {
       })
         .then(() => {
           // TODO 添加一条信息
-          // this.addEducationInfo()
+          // this.addNewsInfo()
           this.tableData.push({
             title: this.ruleForm.title,
             date: this.ruleForm.date,
@@ -222,7 +222,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // TODO deleteEducationInfo() 传id
+        // TODO deleteNewsInfo() 传id
         rows.splice(index, 1) // 从rows数据里删除一个
         // uploadData
       }).catch(() => {
@@ -234,7 +234,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // TODO updateEducationInfo(params) 传id 和各个数据
+        // TODO updateNewsInfo(params) 传id 和各个数据
         for (let key in this.ruleForm) {
           this.tableData[this.editingRow][key] = this.ruleForm[key]
         }
@@ -284,7 +284,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.page.education-info {
+.page.news-info {
   .el-pagination{
     margin-top: 20px;
     margin-bottom: 10px;

@@ -1,5 +1,5 @@
 <template lang="html">
-  <div id="backstage-menu" v-show="isLogin">
+  <div id="backstage-menu" v-if="isLogin">
 
     <el-col>
       <el-menu
@@ -12,7 +12,7 @@
         :default-active="$route.path"
         router>
 
-        <section v-show="client !== '2'">
+        <section v-if="userInfo.type !== '2'">
           <el-submenu v-for="elMenuItem in elParentMenuItems" :key="`${elMenuItem.index}`" :index="elMenuItem.index">
             <template slot="title">
               <i class="el-icon-location"></i>
@@ -30,7 +30,7 @@
           </el-menu-item>
         </section>
 
-        <section class="student-menu">
+        <section class="student-menu" v-if="userInfo.type === '2'">
           <el-menu-item index="/shelf">
             <i class="el-icon-menu"></i>
             <span>学院证书</span>
@@ -45,7 +45,7 @@
 
 <script>
 
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 
 export default {
   data () {
@@ -241,14 +241,17 @@ export default {
   computed: {
     ...mapState([
       'isLogin',
-      'client'
+      'userInfo'
     ])
   },
   methods: {
     handleOpen (key, keyPath) {
     },
     handleClose (key, keyPath) {
-    }
+    },
+    ...mapMutations([
+
+    ])
   }
 }
 </script>

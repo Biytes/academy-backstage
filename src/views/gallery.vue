@@ -1,29 +1,38 @@
 <template lang="html">
-  <div class="">
-    <div id="shelves">
-      <div class="top-bar">
-        <span class="select-name">专业:</span>
-        <el-select v-model="majorType.value" placeholder="请选择" size="mini">
-          <el-option
-            v-for="item in majorType.options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-        <span class="select-name">比赛类型:</span>
-        <el-select v-model="awardType.value" placeholder="请选择" size="mini">
-          <el-option
-            v-for="item in awardType.options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </div>
+  <div class="page gallery" v-if="isLogin">
+    <div class="top-bar">
+      <span class="select-name">年级:</span>
+      <el-select v-model="gradeType.value" placeholder="请选择" size="mini" @change="selectChange()">
+        <el-option
+          v-for="item in gradeType.options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+      <span class="select-name">专业:</span>
+      <el-select v-model="majorType.value" placeholder="请选择" size="mini" @change="selectChange()">
+        <el-option
+          v-for="item in majorType.options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+      <span class="select-name">比赛类型:</span>
+      <el-select v-model="awardType.value" placeholder="请选择" size="mini" @change="selectChange()">
+        <el-option
+          v-for="item in awardType.options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+    </div>
+    <el-card class="page-container">
       <div v-for="(shelf, shelfIndex) in shelves" :key="shelfIndex" class="shelf" v-show="!addPage && !editPage">
         <h3 class="shelf-name clearfloat">{{shelf.shelfName}}
-          <div class="shelf-mode-change">
+          <div class="shelf-mode-control">
             <span :class="{'shelf-mode-active': !shelf.editShelfMode}" @click="readMode(shelf)">Read</span>/
             <span :class="{'shelf-mode-active': shelf.editShelfMode}" @click="editMode(shelf)">Edit</span>
           </div>
@@ -31,16 +40,16 @@
         <ul class="shelf-inner">
           <li v-for="(item, itemIndex) in shelf.Items" :key="itemIndex"  class="shelf-item">
             <div class="shelf-item-info">
-              <img @click="showPic(item.imgUrl)" class="item-img" :src="item.imgUrl" alt="">
+              <img @click="showImagePage(item.imgUrl)" class="item-img" :src="item.imgUrl" alt="">
               <p class="item-name">
                 {{item.name}}
               </p>
               <p class="item-owner clearfloat">
                 {{item.owner}}
-                <i class="item-detail-icon iconfont icon-detail" title="详情" @click="showDescription(item)" v-show="!shelf.editShelfMode"></i>
-                <a :href="item.imgUrl" download><i class="item-download-icon iconfont icon-download" title="下载" v-show="!shelf.editShelfMode"></i></a>
-                <i class="item-edit-icon iconfont icon-edit" title="编辑" @click="editItem(shelf, itemIndex)" v-show="shelf.editShelfMode"></i>
-                <i class="item-delete-icon iconfont icon-delete" title="删除" @click="deleteItem(shelf, itemIndex)" v-show="shelf.editShelfMode"></i>
+                <i class="item-icon-detail iconfont icon-detail" title="详情" @click="showDescription(item)" v-show="!shelf.editShelfMode"></i>
+                <a :href="item.imgUrl" download><i class="item-icon-download iconfont icon-download" title="下载" v-show="!shelf.editShelfMode"></i></a>
+                <i class="item-icon-edit iconfont icon-edit" title="编辑" @click="editItem(shelf, itemIndex)" v-show="shelf.editShelfMode"></i>
+                <i class="item-icon-delete iconfont icon-delete" title="删除" @click="deleteItem(shelf, itemIndex)" v-show="shelf.editShelfMode"></i>
               </p>
               <p class="item-time clearfloat">获奖时间:<span>{{item.awardTime}}</span></p>
               <div class="item-tags">                             <!--明天改-->
@@ -48,77 +57,105 @@
               </div>
             </div>
           </li>
-          <li id="shelf-add-item" @click="showShelfAddItemPage(shelf)" v-show="shelf.editShelfMode">+</li>
+          <li class="shelf-add-item" @click="showShelfAddItemPage(shelf)" v-show="shelf.editShelfMode">+</li>
         </ul>
       </div>
       <div v-show="addPage || editPage">
-        <form id="add-page" action="index.html" method="post">
-          <div><label>证书名称:</label><input type="text" v-model="addForm.name" class="custom__input"/></div>
-          <div><label>获奖得主:</label><input type="text" v-model="addForm.owner" class="custom__input"/></div>
-          <div><label>得奖时间:</label>
+
+        <el-form :model="addForm" ref="ruleForm" label-width="100px" class="demo-ruleForm add-page">
+          <el-form-item label="证书名称:" prop="name">
+            <el-input v-model="addForm.name"></el-input>
+          </el-form-item>
+          <el-form-item label="获奖得主:" prop="owner">
+            <el-input v-model="addForm.owner"></el-input>
+          </el-form-item>
+          <el-form-item label="得奖时间:" prop="awardTime" align="left">
             <el-date-picker
-        v-model="addForm.awardTime"
-        align="right"
-        type="date"
-        placeholder="选择日期"
-        format="yyyy 年 MM 月 dd 日"
-        value-format="yyyy-MM-dd"
-        :picker-options="datePicker">
-      </el-date-picker></div>
-          <div>
-            <label class="image-upload-text">上传图片:</label><label for="imgUrl" class="image-upload"><img id="showImg" :src="addForm.imgUrl" alt=""></label>
+              v-model="addForm.awardTime"
+              align="right"
+              type="date"
+              placeholder="选择日期:"
+              format="yyyy 年 MM 月 dd 日"
+              value-format="yyyy-MM-dd"
+              :picker-options="datePicker">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="上传图片:" prop="imgUrl">
+            <label for="imgUrl" class="image-upload"><img id="showImg" :src="addForm.imgUrl" alt=""></label>
             <input id="imgUrl" @change="changepic" type="file" ref="certicification_pic" />
-          </div>
-          <div style="margin-top: 20px">
-            <label>证书类型:</label>
+          </el-form-item>
+          <el-form-item label="证书类型:" prop="tags">
             <el-checkbox-group v-model="addForm.tags" size="medium" style="display: inline-block;">
               <el-checkbox-button v-for="tag in tags" :label="tag" :key="tag">{{tag}}</el-checkbox-button>
             </el-checkbox-group>
             <i class="iconfont icon-plus" id="addTags" @click="addTags()"></i>
-          </div>
-          <div>
-            <label class="item-description-text">证书描述:</label>
-            <textarea type="text" class="custom__input" v-model="addForm.description"/>
-          </div>
-          <el-row>
+          </el-form-item>
+          <el-form-item label="证书描述:" prop="description">
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 6, maxRows: 6}"
+              placeholder="请输入内容"
+              v-model="addForm.description">
+            </el-input>
+          </el-form-item>
+          <el-form-item>
             <el-button type="success" style="width:45%;" @click="shelfAddItem()" v-show="addPage">添加</el-button>
             <el-button type="success" style="width:45%;" @click="shelfEditItem()" v-show="editPage">完成</el-button>
             <el-button type="warning" style="width:45%;" @click="backToRead()">返回</el-button>
-          </el-row>
-        </form>
+          </el-form-item>
+        </el-form>
       </div>
-    </div>
+    </el-card>
   </div>
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
-  mounted () {
-  },
   data () {
     return {
+      gradeType: {
+        options: [{
+          value: '2014',
+          label: '2014'
+        }, {
+          value: '2015',
+          label: '2015'
+        }, {
+          value: '2016',
+          label: '2016'
+        }, {
+          value: '2017',
+          label: '2017'
+        }, {
+          value: '2018',
+          label: '2018'
+        }],
+        value: ''
+      },
       majorType: {
         options: [{
-          value: '选项1',
+          value: '计算机科学与技术',
           label: '计算机科学与技术'
         }, {
-          value: '选项2',
+          value: '软件工程',
           label: '软件工程'
         }, {
-          value: '选项3',
+          value: '网络工程',
           label: '网络工程'
         }],
         value: ''
       },
       awardType: {
         options: [{
-          value: '选项1',
+          value: 'ACM',
           label: 'ACM'
         }, {
-          value: '选项2',
+          value: '蓝桥杯',
           label: '蓝桥杯'
         }, {
-          value: '选项3',
+          value: '省赛',
           label: '省赛'
         }],
         value: ''
@@ -189,28 +226,19 @@ export default {
       console.log(this.$route.params.id) // 利用id获取需要的数据
       return this.$store.state.testData.shelves
     },
-    currentImg () {
-      return this.$store.state.testData.currentImg
-    },
-    imgPage () {
-      return this.$store.state.testData.imgPage
+    isLogin () {
+      return this.$store.state.isLogin
     }
   },
   methods: {
-    selectChange (val) {
+    selectChange () {
       // 通过这个val 来判断
-    },
-    showPic (url) {
-      this.$store.state.testData.imgPage = true
-      this.$store.state.testData.currentImg = url
     },
     readMode (shelf) {
       shelf.editShelfMode = false
-      console.log(shelf.editShelfMode)
     },
     editMode (shelf) {
       shelf.editShelfMode = true
-      console.log(shelf.editShelfMode)
     },
     showShelfAddItemPage (shelf) {
       this.$confirm('添加新证书', {
@@ -338,13 +366,7 @@ export default {
       this.editingShelfId = ''
     },
     contains (arr, obj) {
-      var i = arr.length
-      while (i--) {
-        if (arr[i] === obj) {
-          return true
-        }
-      }
-      return false
+      return arr.some(item => item === obj)
     },
     changepic (e) {
       console.log(e)
@@ -410,231 +432,239 @@ export default {
       var g = this.random(256) | 0
       var b = this.random(256) | 0
       return 'rgb(' + r + ',' + g + ',' + b + ')'
-    }
+    },
+    ...mapMutations([
+      'loading',
+      'showImagePage'
+    ])
   }
 }
 </script>
 
-<style lang="css">
-#shelves{
+<style lang="scss">
+.page.gallery {
   text-align: left;
-}
-.shelf{
-  font-family: "Microsoft Yahei";
-  font-size: 16px;
-  padding: 10px;
-  width:90%;
-  margin: 0 auto;
-}
-.shelf ul{
-  list-style:none;
-  margin: 0;
-  padding:0;
-  text-align: left;
-}
-.shelf a{
-  text-decoration: none;
-}
-.shelf-name{
-  font-size: 24px;
-  padding:5px;
-  border-bottom: 3px solid rgb(230, 121, 52);
-}
-.shelf-mode-change{
-  float: right;
-}
-.shelf-mode-change span{
-  display: inline-block;
-  margin: 0 3px;
-  padding: 2px;
-  cursor: pointer;
-}
-.shelf-mode-change span:hover{
-  background: rgb(230, 121, 52);
-  color:#fff;
-}
-.shelf-mode-active{
-  background: rgb(230, 121, 52);
-  color:#fff;
-}
-.shelf-inner{
 
-}
-.shelf-item{
-  display: inline-block;
-  vertical-align: top;
-}
-.shelf-item:hover .shelf-item-info{
-  box-shadow: 0 2px 50px rgba(0, 0, 0, 0.25);
-}
-.shelf-item-info{
-  height:auto;
-  padding: 15px 17px 5px;
-}
-.shelf-item-info .item-img{
-  height:200px;
-  width:auto;
-}
-.shelf-item-info p{
-  margin:0;
-}
-.shelf-item-info .item-owner{
-    font-size: 15px;
-}
-.shelf-item-info .item-name{
-  text-align: left;
-  margin: 5px 0;
-  font-weight: bold;
-}
-.item-detail-icon{
-  display: inline-block;
-  font-size: 20px;
-  vertical-align: bottom;
-  cursor: pointer;
-  float: right;
-  color:rgb(81, 119, 235);
-}
-.item-download-icon{
-  display: inline-block;
-  font-size: 20px;
-  vertical-align: bottom;
-  cursor: pointer;
-  float: right;
-  color:rgb(212, 95, 46);
-}
-.item-edit-icon{
-  display: inline-block;
-  font-size: 20px;
-  vertical-align: bottom;
-  cursor: pointer;
-  float: right;
-  color:rgb(18, 111, 235);
-}
-.item-delete-icon{
-  display: inline-block;
-  font-size: 20px;
-  vertical-align: bottom;
-  cursor: pointer;
-  float: right;
-  color:rgb(252, 11, 11);
-}
-.item-time{
-  width: 100%;
-  font-size: 14px;
-  color:rgb(159, 159, 158)
-}
-.item-time span{
-  float: right;
-}
-.item-tags{
-  padding: 6px 0;
-  text-align: right;
-}
-.item-tag{
-  font-size: 11px;
-  display: inline-block;
-  padding: 0 6px;
-  border-radius: 8px;
-}
-#shelf-add-item{
-  cursor: pointer;
-  padding: 132px 88px;
-  display: inline-block;
-  font-size: 45px;
-  color: rgb(194, 194, 194);
-  text-align: center;
-  border: 2px dashed rgb(194, 194, 194);
-}
-#shelf-add-item:hover{
-  border: 2px dashed #000;
-  color: #000;
-}
-.clearfloat:after {
-  display: block;
-  clear: both;
-  content: "";
-  visibility: hidden;
-  height: 0
-}
-.clearfloat {
-  zoom: 1
-}
-#add-page {
-  text-align: left;
-  padding-left: 55px;
-}
-#add-page > div{
-  margin: 15px auto;
-  width: 80%;
-}
-#add-page > div > label{
-  margin-right: 15px;
-  letter-spacing: 2px;
-  font-weight: bold;
-  font-size: 18px;
-}
-.img-container{
-  width: calc(80% - 55px);
-  padding-left: 55px;
-  text-align: left;
-}
-.item-description-text + .custom__input{
-  height:150px;
-}
-#add-page .custom__input{
-  width: 80%;
-  box-shadow: 0px 6px 10px 7px rgba(0, 0, 0, 0.1);
-}
-input[type="file"]#imgUrl{
-  width: 0.1px;
-  height: 0.1px;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  z-index: -1;
-}
-#showImg{
-  display: inline-block;
-  vertical-align: bottom;
-  width: 300px;
-  height:300px;
-}
-.image-upload-text,.item-description-text{
-  vertical-align: top;
-}
-.image-upload{
-  display: inline-block;
-  border:2px dashed grey;
-  color: grey;
-  vertical-align: bottom;
-  position: relative;
-  cursor: pointer;
-}
-.image-upload:after {
-  content: '+';
-  position: absolute;
-  font-size: 2.5rem;
-  color: grey;
-  top: calc(50% - 1.7rem);
-  left: calc(50% - 1.25rem);
-  z-index: -1;
-}
-.image-upload:hover{
-  border:2px dashed #000;
-  color: #000;
-}
-#addTags{
-  vertical-align: -webkit-baseline-middle;
-  cursor: pointer;
-  color:rgb(121, 124, 123);
-}
-#addTags:hover{
-  color:rgb(37, 36, 36);
-}
-.description-dialog{
+  .top-bar {
 
+    .select-name{
+      font-size: 14px;
+    }
+
+  }
+
+  .shelf {
+    font-family: "Microsoft Yahei";
+    font-size: 16px;
+    margin: 0 auto;
+
+    &-name {
+      margin: 10px 0;
+      font-size: 24px;
+      padding:5px;
+      border-bottom: 3px solid rgb(230, 121, 52);
+    }
+
+    &-mode {
+      &-control {
+        float: right;
+
+        span {
+          display: inline-block;
+          margin: 0 3px;
+          padding: 2px;
+          cursor: pointer;
+
+          &:hover {
+            background: rgb(230, 121, 52);
+            color:#fff;
+          }
+        }
+      }
+
+      &-active {
+        background: rgb(230, 121, 52);
+        color:#fff;
+      }
+    }
+
+    &-item {
+      display: inline-block;
+      vertical-align: top;
+
+      &:hover {
+        .shelf-item-info {
+          box-shadow: 0 2px 50px rgba(0, 0, 0, 0.25);
+        }
+      }
+
+      &-info {
+        height:auto;
+        padding: 15px 17px 5px;
+
+        .item-img {
+          height:200px;
+          width:auto;
+        }
+
+        p {
+          margin:0;
+        }
+
+        .item-owner {
+          font-size: 15px;
+        }
+
+        .item-name {
+          text-align: left;
+          margin: 5px 0;
+          font-weight: bold;
+        }
+
+        .item-icon {
+          &-detail {
+            display: inline-block;
+            font-size: 20px;
+            vertical-align: bottom;
+            cursor: pointer;
+            float: right;
+            color:rgb(81, 119, 235);
+          }
+
+          &-download {
+            display: inline-block;
+            font-size: 20px;
+            vertical-align: bottom;
+            cursor: pointer;
+            float: right;
+            color:rgb(212, 95, 46);
+          }
+
+          &-edit {
+            display: inline-block;
+            font-size: 20px;
+            vertical-align: bottom;
+            cursor: pointer;
+            float: right;
+            color:rgb(18, 111, 235);
+          }
+
+          &-delete {
+            display: inline-block;
+            font-size: 20px;
+            vertical-align: bottom;
+            cursor: pointer;
+            float: right;
+            color:rgb(252, 11, 11);
+          }
+        }
+
+        .item-time {
+          width: 100%;
+          font-size: 14px;
+          color:rgb(159, 159, 158)
+
+          span {
+            float: right;
+          }
+        }
+
+        .item-tags{
+          padding: 6px 0;
+          text-align: right;
+          .item-tag{
+            font-size: 11px;
+            display: inline-block;
+            padding: 0 6px;
+            border-radius: 8px;
+          }
+        }
+      }
+    }
+
+    &-add-item{
+      cursor: pointer;
+      padding: 132px 88px;
+      display: inline-block;
+      font-size: 45px;
+      color: rgb(194, 194, 194);
+      text-align: center;
+      border: 2px dashed rgb(194, 194, 194);
+
+      &:hover{
+        border: 2px dashed #000;
+        color: #000;
+      }
+    }
+  }
+
+  .add-page {
+    text-align: left;
+    padding-left: 55px;
+
+    .item-description-text + .custom__input {
+      height:150px;
+    }
+
+    input[type="file"]#imgUrl {
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      z-index: -1;
+    }
+    #showImg {
+      display: inline-block;
+      vertical-align: bottom;
+      width: 300px;
+      height:300px;
+    }
+
+    .image-upload {
+      display: inline-block;
+      border:2px dashed grey;
+      color: grey;
+      vertical-align: bottom;
+      position: relative;
+      cursor: pointer;
+
+      &:after {
+        content: '+';
+        position: absolute;
+        font-size: 2.5rem;
+        color: grey;
+        top: calc(50% - 1.7rem);
+        left: calc(50% - 1.25rem);
+        z-index: 1;
+      }
+
+      &:hover {
+        border:2px dashed #000;
+        color: #000;
+      }
+
+      &-text,
+      .item-description-text {
+        vertical-align: top;
+      }
+    }
+
+    .img-container {
+      width: calc(80% - 55px);
+      padding-left: 55px;
+      text-align: left;
+    }
+
+    #addTags {
+      vertical-align: -webkit-baseline-middle;
+      cursor: pointer;
+      color:rgb(121, 124, 123);
+      &:hover {
+        color:rgb(37, 36, 36);
+      }
+    }
+  }
 }
-.select-name{
-  font-size: 14px;
-}
+
 </style>

@@ -24,7 +24,7 @@
         <li class="dropdown-menu-item"><a href="#"><i class="iconfont icon-person"></i>My Profile</a></li>
         <li class="dropdown-menu-item"><a href="#"><i class="iconfont icon-setting"></i>Setting</a></li>
         <li class="dropdown-menu-item--divider"></li>
-        <li class="dropdown-menu-item" @click="logOut()"><a><i class="iconfont icon-poweroff"></i>Logout</a></li>
+        <li class="dropdown-menu-item" @click="logOutConfirm"><a><i class="iconfont icon-poweroff"></i>Logout</a></li>
       </div>
       <div v-else>
         <li class="dropdown-menu-item"><router-link to='/' tag="a">Login</router-link></li>
@@ -57,13 +57,13 @@ export default {
     hideSubMenu () {
       this.isShowHeaderSubMenu = false
     },
-    logOut () {
+    logOutConfirm () {
       this.$confirm('是否要退出当前账户', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.loginControl()
+        this.logout()
 
         this.$router.push({ path: '/' })
         this.$message({
@@ -73,7 +73,7 @@ export default {
       })
     },
     ...mapMutations([
-      'loginControl'
+      'logout'
     ])
   }
 }
@@ -171,6 +171,9 @@ export default {
     &-search {
       height:100px;
       margin-right: 20px;
+      .customInput {
+        margin: 30px 10px;
+      }
     }
   }
 
