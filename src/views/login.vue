@@ -5,6 +5,7 @@
                   pattern="gate"
                   placeholder="Input your Username"
                   v-model="username"
+                  @keyup.enter.native="loginSubmit"
                   focus="true"></customInput>
     <customInput type="password"
                   label="password"

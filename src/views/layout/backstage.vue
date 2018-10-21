@@ -21,9 +21,6 @@
 import backstageHeader from '@views/layout/backstageHeader'
 import backstageMenu from '@views/layout/backstageMenu'
 import showImg from '@views/layout/showImg'
-import '@css/topBar.css'
-import '@css/customInput.css'
-import '@css/global.css'
 
 import { mapState } from 'vuex'
 
@@ -49,6 +46,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import '@css/topBar.scss';
+@import '@css/global.scss';
 
 .el-row {
   margin-bottom: 0;
