@@ -1,5 +1,5 @@
 <template lang="html">
-  <div id="backstage-menu" v-if="isLogin">
+  <div id="backstage-menu">
 
     <el-col>
       <el-menu
@@ -59,22 +59,22 @@ export default {
             {
               index: '1-1',
               linkTitle: '学院简介',
-              router: '/schoolInfo/about'
+              router: '/collegeIntro/about'
             },
             {
               index: '1-2',
               linkTitle: '机构建设',
-              router: '/schoolInfo/facility'
+              router: '/collegeIntro/facility'
             },
             {
               index: '1-3',
               linkTitle: '师资建设',
-              router: '/schoolInfo/teacher'
+              router: '/collegeIntro/teacher'
             },
             {
               index: '1-4',
               linkTitle: '专业设置',
-              router: '/schoolInfo/major'
+              router: '/collegeIntro/major'
             }
           ]
         },
@@ -85,22 +85,22 @@ export default {
             {
               index: '2-1',
               linkTitle: '教学文件',
-              router: '/educationInfo/file'
+              router: '/educationNews/file'
             },
             {
               index: '2-2',
               linkTitle: '资源下载',
-              router: '/educationInfo/download'
+              router: '/educationNews/download'
             },
             {
               index: '2-3',
               linkTitle: '实验中心规章',
-              router: '/educationInfo/protocol'
+              router: '/educationNews/protocol'
             },
             {
               index: '2-4',
               linkTitle: '教学管理',
-              router: '/educationInfo/management'
+              router: '/educationNews/management'
             }
           ]
         },
@@ -111,32 +111,32 @@ export default {
             {
               index: '3-1',
               linkTitle: '工作动态',
-              router: '/studentInfo/condition'
+              router: '/studentNews/condition'
             },
             {
               index: '3-2',
               linkTitle: '班团风采',
-              router: '/studentInfo/moment'
+              router: '/studentNews/moment'
             },
             {
               index: '3-3',
               linkTitle: '新生军训',
-              router: '/studentInfo/militaryTraining'
+              router: '/studentNews/militaryTraining'
             },
             {
               index: '3-4',
               linkTitle: '实践创新',
-              router: '/studentInfo/practice'
+              router: '/studentNews/practice'
             },
             {
               index: '3-5',
               linkTitle: '学风建设',
-              router: '/studentInfo/motto'
+              router: '/studentNews/motto'
             },
             {
               index: '3-6',
               linkTitle: '学生荣誉',
-              router: '/studentInfo/glory'
+              router: '/studentNews/glory'
             }
           ]
         },
@@ -147,22 +147,22 @@ export default {
             {
               index: '4-1',
               linkTitle: '党建工作',
-              router: '/communistInfo/work'
+              router: '/partyNews/work'
             },
             {
               index: '4-2',
               linkTitle: '机构设置',
-              router: '/communistInfo/facility'
+              router: '/partyNews/facility'
             },
             {
               index: '4-3',
               linkTitle: '组织生活',
-              router: '/communistInfo/organization'
+              router: '/partyNews/organization'
             },
             {
               index: '4-4',
               linkTitle: '入党指引',
-              router: '/communistInfo/instruction'
+              router: '/partyNews/instruction'
             }
           ]
         },
@@ -203,12 +203,12 @@ export default {
         {
           index: '7',
           linkTitle: '教师队伍',
-          router: '/teacher'
+          router: '/teacherInfo'
         },
         {
           index: '8',
           linkTitle: '新闻中心',
-          router: '/news'
+          router: '/collegeNews'
         },
         {
           index: '9',
@@ -228,19 +228,23 @@ export default {
         {
           index: '12',
           linkTitle: '活动发布',
-          router: '/event'
+          router: '/activity'
         },
         {
           index: '13',
           linkTitle: '学院证书',
           router: '/certificate'
+        },
+        {
+          index: '14',
+          linkTitle: 'Banners',
+          router: '/banners'
         }
       ]
     }
   },
   computed: {
     ...mapState([
-      'isLogin',
       'userInfo'
     ])
   },
@@ -280,22 +284,11 @@ $height: 810px;
 }
 
 #backstage-menu{
-  max-width: 28em;
-  left:0;
   margin: 10px 0 0 10px;
   height: $height;
   overflow-x: hidden;
   overflow-y: scroll;
   border-radius: 8px;
-
-  & > .el-col{
-    height: 100%;
-  }
-  .el-menu{
-    text-align: left;
-    font-weight: bold;
-    height: 100%;
-  }
 
   .el-submenu__icon-arrow{
     font-size: 16px;
@@ -308,13 +301,10 @@ $height: 810px;
   }
 
 }
-@media (min-width: 1200px) and (max-width: 1366px) {
-  .el-submenu .el-menu-item{
-    width: 195.555px;
-    min-width: 195.55px;
-  }
-  .el-menu-vertical-demo:not(.el-menu--collapse){
-    width:195.555px;
+@media screen and (max-width: 1366px) {
+  $height: 480px;
+  #backstage-menu {
+    height: $height;
   }
 }
 

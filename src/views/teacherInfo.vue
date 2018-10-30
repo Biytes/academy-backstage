@@ -1,117 +1,126 @@
 <template lang="html">
-  <div class="whole-wrapper">
+  <div class="page teacher-info" v-if="isLogin">
+
     <div class="top-bar">
-      <el-button @click="addItem" type="text" size="small"  style="float:right;cursor:pointer;margin-right:10px;"><i class="iconfont icon-plus" style="font-size:24px;"></i></el-button>
-      <el-button @click="back" type="text" size="small" style="float:left;cursor:pointer;margin-left:10px;color:#333;"><i class="iconfont icon-arrowsleftline" style="font-size:24px;"></i></el-button>
+      <el-button @click="addItem"
+                 type="text"
+                 size="small"
+                 class="top-bar-button-right right pointer"><i class="iconfont icon-plus"></i></el-button>
+      <el-button @click="back"
+                 type="text"
+                 size="small"
+                 class="top-bar-button-left left pointer"><i class="iconfont icon-arrowsleftline"></i></el-button>
     </div>
-    <div class="container">
+
+    <el-card class="page-container">
+
       <div class="tablePage" v-show="!isEdit && !isAdd">
         <el-table
-      :data="teachers"
-      border
-      style="width: 100%;color:#333;">
-      <el-table-column
-        fixed
-        prop="name"
-        label="名字"
-        width="150">
-      </el-table-column>
-      <el-table-column
-        prop="position"
-        label="职位"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="studyDirection"
-        label="研究方向">
-      </el-table-column>
-      <el-table-column
-        prop="educationBackground"
-        label="教育背景"
-        >
-      </el-table-column>
-      <el-table-column
-        prop="brief"
-        label="个人简介"
-        min-width="300">
-      </el-table-column>
-      <el-table-column
-        fixed="right"
-        label="操作"
-        width="120">
-        <template slot-scope="scope">
-          <el-button @click.native.prevent="deleteRow(scope.$index, teachers)" type="text" size="small"><i class="iconfont icon-delete" style="color:red;font-size:30px;"></i></el-button>
-          <el-button @click="handleClick(scope.row)" type="text" size="small"><i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i></el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <!-- @size-change="handleSizeChange" -->
-    <!-- @current-change="handleCurrentChange" -->
-    <el-pagination
-    background
-    :current-page="pagination.currentPage"
-    :page-sizes="[5,6,8,10]"
-    :page-size="pagination.pageSize"
-    layout="total, sizes, prev, pager, next, jumper"
-    :total="totalDataNumber">
-    </el-pagination>
+          :data="teachers"
+          border
+          style="width: 100%;color:#333;">
+          <el-table-column
+            fixed
+            prop="name"
+            label="名字"
+            width="150">
+          </el-table-column>
+          <el-table-column
+            prop="position"
+            label="职位"
+            width="180">
+          </el-table-column>
+          <el-table-column
+            prop="studyDirection"
+            label="研究方向">
+          </el-table-column>
+          <el-table-column
+            prop="educationBackground"
+            label="教育背景">
+          </el-table-column>
+          <el-table-column
+            prop="brief"
+            label="个人简介"
+            min-width="300"
+            align="left">
+          </el-table-column>
+          <el-table-column
+            fixed="right"
+            label="操作"
+            width="120">
+            <template slot-scope="scope">
+              <el-button @click.native.prevent="deleteRow(scope.$index, teachers)" type="text" size="small"><i class="iconfont icon-delete" style="color:red;font-size:30px;"></i></el-button>
+              <el-button @click="handleClick(scope.row)" type="text" size="small"><i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i></el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination  
+          background
+          :current-page="pagination.currentPage"
+          :page-sizes="[5,6,8,10]"
+          :page-size="pagination.pageSize"
+          layout="total, prev, pager, next, jumper"
+          :total="totalDataNumber">
+        </el-pagination>
       </div>
       <div class="editPage" v-show="isAdd^isEdit">
         <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-    <el-form-item label="姓名" prop="name">
-      <el-input v-model="ruleForm.name" required></el-input>
-    </el-form-item>
-    <el-form-item label="职位" prop="position">
-      <el-input v-model="ruleForm.position" required></el-input>
-    </el-form-item>
-    <el-form-item label="简洁简介" prop="brief">
-      <el-input type="textarea" v-model="ruleForm.brief"></el-input>
-    </el-form-item>
-    <el-form-item label="电话" prop="tel">
-      <el-input v-model="ruleForm.tel"></el-input>
-    </el-form-item>
-    <el-form-item label="邮箱" prop="email">
-      <el-input v-model="ruleForm.email"></el-input>
-    </el-form-item>
-    <el-form-item label="社会任职" prop="socialPosition" v-show="ruleForm.socialPosition">
-      <el-input v-for="(socialItem, index) in ruleForm.socialPosition" v-model="socialItem.position" :key="index"></el-input> <!--改成arrary-->
-    </el-form-item>
-    <el-form-item label="教育背景" prop="educationBackground">
-      <el-input
-  type="textarea"
-  :autosize="{ minRows: 6, maxRows: 6}"
-  placeholder="请输入内容"
-  v-model="ruleForm.educationBackground"></el-input>
-    </el-form-item>
-    <el-form-item label="个人简介" prop="workingExperience" size="large">
-      <el-input
-  type="textarea"
-  :autosize="{ minRows: 6, maxRows: 6}"
-  placeholder="请输入内容"
-  v-model="ruleForm.briefContent"></el-input>
-    </el-form-item>
-    <el-form-item label="研究方向" prop="studyDirection">
-      <el-input v-model="ruleForm.workingExperience"></el-input>
-    </el-form-item>
-    <el-form-item label="学术成果" prop="achievement" v-show="ruleForm.achievement">
-      <el-input
-  type="textarea"
-  :autosize="{ minRows: 6, maxRows: 6}"
-  placeholder="请输入内容"
-  v-model="ruleForm.achievement"></el-input>
-    </el-form-item>
-    <el-form-item>
-      <el-button v-show="!isAdd" type="success" @click="editSubmitForm('ruleForm')">完成</el-button>
-      <el-button v-show="isAdd" type="success" @click="addItemSubmit('ruleForm')">添加</el-button>
-      <el-button type="danger" @click="resetForm('ruleForm')">重置</el-button>
-    </el-form-item>
-  </el-form>
+          <el-form-item label="姓名" prop="name">
+            <el-input v-model="ruleForm.name" required></el-input>
+          </el-form-item>
+          <el-form-item label="职位" prop="position">
+            <el-input v-model="ruleForm.position" required></el-input>
+          </el-form-item>
+          <el-form-item label="简洁简介" prop="brief">
+            <el-input type="textarea" v-model="ruleForm.brief"></el-input>
+          </el-form-item>
+          <el-form-item label="电话" prop="tel">
+            <el-input v-model="ruleForm.tel"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="ruleForm.email"></el-input>
+          </el-form-item>
+          <el-form-item label="社会任职" prop="socialPosition" v-show="ruleForm.socialPosition">
+            <el-input v-for="(socialItem, index) in ruleForm.socialPosition" v-model="socialItem.position" :key="index"></el-input> <!--改成arrary-->
+          </el-form-item>
+          <el-form-item label="教育背景" prop="educationBackground">
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 6, maxRows: 6}"
+              placeholder="请输入内容"
+              v-model="ruleForm.educationBackground"></el-input>
+                </el-form-item>
+                <el-form-item label="个人简介" prop="workingExperience" size="large">
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 6, maxRows: 6}"
+              placeholder="请输入内容"
+              v-model="ruleForm.briefContent"></el-input>
+          </el-form-item>
+          <el-form-item label="研究方向" prop="studyDirection">
+            <el-input v-model="ruleForm.workingExperience"></el-input>
+          </el-form-item>
+          <el-form-item label="学术成果" prop="achievement" v-show="ruleForm.achievement">
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 6, maxRows: 6}"
+              placeholder="请输入内容"
+              v-model="ruleForm.achievement"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button v-show="!isAdd" type="success" @click="editSubmitForm('ruleForm')">完成</el-button>
+            <el-button v-show="isAdd" type="success" @click="addItemSubmit('ruleForm')">添加</el-button>
+            <el-button type="danger" @click="resetForm('ruleForm')">重置</el-button>
+          </el-form-item>
+        </el-form>
       </div>
-    </div>
-    </div>
+    </el-card>
+  </div>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
+
 export default {
   created () {
   },
@@ -170,7 +179,7 @@ export default {
         this.rowNow[key] = row[key]
       }
       this.isEdit = true
-      console.log(this.rowNow)
+
       this.ruleForm = row // 使当前要编辑的数据绑定在表中
     },
     deleteRow (index, rows) {
@@ -619,50 +628,29 @@ export default {
   computed: {
     totalDataNumber () {
       return this.teachers.length
+    },
+    isLogin () {
+      return this.$store.state.isLogin
     }
   }
 }
 </script>
 
-<style lang="css">
-.whole-wrapper{
-  width:100%;
-}
-.top-bar{
-  height:40px;
-  background: #ddd;
-}
-.el-table th{
-  text-align: center;
-}
-.el-pagination{
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-.el-table--border{
-  box-shadow: 0px 0px 8px rgba(66, 61, 61, 0.76);
-  border-radius: 8px;
-}
-.el-table__header-wrapper{
-  border-bottom: 1px solid grey;
-}
-.el-table thead{
-  color: #333;
-}
-ul.el-upload-list > li.el-upload-list__item
-{
-  width: 155px;
-  height:155px;
-  float: left;
-}
-div[tabindex="0"].el-upload--picture-card{
-  width: 155px;
-  height:155px;
-  float: left;
-}
-@media (min-width: 1200px) and (max-width: 1366px) {
-  .container{
-    width: calc(100% - 200px)
+<style lang="scss" scoped>
+
+.page.teacher-info {
+  .el-pagination{
+    margin-top: 20px;
+    margin-bottom: 10px;
   }
+}
+.table-button-delete{
+  color:red;
+  font-size:25px;
+}
+
+.table-button-edit{
+  color:rgb(84, 80, 218);
+  font-size:25px;
 }
 </style>

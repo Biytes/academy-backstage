@@ -1,17 +1,16 @@
 <template lang="html">
   <div class="wrapper">
     <show-img></show-img>
-    <el-row>
+    <el-row class="wrapper-header">
       <backstage-header></backstage-header>
     </el-row>
-    <el-row class="wrapper-inner">
-      <el-col class="wrapper-inner__menu"
-              :span="isLogin ? 3 : 0">
+    <el-row class="wrapper-inner" v-if="isLogin">
+      <el-col class="wrapper-inner__menu" :span="3">
         <backstage-menu></backstage-menu>
       </el-col>
       <el-col class="wrapper-inner__content"
-              :span="isLogin ? 20 : 24"
-              v-loading="loading">
+              v-loading="loading"
+              :span="20">
         <router-view></router-view>
       </el-col>
     </el-row>
@@ -46,8 +45,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@css/topBar.scss';
-@import '@css/global.scss';
 
 .el-row {
   margin-bottom: 0;
@@ -58,6 +55,11 @@ export default {
 
   &__content {
     margin-left: 2.4%;
+  }
+}
+@media (min-width: 1200px) and (max-width: 1366px) {
+  .wrapper-inner {
+    width: 100%
   }
 }
 </style>

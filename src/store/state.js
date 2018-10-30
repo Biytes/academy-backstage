@@ -36,6 +36,33 @@ export default {
         banJi: '',
         clientType: 0
       }],
+    banners: [
+      {
+        date: '2016-05-02',
+        title: '王小虎1',
+        imageUrl: require('@img/assc/1.jpg'),
+        briefContent: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, dolorem consequatur a repudiandae voluptate dolores. Ex voluptatum doloremque cumque aperiam ad, dolorum, voluptates dolore hic fuga atque cere quas vel inventore sed perferendis.',
+        content: '普陀区1'
+      }, {
+        date: '2016-05-03 12:24:30',
+        title: '王小虎',
+        imageUrl: require('@img/assc/3.jpg'),
+        briefContent: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, dolorem consequatur a repudiandae voluptate dolores. Ex voluptatum doloremque cumque aperiam ad, dolorum, voluptates dolore hic fuga atque officia. Pcere quas vel inventore sed perferendis.',
+        content: '普陀区'
+      }, {
+        date: '2016-05-03',
+        title: '王小虎',
+        imageUrl: require('@img/assc/4.jpg'),
+        briefContent: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, dolorem consequatur a repudiandae voluptate dolores. e cumque aperiam ad, dolorum, voluptates dolore hic fuga atque o Facere quas vel inventore sed perferendis.',
+        content: '普陀区'
+      }, {
+        date: '2016-05-03',
+        title: '王小虎',
+        imageUrl: require('@img/assc/5.jpg'),
+        briefContent: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, dolorem consequatur a repudiandae voluptate dolorperiam ad, dolorum, voluptates dolore hic fuga atque ectus. Facere quas vel inventore sed perferendis.',
+        content: '普陀区'
+      }
+    ],
     tableData: [
       {
         date: '2016-05-02',

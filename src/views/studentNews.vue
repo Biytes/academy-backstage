@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="page communist-info" v-if="isLogin">
+  <div class="page student-news" v-if="isLogin">
 
     <div class="top-bar">
       <el-button @click="addItem"
@@ -65,7 +65,7 @@
         :current-page="pagination.currentPage"
         :page-sizes="[5,6,8,10]"
         :page-size="pagination.pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
+        layout="total, prev, pager, next, jumper"
         :total="totalDataNumber">
         </el-pagination>
       </div>
@@ -114,7 +114,6 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
-import { getCommunistInfo, addCommunistInfo, updateCommunistInfo, deleteCommunistInfo } from '@api/index'
 
 export default {
   mounted () {
@@ -192,7 +191,7 @@ export default {
       })
         .then(() => {
           // TODO 添加一条信息
-          // this.addCommunistInfo()
+          // this.addStudentInfo()
           this.tableData.push({
             title: this.ruleForm.title,
             date: this.ruleForm.date,
@@ -222,7 +221,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // TODO deleteCommunistInfo() 传id
+        // TODO deleteStudentInfo() 传id
         rows.splice(index, 1) // 从rows数据里删除一个
         // uploadData
       }).catch(() => {
@@ -234,7 +233,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // TODO updateCommunistInfo(params) 传id 和各个数据
+        // TODO updateStudentInfo(params) 传id 和各个数据
         for (let key in this.ruleForm) {
           this.tableData[this.editingRow][key] = this.ruleForm[key]
         }
@@ -284,7 +283,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.page.communist-info {
+.page.student-news {
   .el-pagination{
     margin-top: 20px;
     margin-bottom: 10px;

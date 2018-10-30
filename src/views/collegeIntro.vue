@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="page education-info" v-if="isLogin">
+  <div class="page college-intro" v-if="isLogin">
 
     <div class="top-bar">
       <el-button @click="addItem"
@@ -12,7 +12,7 @@
                  class="top-bar-button-left left pointer"><i class="iconfont icon-arrowsleftline"></i></el-button>
     </div>
 
-    <el-card class="page-container">
+    <el-card class="page-container" v-loading="isLoading">
 
       <div class="tablePage" v-show="!isEdit && !isAdd">
         <el-table
@@ -21,7 +21,7 @@
           style="width: 100%;color:#333;">
           <el-table-column
             fixed
-            prop="date"
+            prop="created_time"
             label="日期"
             align="center"
             sortable>
@@ -32,7 +32,7 @@
             align="center">
           </el-table-column>
           <el-table-column
-            prop="briefContent"
+            prop="preview"
             label="内容简介"
             min-width="350"
             align="left">
@@ -65,36 +65,34 @@
         :current-page="pagination.currentPage"
         :page-sizes="[5,6,8,10]"
         :page-size="pagination.pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="totalDataNumber">
+        layout="total, prev, pager, next, jumper">
         </el-pagination>
       </div>
 
       <div class="editPage" v-show="isAdd^isEdit">
         <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-          <el-form-item label="日期" prop="date" align="left">
+          <el-form-item label="日期" prop="created_time" align="left">
             <el-date-picker
-              v-model="ruleForm.date"
+              v-model="ruleForm.created_time"
               align="right"
               type="date"
               placeholder="选择日期"
-              format="yyyy 年 MM 月 dd 日"
-              @change = "changeTimeFormat()"
-              :picker-options="datePicker">
+              value-format="yyyy 年 MM 月 dd 日"
+              @change = "changeTimeFormat()">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="标题" prop="title">
             <el-input v-model="ruleForm.title"></el-input>
           </el-form-item>
-          <el-form-item label="内容简介" prop="briefContent">
+          <el-form-item label="内容简介" prop="preview">
             <el-input
               type="textarea"
               :autosize="{ minRows: 6, maxRows: 6}"
               placeholder="请输入内容"
-              v-model="ruleForm.briefContent">
+              v-model="ruleForm.preview">
             </el-input>
           </el-form-item>
-          <el-form-item label="简介" prop="content">
+          <el-form-item label="html文本" prop="content">
             <el-input v-model="ruleForm.content"></el-input>
           </el-form-item>
           <el-form-item class="wang-editor">
@@ -114,69 +112,73 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
-import { getEducationInfo, addEducationInfo, updateEducationInfo, deleteEducationInfo } from '@api/index'
+import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
 
 export default {
-  mounted () {
-
-  },
-  created () {
-  },
   data () {
     return {
+      isLoading: false,
+      section: '',
+      category: '',
+      tableData: [],
       ruleForm: {
+        id: '',
         title: '',
-        date: '',
-        briefContent: '',
+        created_time: '',
+        preview: '',
         content: ''
       },
       pagination: {
         currentPage: 1,
         pageSize: 6
       },
-      pageTableData: [],
+      pageTableData: '',
       editingRow: '',
       isEdit: false,
-      isAdd: false,
-      datePicker: {
-        disabledDate (time) {
-          return time.getTime() > Date.now()
-        },
-        shortcuts: [{
-          text: '今天',
-          onClick (picker) {
-            picker.$emit('pick', new Date())
-          }
-        }, {
-          text: '昨天',
-          onClick (picker) {
-            const date = new Date()
-            date.setTime(date.getTime() - 3600 * 1000 * 24)
-            picker.$emit('pick', date)
-          }
-        }, {
-          text: '一周前',
-          onClick (picker) {
-            const date = new Date()
-            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7)
-            picker.$emit('pick', date)
-          }
-        }]
-      }
+      isAdd: false
     }
+  },
+  mounted () {
+    // 当前页面分类
+    this.section = this.$route.name
+    this.category = this.$route.params.category
+
+    this.getPageData()
+      .then(_ => this.checkPermission())
+  },
+  created () {
   },
   computed: {
-    tableData () {
-      return this.$store.state.testData.tableData
-    },
-    totalDataNumber () {
-      return this.$store.state.testData.tableData.length
-    },
-    isLogin () {
-      return this.$store.state.isLogin
-    }
+    ...mapState([
+      'isLogin',
+      'token'
+    ])
   },
   methods: {
+    getPageData() {
+      // 获取页面数据
+      let params = {
+        category: this.category,
+        page: this.pagination.currentPage,
+        token: this.token
+      }
+
+      return new Promise((resolve, reject) => {
+        this.isLoading = true
+        resolve()
+      })
+        .then(_ => getAcademyData(this.section, params))
+        .then(res => {
+          console.log(res)
+          if (res.status === 200) {
+            this.tableData = res.data.results
+          }
+        })
+        .then(_ => this.isLoading = false)
+    },
+    checkPermission() {
+
+    },
     addItem () {
       this.isAdd = true
       this.isEdit = false
@@ -192,37 +194,53 @@ export default {
       })
         .then(() => {
           // TODO 添加一条信息
-          // this.addEducationInfo()
-          this.tableData.push({
+          // this.addSchoolInfo()
+          let params = {
             title: this.ruleForm.title,
-            date: this.ruleForm.date,
-            briefContent: this.ruleForm.briefContent,
+            created_time: this.ruleForm.created_time,
+            preview: this.ruleForm.preview,
             content: this.ruleForm.content
-          })
-          // uploadData
+          }
+
+          return addAcademyData(this.section, params)
+        })
+        .then(res => {
+          res = JSON.stringify(res)
+          if (res.status === 200) {
+            
+            this.tableData = res.data.results
+          }
+        })
+        .then(_ => {
+          // uploadData success
           this.resetRuleForm()
           this.$message({
             type: 'success',
             message: '添加成功'
           })
         })
+        .then(_ => {
+          this.getPageData()
+        })
         .catch(() => {
         })
     },
-    editRow (row, index) { // 打开编辑页面
-      this.isEdit = true
-      this.editingRow = index
-      for (let key in row) {
-        this.ruleForm[key] = row[key]
-      } // 使当前要编辑的数据绑定在表中
-    },
+    // TODO: 编辑页面
     deleteRow (index, rows) { // 删除记录
       this.$confirm('你确定要删除该记录！', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // TODO deleteEducationInfo() 传id
+        // TODO deleteSchoolInfo() 传id
+        addAcademyData(this.section, params)
+          .then(res => {
+            res = JSON.stringify(res)
+            if (res.status === 200) {
+              
+              this.tableData = res.data.results
+            }
+          })
         rows.splice(index, 1) // 从rows数据里删除一个
         // uploadData
       }).catch(() => {
@@ -233,18 +251,26 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        // TODO updateEducationInfo(params) 传id 和各个数据
-        for (let key in this.ruleForm) {
-          this.tableData[this.editingRow][key] = this.ruleForm[key]
-        }
-        // uploadData
+      })
+      .then(() => {
+        // TODO updateSchoolInfo(params) 传id 和各个数据
+        
+        return updateAcademyData(this.section, this.ruleForm.id, this.ruleForm)
+      })
+      .then(_ => {
         this.resetRuleForm()
         this.$message({
           type: 'success',
           message: '修改成功'
         })
-      }).catch(() => {
+      })
+      .then(_ => {
+        this.getPageData()
+      })
+      .catch(res => {
+        console.log(res)
+      })
+      .catch(() => {
         console.log('error submit!!')
         return false
       })
@@ -275,6 +301,22 @@ export default {
       s = s < 10 ? '0' + s : s // 判断秒数是否大10
       this.ruleForm.date = y + '-' + m + '-' + d + ' ' + h + ':' + mm + ':' + s // 返回时间格式
     },
+    editRow (row, index) { // 打开编辑页面
+      this.isEdit = true
+
+      this.isLoading = true
+      editAcademyData(this.section, row.id)
+        .then(res => {
+          if (res.status === 200) {
+            for (let key in this.ruleForm) {
+              this.ruleForm[key] = res.data[key]
+            }
+          }
+        })
+        .then(_ => {
+          this.isLoading = false
+        })
+    },
     ...mapMutations([
       'loading'
     ])
@@ -284,7 +326,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.page.education-info {
+.page.college-intro {
   .el-pagination{
     margin-top: 20px;
     margin-bottom: 10px;

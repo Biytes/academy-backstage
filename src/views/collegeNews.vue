@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="page news-info" v-if="isLogin">
+  <div class="page college-news" v-if="isLogin">
 
     <div class="top-bar">
       <el-button @click="addItem"
@@ -61,12 +61,12 @@
         <!-- @size-change="handleSizeChange"
         @current-change="handleCurrentChange" -->
         <el-pagination
-        background
-        :current-page="pagination.currentPage"
-        :page-sizes="[5,6,8,10]"
-        :page-size="pagination.pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="totalDataNumber">
+          background
+          :current-page="pagination.currentPage"
+          :page-sizes="[5,6,8,10]"
+          :page-size="pagination.pageSize"
+          layout="total, prev, pager, next, jumper"
+          :total="totalDataNumber">
         </el-pagination>
       </div>
 
@@ -114,7 +114,6 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
-import { getNewsInfo, addNewsInfo, updateNewsInfo, deleteNewsInfo } from '@api/index'
 
 export default {
   mounted () {
@@ -284,7 +283,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.page.news-info {
+.page.college-news {
   .el-pagination{
     margin-top: 20px;
     margin-bottom: 10px;

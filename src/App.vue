@@ -14,7 +14,10 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+@import '@css/topBar.scss';
+@import '@css/global.scss';
+
 body{
   padding:0;
   margin:0;

@@ -1,18 +1,20 @@
 import {
-  get, post, patch, remove
+  http
 } from './axios'
 
 // 获取登陆权限和刷新登陆的token
-export const checkAuth = params => post(`api/auth/refresh-token`, params)
+export const checkAuth = params => http('POST', `api/auth/refresh-token`, params)
 
-// 获取老师的信息
-export const getTeacherInfo = params => get(`/api/v1/teacherinfo/`, params)
+// 获取模块的数据
+export const getAcademyData = (section, params) => http('GET', `/api/${section}?`, params)
 
-// 增加老师信息
-export const addTeacherInfo = params => post(`/api/v1/teacherinfo/`, params)
+// 获取单个的数据
+export const editAcademyData = (section, id) => http('GET', `/api/${section}/${id}`)
+// 增加模块的数据
+export const addAcademyData = (section, params) => http('POST', `/api/${section}`, params)
 
-// 更新老师信息
-export const updateTeacherInfo = (id, params) => patch(`/api/v1/teacherinfo/${id}/`, params)
+// 更新模块的数据
+export const updateAcademyData = (section, id, params) => http('PATCH', `/api/${section}/${id}`, params)
 
-// 删除老师信息
-export const deleteTeacherInfo = id => remove(`/api/v1/teacherinfo/${id}/`)
+// 删除模块的数据
+export const deleteAcademyData = (section, id) => http('DELETE', `/api/${section}/${id}`)

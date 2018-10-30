@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="page school-info" v-if="isLogin">
+  <div class="page banners-info" v-if="isLogin">
 
     <div class="top-bar">
       <el-button @click="addItem"
@@ -24,7 +24,16 @@
             prop="date"
             label="日期"
             align="center"
+            width="200"
             sortable>
+          </el-table-column>
+          <el-table-column
+            label="图片"
+            align="center"
+            width="200">
+              <template slot-scope="scope">
+                <img  @click="showImagePage(scope.row.imageUrl)" :src="scope.row.imageUrl" height="100" alt="">
+              </template>
           </el-table-column>
           <el-table-column
             prop="title"
@@ -34,7 +43,7 @@
           <el-table-column
             prop="briefContent"
             label="内容简介"
-            min-width="350"
+            min-width="200"
             align="left">
           </el-table-column>
           <el-table-column
@@ -43,30 +52,31 @@
             width="150"
             align="center">
             <template slot-scope="scope">
-              <el-button
-                @click.native.prevent="deleteRow(scope.$index, tableData)"
-                type="text"
-                size="small">
-                <i class="iconfont icon-delete table-button-delete"></i>
-              </el-button>
-              <el-button
-                @click="editRow(scope.row, scope.$index)"
-                type="text"
-                size="small">
-                <i class="iconfont icon-edit06 table-button-edit"></i>
-              </el-button>
+              <div>
+                <el-button
+                  @click.native.prevent="deleteRow(scope.$index, tableData)"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-delete table-button-delete"></i>
+                </el-button>
+                <el-button
+                  @click="editRow(scope.row, scope.$index)"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-edit06 table-button-edit"></i>
+                </el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
         <!-- @size-change="handleSizeChange"
         @current-change="handleCurrentChange" -->
         <el-pagination
-        background
-        :current-page="pagination.currentPage"
-        :page-sizes="[5,6,8,10]"
-        :page-size="pagination.pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="totalDataNumber">
+          background
+          :current-page="pagination.currentPage"
+          :page-size="pagination.pageSize"
+          layout="total, prev, pager, next, jumper"
+          :total="totalDataNumber">
         </el-pagination>
       </div>
 
@@ -79,12 +89,15 @@
               type="date"
               placeholder="选择日期"
               format="yyyy 年 MM 月 dd 日"
-              @change = "changeTimeFormat()"
-              :picker-options="datePicker">
+              @change = "changeTimeFormat()">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="标题" prop="title">
             <el-input v-model="ruleForm.title"></el-input>
+          </el-form-item>
+          <el-form-item label="上传图片:" prop="imageUrl" align="left">
+            <label for="imgUrl" class="image-upload"><img id="showImg" :src="ruleForm.imageUrl" alt=""></label>
+            <input id="imgUrl" @change="changepic" type="file" ref="certicification_pic" />
           </el-form-item>
           <el-form-item label="内容简介" prop="briefContent">
             <el-input
@@ -114,7 +127,6 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
-import { getSchoolInfo, addSchoolInfo, updateSchoolInfo, deleteSchoolInfo } from '@api/index'
 
 export default {
   mounted () {
@@ -127,6 +139,7 @@ export default {
       ruleForm: {
         title: '',
         date: '',
+        imageUrl: '',
         briefContent: '',
         content: ''
       },
@@ -137,37 +150,12 @@ export default {
       pageTableData: [],
       editingRow: '',
       isEdit: false,
-      isAdd: false,
-      datePicker: {
-        disabledDate (time) {
-          return time.getTime() > Date.now()
-        },
-        shortcuts: [{
-          text: '今天',
-          onClick (picker) {
-            picker.$emit('pick', new Date())
-          }
-        }, {
-          text: '昨天',
-          onClick (picker) {
-            const date = new Date()
-            date.setTime(date.getTime() - 3600 * 1000 * 24)
-            picker.$emit('pick', date)
-          }
-        }, {
-          text: '一周前',
-          onClick (picker) {
-            const date = new Date()
-            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7)
-            picker.$emit('pick', date)
-          }
-        }]
-      }
+      isAdd: false
     }
   },
   computed: {
     tableData () {
-      return this.$store.state.testData.tableData
+      return this.$store.state.testData.banners
     },
     totalDataNumber () {
       return this.$store.state.testData.tableData.length
@@ -192,10 +180,11 @@ export default {
       })
         .then(() => {
           // TODO 添加一条信息
-          // this.addSchoolInfo()
+          // this.addCommunistInfo()
           this.tableData.push({
             title: this.ruleForm.title,
             date: this.ruleForm.date,
+            imageUrl: this.ruleForm.imageUrl,
             briefContent: this.ruleForm.briefContent,
             content: this.ruleForm.content
           })
@@ -222,7 +211,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // TODO deleteSchoolInfo() 传id
+        // TODO deleteCommunistInfo() 传id
         rows.splice(index, 1) // 从rows数据里删除一个
         // uploadData
       }).catch(() => {
@@ -234,7 +223,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // TODO updateSchoolInfo(params) 传id 和各个数据
+        // TODO updateCommunistInfo(params) 传id 和各个数据
         for (let key in this.ruleForm) {
           this.tableData[this.editingRow][key] = this.ruleForm[key]
         }
@@ -259,6 +248,22 @@ export default {
       this.isEdit = false
       this.isAdd = false
     },
+    changepic (e) {
+      console.log(e)
+      // 获取img blob 格式 URL
+      var url = null
+      var file = e.target.files[0] // 也可以用下面的形式/
+      // var file = this.$refs['certicification_pic'].files[0]
+      /* window.URL = window.URL || window.webkitURL; */
+      if (window.createObjcectURL !== undefined) {
+        url = window.createOjcectURL(file)
+      } else if (window.URL !== undefined) {
+        url = window.URL.createObjectURL(file)
+      } else if (window.webkitURL !== undefined) {
+        url = window.webkitURL.createObjectURL(file)
+      }
+      this.ruleForm.imageUrl = url
+    },
     changeTimeFormat () {
       let date = new Date(this.ruleForm.date)
       let now = new Date()
@@ -276,7 +281,8 @@ export default {
       this.ruleForm.date = y + '-' + m + '-' + d + ' ' + h + ':' + mm + ':' + s // 返回时间格式
     },
     ...mapMutations([
-      'loading'
+      'loading',
+      'showImagePage'
     ])
   }
 }
@@ -284,19 +290,64 @@ export default {
 
 <style lang="scss" scoped>
 
-.page.school-info {
+.page.banners-info {
   .el-pagination{
     margin-top: 20px;
     margin-bottom: 10px;
   }
-}
-.table-button-delete{
-  color:red;
-  font-size:25px;
-}
 
-.table-button-edit{
-  color:rgb(84, 80, 218);
-  font-size:25px;
+  input[type="file"]#imgUrl {
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      z-index: -1;
+  }
+  #showImg {
+    display: inline-block;
+    vertical-align: bottom;
+    width: 300px;
+    height:300px;
+  }
+
+  .image-upload {
+    display: inline-block;
+    border:2px dashed grey;
+    color: grey;
+    vertical-align: bottom;
+    position: relative;
+    cursor: pointer;
+
+    &:after {
+      content: '+';
+      position: absolute;
+      font-size: 2.5rem;
+      color: grey;
+      top: calc(50% - 1.7rem);
+      left: calc(50% - 1.25rem);
+      z-index: 1;
+    }
+
+    &:hover {
+      border:2px dashed #000;
+      color: #000;
+    }
+
+    &-text,
+    .item-description-text {
+      vertical-align: top;
+    }
+  }
+
+  .table-button-delete{
+    color:red;
+    font-size:25px;
+  }
+
+  .table-button-edit{
+    color:rgb(84, 80, 218);
+    font-size:25px;
+  }
 }
 </style>

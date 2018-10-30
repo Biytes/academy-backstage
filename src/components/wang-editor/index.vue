@@ -24,7 +24,7 @@ export default {
     }
     editor.customConfig.zIndex = 100
     editor.customConfig.uploadFileName = 'pic'
-    editor.customConfig.uploadImgServer = '/src/assets/img/upload-img'
+    editor.customConfig.uploadImgServer = '/api/image'
     editor.customConfig.uploadImgHooks = {
       before: function (xhr, editor, files) {
       },

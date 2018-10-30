@@ -2,50 +2,67 @@ const _import = file => resolve => require([`@views/${file}`], resolve)
 
 export default [{
   path: '/',
+  component: _import('layout/login')
+}, {
+  path: '/backstage',
   component: _import('layout/backstage'),
   children: [
     {
-      path: '/',
-      component: _import('login')
-    }, {
+      name: 'certificate',
       path: '/certificate',
       component: _import('certificate')
     }, {
-      path: '/schoolInfo/:id',
-      component: _import('schoolInfo')
+      name: 'collegeintro',
+      path: '/collegeIntro/:category',
+      component: _import('collegeIntro')
     }, {
-      path: '/educationInfo/:id',
-      component: _import('educationInfo')
+      name: 'educationnews',
+      path: '/educationNews/:category',
+      component: _import('educationNews')
     }, {
-      path: '/studentInfo/:id',
-      component: _import('schoolInfo')
+      name: 'studentnews',
+      path: '/studentNews/:category',
+      component: _import('studentNews')
     }, {
-      path: '/communistInfo/:id',
-      component: _import('communistInfo')
+      name: 'partynews',
+      path: '/partyNews/:category',
+      component: _import('partyNews')
     }, {
-      path: '/cooperateInfo/:id',
+      name: 'cooperateinfo',
+      path: '/cooperateInfo/:category',
       component: _import('cooperateInfo')
     }, {
-      path: '/gallery/:id',
+      name: 'gallery',
+      path: '/gallery/:category',
       component: _import('gallery')
     }, {
-      path: '/teacher',
-      component: _import('teacher')
+      name: 'teacherinfo',
+      path: '/teacherInfo',
+      component: _import('teacherInfo')
     }, {
+      name: 'friendlylink',
       path: '/friendlyLink',
       component: _import('friendlyLink')
     }, {
-      path: '/news',
-      component: _import('newsInfo')
+      name: 'collegenews',
+      path: '/collegeNews',
+      component: _import('collegeNews')
     }, {
+      name: 'reportblog',
       path: '/reportBlog',
       component: _import('reportBlog')
     }, {
-      path: '/event',
-      component: _import('event')
+      name: 'activity',
+      path: '/activity',
+      component: _import('activity')
     }, {
+      name: 'modified',
       path: '/modified',
       component: _import('modified')
+    }, {
+      name: 'banners',
+      path: '/banners',
+      component: _import('banners')
     }
   ]
 }]

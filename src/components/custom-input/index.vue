@@ -44,6 +44,7 @@ $label-color: #fff;
 $label-background-color: #7AB893;
 $input-width: 310px;
 $text-indent: 100px;
+$font-size: 16px; 
 
 .customInput{
   position: relative;
@@ -105,6 +106,7 @@ $text-indent: 100px;
     top: 0;
     left: 0;
     padding: 10px 15px;
+    font-size: $font-size;
     text-shadow: 0 1px 0 rgba(19,74,70,.4);
     color: $label-color;
     background: $label-background-color;
@@ -603,6 +605,32 @@ $text-indent: 100px;
       &:after {
         border-top: 4px solid rgba(122,184,147,1);
       }
+    }
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1366px) {
+  $input-width: 280px;
+  $font-size: 14px;
+  $padding: 10px;
+  .customInput {
+    margin: 5px 0 30px;
+  }
+  %gate-skew {
+    width: $input-width;
+    text-indent: 80px;
+    + label {
+      padding: $padding;
+      font-size: $font-size;
+    }
+  }
+
+  %clean-slide {
+    width: 250px;
+
+    + label {
+      padding: $padding;
+      font-size: 12px;
     }
   }
 }

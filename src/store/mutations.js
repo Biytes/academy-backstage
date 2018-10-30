@@ -16,7 +16,7 @@ export default {
 
   // 控制登陆状态
   [LOGIN] (state) {
-    state.isLogin = !state.isLogin
+    state.isLogin = true
   },
 
   // 保存用户信息Token
@@ -26,6 +26,7 @@ export default {
 
   // 登出 logout 清除状态
   [LOGOUT] (state) {
+    state.isLogin = false
     state.userInfo = {
       token: '',
       type: '0'

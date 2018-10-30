@@ -1,70 +1,78 @@
 <template lang="html">
-  <div class="whole-wrapper">
+  <div class="page modified-info" v-if="isLogin">
+
     <div class="top-bar">
-      <el-button @click="addItem" type="text" size="small"  style="float:right;cursor:pointer;margin-right:10px;"><i class="iconfont icon-plus" style="font-size:24px"></i></el-button>
-      <el-button @click="back" type="text" size="small" style="float:left;cursor:pointer;margin-left:10px;color:#333;"><i class="iconfont icon-arrowsleftline" style="font-size:24px"></i></el-button>
+      <el-button @click="addItem"
+                 type="text"
+                 size="small"
+                 class="top-bar-button-right right pointer"><i class="iconfont icon-plus"></i></el-button>
+      <el-button @click="back"
+                 type="text"
+                 size="small"
+                 class="top-bar-button-left left pointer"><i class="iconfont icon-arrowsleftline"></i></el-button>
     </div>
-    <div class="container">
+
+    <el-card class="page-container">
+
       <div class="tablePage" v-show="!isEdit && !isAdd">
         <el-table
-      :data="Users"
-      border
-      style="width: 100%;color:#333;">
-      <el-table-column
-        fixed
-        prop="createDate"
-        label="创建日期"
-        sortable>
-      </el-table-column>
-      <el-table-column
-        prop="grade"
-        label="年级"
-        width="60">
-      </el-table-column>
-      <el-table-column
-        prop="major"
-        label="专业">
-      </el-table-column>
-      <el-table-column
-        prop="banJi"
-        label="班级"
-        width="60">
-      </el-table-column>
-      <el-table-column
-        prop="username"
-        label="账号">
-      </el-table-column>
-      <el-table-column
-        prop="password"
-        label="密码">
-      </el-table-column>
-      <el-table-column
-        prop="clientType"
-        label="账户类型"
-        width="130"
-        :formatter="changeClientTypeFormat"
-        sortable>
-      </el-table-column>
-      <el-table-column
-        fixed="right"
-        label="操作">
-        <template slot-scope="scope">
-          <el-button @click.native.prevent="deleteRow(scope.$index, tableData)" type="text" size="small"><i class="iconfont icon-delete" style="color:red;font-size:30px;"></i></el-button>
-          <el-button @click="editRow(scope.row, scope.$index)" type="text" size="small"><i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i></el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <!-- @size-change="handleSizeChange"
-    @current-change="handleCurrentChange" -->
-    <el-pagination
-    background
-    :current-page="pagination.currentPage"
-    :page-sizes="[5,6,8,10]"
-    :page-size="pagination.pageSize"
-    layout="total, sizes, prev, pager, next, jumper"
-    :total="totalDataNumber">
-    </el-pagination>
+          :data="Users"
+          border
+          style="width: 100%;color:#333;">
+          <el-table-column
+            fixed
+            prop="createDate"
+            label="创建日期"
+            sortable>
+          </el-table-column>
+          <el-table-column
+            prop="grade"
+            label="年级">
+          </el-table-column>
+          <el-table-column
+            prop="major"
+            label="专业">
+          </el-table-column>
+          <el-table-column
+            prop="banJi"
+            label="班级">
+          </el-table-column>
+          <el-table-column
+            prop="username"
+            label="账号">
+          </el-table-column>
+          <el-table-column
+            prop="password"
+            label="密码">
+          </el-table-column>
+          <el-table-column
+            prop="clientType"
+            label="账户类型"
+            width="200"
+            :formatter="changeClientTypeFormat"
+            sortable>
+          </el-table-column>
+          <el-table-column
+            fixed="right"
+            label="操作">
+            <template slot-scope="scope">
+              <el-button @click.native.prevent="deleteRow(scope.$index, tableData)" type="text" size="small"><i class="iconfont icon-delete" style="color:red;font-size:30px;"></i></el-button>
+              <el-button @click="editRow(scope.row, scope.$index)" type="text" size="small"><i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i></el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!-- @size-change="handleSizeChange"
+        @current-change="handleCurrentChange" -->
+        <el-pagination
+          background
+          :current-page="pagination.currentPage"
+          :page-sizes="[5,6,8,10]"
+          :page-size="pagination.pageSize"
+          layout="total, prev, pager, next, jumper"
+          :total="totalDataNumber">
+        </el-pagination>
       </div>
+
       <div class="editPage" v-show="isAdd^isEdit">
         <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">
           <!-- <el-form-item label="日期" prop="createDate">
@@ -78,7 +86,7 @@
             :picker-options="datePicker">
             </el-date-picker>
           </el-form-item> -->
-          <el-form-item label="账户类型" prop="clientType">
+          <el-form-item label="账户类型" prop="clientType" align="left">
             <el-select v-model="ruleForm.clientType" placeholder="请选择" size="medium">
               <el-option
                 v-for="item in clientType.options"
@@ -89,7 +97,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="年级" prop="grade" v-if="!ruleForm.clientType">
+          <el-form-item label="年级" prop="grade" v-if="!ruleForm.clientType" align="left">
             <el-select v-model="ruleForm.grade" placeholder="请选择" size="medium" @change="selectTypeChange(ruleForm.grade, ruleForm.major)">
               <el-option
                 v-for="item in gradeType"
@@ -99,7 +107,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="专业" prop="major" v-if="!ruleForm.clientType">
+          <el-form-item label="专业" prop="major" v-if="!ruleForm.clientType" align="left">
             <el-select v-model="ruleForm.major" placeholder="请选择" size="medium" @change="selectTypeChange(ruleForm.grade, ruleForm.major)">
               <el-option
                 v-for="item in majorType"
@@ -109,7 +117,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="班级" prop="banJi" v-if="!ruleForm.clientType">
+          <el-form-item label="班级" prop="banJi" v-if="!ruleForm.clientType" align="left">
             <el-select v-model="ruleForm.banJi" placeholder="请选择" size="medium">
               <el-option
                 v-for="item in banJiType"
@@ -119,21 +127,23 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="账号" prop="username">
+          <el-form-item label="账号" prop="username" align="left">
             <el-input v-model="ruleForm.username" required></el-input>
           </el-form-item>
-          <el-form-item label="密码" prop="password">
+          <el-form-item label="密码" prop="password" align="left">
             <el-input v-model="ruleForm.password" required></el-input>
           </el-form-item>
-        <el-form-item>
-          <el-button v-show="!isAdd" type="success" @click="editSubmitForm('ruleForm')">完成</el-button>
-          <el-button v-show="isAdd" type="success" @click="addItemSubmit('ruleForm')">添加</el-button>
-          <el-button type="danger" @click="resetForm('ruleForm')">重置</el-button>
-        </el-form-item>
-  </el-form>
+          <el-form-item>
+            <el-button v-show="!isAdd" type="success" @click="editSubmitForm('ruleForm')">完成</el-button>
+            <el-button v-show="isAdd" type="success" @click="addItemSubmit('ruleForm')">添加</el-button>
+            <el-button type="danger" @click="resetForm('ruleForm')">重置</el-button>
+          </el-form-item>
+        </el-form>
       </div>
-    </div>
-    </div>
+
+    </el-card>
+    
+  </div>
 </template>
 
 <script>
@@ -214,6 +224,9 @@ export default {
     },
     gradeType () {
       return this.$store.state.testData.type.filter(grade => grade.grade)
+    },
+    isLogin () {
+      return this.$store.state.isLogin
     }
   },
   methods: {
@@ -436,45 +449,21 @@ export default {
 }
 </script>
 
-<style lang="css">
-.whole-wrapper{
-  width:100%;
-}
-.el-form-item__content{
-  text-align: left;
-}
-.el-table th{
-  text-align: center;
-}
-.el-pagination{
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-.el-table--border{
-  box-shadow: 0px 0px 8px rgba(66, 61, 61, 0.76);
-  border-radius: 8px;
-}
-.el-table__header-wrapper{
-  border-bottom: 1px solid grey;
-}
-.el-table thead{
-  color: #333;
-}
-ul.el-upload-list > li.el-upload-list__item
-{
-  width: 155px;
-  height:155px;
-  float: left;
-}
-div[tabindex="0"].el-upload--picture-card{
-  width: 155px;
-  height:155px;
-  float: left;
-}
-@media (min-width: 1200px) and (max-width: 1366px) {
-  .container{
-    width: calc(100% - 165px)
+<style lang="scss" scoped>
+
+.page.modified-info {
+  .el-pagination{
+    margin-top: 20px;
+    margin-bottom: 10px;
   }
 }
+.table-button-delete{
+  color:red;
+  font-size:25px;
+}
 
+.table-button-edit{
+  color:rgb(84, 80, 218);
+  font-size:25px;
+}
 </style>

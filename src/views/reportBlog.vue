@@ -65,7 +65,7 @@
         :current-page="pagination.currentPage"
         :page-sizes="[5,6,8,10]"
         :page-size="pagination.pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
+        layout="total, prev, pager, next, jumper"
         :total="totalDataNumber">
         </el-pagination>
       </div>
@@ -114,7 +114,6 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
-import { getReportBlogInfo, addReportBlogInfo, updateReportBlogInfo, deleteReportBlogInfo } from '@api/index'
 
 export default {
   mounted () {
