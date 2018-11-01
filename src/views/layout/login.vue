@@ -91,7 +91,7 @@ export default {
     },
     ...mapMutations([
       'login',
-      'saveUserInfo',
+      'saveUserInfo'
     ])
   }
 }

@@ -197,33 +197,44 @@ export default {
               router: '/gallery/netherland'
             }
           ]
-        }
+        },
+        {
+          index: '7',
+          linkTitle: '账号管理',
+          subMenuItems: [
+            {
+              index: '7-1',
+              linkTitle: '老师',
+              router: '/modified/teacher'
+            },
+            {
+              index: '7-2',
+              linkTitle: '学生',
+              router: '/modified/student'
+            }
+          ]
+        },
       ],
       elSingleMenuItems: [
         {
-          index: '7',
+          index: '8',
           linkTitle: '教师队伍',
           router: '/teacherInfo'
         },
         {
-          index: '8',
+          index: '9',
           linkTitle: '新闻中心',
           router: '/collegeNews'
         },
         {
-          index: '9',
+          index: '10',
           linkTitle: '友情链接',
           router: '/friendlyLink'
         },
         {
-          index: '10',
+          index: '11',
           linkTitle: '微博发布',
           router: '/reportBlog'
-        },
-        {
-          index: '11',
-          linkTitle: '修改密码',
-          router: '/modified'
         },
         {
           index: '12',
@@ -302,7 +313,7 @@ $height: 810px;
 
 }
 @media screen and (max-width: 1366px) {
-  $height: 480px;
+  $height: 530px;
   #backstage-menu {
     height: $height;
   }

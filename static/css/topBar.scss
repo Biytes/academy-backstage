@@ -1,10 +1,32 @@
 .top-bar{
-  $height: 40px;
-  $iconfont: 24px;
-  $margin-bottom: 16px;
-  $line-height: 36px;
-
   @media screen and (min-width: 1400px) {
+    $height: 40px;
+    $iconfont: 24px;
+    $margin-bottom: 16px;
+    $line-height: 36px;
+  
+    height: $height;
+    background: #ddd;
+    border-radius: 8px;
+    line-height: $line-height;
+    padding: 0 5px 0;
+    margin-bottom: $margin-bottom;
+  
+    &-button {
+      &-left{
+        color: #333;
+        padding: 7px 0px;
+      }
+  
+      &-right{
+        margin-right: 10px;
+        padding: 7px 0px;
+      }
+    }
+  
+    .iconfont {
+      font-size: $iconfont;
+    }
     
   }
   @media (min-width: 1200px) and (max-width: 1366px) {
@@ -12,28 +34,29 @@
     $margin-bottom: 10px;
     $iconfont: 20px;
     $line-height: 26px;
-  }
-  height: $height;
-  background: #ddd;
-  border-radius: 8px;
-  line-height: $line-height;
-  padding: 0 5px 0;
-  margin-bottom: $margin-bottom;
 
-  &-button {
-    &-left{
-      color: #333;
-      padding: 7px 0px;
+    height: $height;
+    background: #ddd;
+    border-radius: 8px;
+    line-height: $line-height;
+    padding: 0 5px 0;
+    margin-bottom: $margin-bottom;
+
+    &-button {
+      &-left{
+        color: #333;
+        padding: 5px 0px;
+      }
+
+      &-right{
+        margin-right: 10px;
+        padding: 4px 0px;
+      }
     }
 
-    &-right{
-      margin-right: 10px;
-      padding: 7px 0px;
+    .iconfont {
+      font-size: $iconfont;
     }
-  }
-
-  .iconfont {
-    font-size: $iconfont;
   }
 }
 

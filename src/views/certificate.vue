@@ -111,6 +111,7 @@
 
 <script>
 import { mapMutations } from 'vuex'
+import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
 
 export default {
   data () {

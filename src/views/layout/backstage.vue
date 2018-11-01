@@ -52,6 +52,7 @@ export default {
 
 .wrapper-inner {
   position: relative;
+  z-index: 1;
 
   &__content {
     margin-left: 2.4%;
@@ -59,7 +60,7 @@ export default {
 }
 @media (min-width: 1200px) and (max-width: 1366px) {
   .wrapper-inner {
-    width: 100%
+    width: 100%;
   }
 }
 </style>

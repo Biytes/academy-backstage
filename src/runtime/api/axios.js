@@ -26,7 +26,7 @@ Vue.prototype.$axios = axios
 axios.interceptors.request.use(
   config => {
     // 在所有请求头部添加token值
-    const token = store.state.userInfo.token
+    const token = 'Token ' + store.state.userInfo.token
     if (token) {
       config.headers.Authorization = token
     }

@@ -14,7 +14,7 @@
 
     <el-card class="page-container">
 
-      <div class="tablePage" v-show="!isEdit && !isAdd">
+      <div class="tablePage" v-show="!isEdit && !isAdd" v-loading="isLoading">
         <el-table
           :data="teachers"
           border
@@ -63,54 +63,54 @@
           :total="totalDataNumber">
         </el-pagination>
       </div>
-      <div class="editPage" v-show="isAdd^isEdit">
-        <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+      <div class="editPage" v-show="isAdd^isEdit" v-loading="isLoading">
+        <el-form :model="operateForm" ref="operateForm" label-width="100px" class="demo-operateForm">
           <el-form-item label="姓名" prop="name">
-            <el-input v-model="ruleForm.name" required></el-input>
+            <el-input v-model="operateForm.name" required></el-input>
           </el-form-item>
           <el-form-item label="职位" prop="position">
-            <el-input v-model="ruleForm.position" required></el-input>
+            <el-input v-model="operateForm.position" required></el-input>
           </el-form-item>
           <el-form-item label="简洁简介" prop="brief">
-            <el-input type="textarea" v-model="ruleForm.brief"></el-input>
+            <el-input type="textarea" v-model="operateForm.brief"></el-input>
           </el-form-item>
           <el-form-item label="电话" prop="tel">
-            <el-input v-model="ruleForm.tel"></el-input>
+            <el-input v-model="operateForm.tel"></el-input>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
-            <el-input v-model="ruleForm.email"></el-input>
+            <el-input v-model="operateForm.email"></el-input>
           </el-form-item>
-          <el-form-item label="社会任职" prop="socialPosition" v-show="ruleForm.socialPosition">
-            <el-input v-for="(socialItem, index) in ruleForm.socialPosition" v-model="socialItem.position" :key="index"></el-input> <!--改成arrary-->
+          <el-form-item label="社会任职" prop="socialPosition" v-show="operateForm.socialPosition">
+            <el-input v-for="(socialItem, index) in operateForm.socialPosition" v-model="socialItem.position" :key="index"></el-input> <!--改成arrary-->
           </el-form-item>
           <el-form-item label="教育背景" prop="educationBackground">
             <el-input
               type="textarea"
               :autosize="{ minRows: 6, maxRows: 6}"
               placeholder="请输入内容"
-              v-model="ruleForm.educationBackground"></el-input>
+              v-model="operateForm.educationBackground"></el-input>
                 </el-form-item>
                 <el-form-item label="个人简介" prop="workingExperience" size="large">
             <el-input
               type="textarea"
               :autosize="{ minRows: 6, maxRows: 6}"
               placeholder="请输入内容"
-              v-model="ruleForm.briefContent"></el-input>
+              v-model="operateForm.briefContent"></el-input>
           </el-form-item>
           <el-form-item label="研究方向" prop="studyDirection">
-            <el-input v-model="ruleForm.workingExperience"></el-input>
+            <el-input v-model="operateForm.workingExperience"></el-input>
           </el-form-item>
-          <el-form-item label="学术成果" prop="achievement" v-show="ruleForm.achievement">
+          <el-form-item label="学术成果" prop="achievement" v-show="operateForm.achievement">
             <el-input
               type="textarea"
               :autosize="{ minRows: 6, maxRows: 6}"
               placeholder="请输入内容"
-              v-model="ruleForm.achievement"></el-input>
+              v-model="operateForm.achievement"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button v-show="!isAdd" type="success" @click="editSubmitForm('ruleForm')">完成</el-button>
-            <el-button v-show="isAdd" type="success" @click="addItemSubmit('ruleForm')">添加</el-button>
-            <el-button type="danger" @click="resetForm('ruleForm')">重置</el-button>
+            <el-button v-show="!isAdd" type="success" @click="editSubmitForm">完成</el-button>
+            <el-button v-show="isAdd" type="success" @click="addItemSubmit">添加</el-button>
+            <el-button type="danger" @click="resetOperateForm">重置</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -120,116 +120,26 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
+import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
 
 export default {
-  created () {
-  },
-  methods: {
-    addItem () {
-      this.rowNow = { // ruleForm转移绑定对象且将其内容制空
-        name: '',
-        imgUrl: '',
-        position: '',
-        brief: '',
-        tel: '',
-        email: '',
-        socialPosition: [],
-        educationBackground: '',
-        workingExperience: '',
-        studyDirection: '',
-        achievement: ''
-      }
-      this.ruleForm = this.rowNow
-      this.isAdd = true
-      this.isEdit = false
-    },
-    back () {
-      for (let key in this.ruleForm) {
-        this.ruleForm[key] = this.rowNow[key]
-      }
-      this.isEdit = false
-      this.isAdd = false
-    },
-    addItemSubmit () {
-      this.$confirm('你确定要添加该记录！', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.teachers.push({
-          name: this.ruleForm.name,
-          imgUrl: this.ruleForm.imgUrl,
-          position: this.ruleForm.position,
-          brief: this.ruleForm.brief,
-          tel: this.ruleForm.tel,
-          email: this.ruleForm.email,
-          socialPosition: this.ruleForm.socialPosition,
-          educationBackground: this.ruleForm.educationBackground,
-          workingExperience: this.ruleForm.workingExperience,
-          studyDirection: this.ruleForm.studyDirection,
-          achievement: this.ruleForm.achievement
-        })
-        this.isAdd = false
-        this.resetRuleForm()
-      }).catch(() => {
-      })
-    },
-    handleClick (row) { // 打开编辑页面
-      for (let key in this.rowNow) {
-        this.rowNow[key] = row[key]
-      }
-      this.isEdit = true
+  mounted () {
+    this.section = this.$route.name
+    this.category = this.$route.params.category
 
-      this.ruleForm = row // 使当前要编辑的数据绑定在表中
-    },
-    deleteRow (index, rows) {
-      this.$confirm('你确定要删除该记录！', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        rows.splice(index, 1) // 从rows数据里删除一个
-      }).catch(() => {
-      })
-    },
-    editSubmitForm (formName) {
-      this.$confirm('你确定要修改该记录！', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            var vm = this
-            vm.isEdit = false
-          }
-        })
-      }).catch(() => {
-        console.log('error submit!!')
-        return false
-      })
-    },
-    resetForm (formName) {
-      this.$refs[formName].resetFields()
-    },
-    resetRuleForm () {
-      this.ruleForm.name = ''
-      this.ruleForm.imgUrl = ''
-      this.ruleForm.position = ''
-      this.ruleForm.brief = ''
-      this.ruleForm.tel = ''
-      this.ruleForm.email = ''
-      this.ruleForm.socialPosition = []
-      this.ruleForm.educationBackground = ''
-      this.ruleForm.workingExperience = ''
-      this.ruleForm.studyDirection = ''
-      this.ruleForm.achievement = ''
-    }
+    this.getPageData()
+      .then(_ => this.checkPermission())
   },
   data () {
     return {
-      rowNow: {},
-      ruleForm: {
+      isLoading: false,
+      isEdit: false,
+      isAdd: false,
+      section: '',
+      category: '',
+      currentPage: 1,
+      pageSize: 10,
+      operateForm: {
         name: '',
         imgUrl: '',
         position: '',
@@ -242,12 +152,6 @@ export default {
         studyDirection: '',
         achievement: ''
       },
-      pagination: {
-        currentPage: 1,
-        pageSize: 6
-      },
-      isEdit: false,
-      isAdd: false,
       headmasters: [
         {
           imgUrl: require('@img/teacher/tec1.jpg'),
@@ -621,18 +525,137 @@ export default {
           achievement: '',
           workingExperience: '2008年曾在微软公司实习，从事软件开发工作。2009年7月至今任教于华南理工大学广州学院计算机工程学院。主讲课程为《操作系统》、《高级语言程序设计》、《数据结构》等计算机科学与技术专业基础核心课程。近年来出版《数据结构（C++语言版）》教材1本，发表教学研究论文1篇。曾在2011年校第一届多媒体教育软件竞赛中获二等奖，在2014年校第六届课堂教学竞赛中获二等奖。'
         }
-      ],
-      imgCount: 0
+      ]
     }
   },
   computed: {
-    totalDataNumber () {
-      return this.teachers.length
+    ...mapState([
+      'isLogin'
+    ])
+  },
+  methods: {
+    getPageData () {
+      let params = {
+        category: this.category,
+        page: this.currentPage
+      }
+
+      return Promise
+        .resolve()
+        .then(_ => {
+          this.isLoading = true
+        })
+        .then(_ => getAcademyData(this.section, params))
+        .then(res => {
+          console.log(res)
+          if (res.status === 200) {
+            let data = res.data
+            this.tableData = data.results
+            this.total = data.count
+            this.pageSize = this.total < 10 ? this.total : 10
+          }
+        })
+        .then(_ => this.isLoading = false)
+        .catch(error => console.log(error))
     },
-    isLogin () {
-      return this.$store.state.isLogin
+    checkPermission () {
+
+    },
+    addItem () {
+      this.resetOperateForm()
+      this.isAdd = true
+      this.isEdit = false
+    },
+    back () {
+      this.resetOperateForm()
+      this.isEdit = false
+      this.isAdd = false
+    },
+    addItemSubmit () {
+      this.$confirm('你确定要添加该记录！', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(_ => {
+          let params = {
+            name: this.operateForm.name,
+            imgUrl: this.operateForm.imgUrl,
+            position: this.operateForm.position,
+            brief: this.operateForm.brief,
+            tel: this.operateForm.tel,
+            email: this.operateForm.email,
+            socialPosition: this.operateForm.socialPosition,
+            educationBackground: this.operateForm.educationBackground,
+            workingExperience: this.operateForm.workingExperience,
+            studyDirection: this.operateForm.studyDirection,
+            achievement: this.operateForm.achievement
+          }
+
+          return addAcademyData(this.section, params)
+        })
+        .catch(error => console.los(error, 'error Submit'))
+        .then(_ => {
+          this.$message({
+            type: 'success',
+            message: '添加成功'
+          })
+          this.resetOperateForm()
+        })
+        .then(_ => this.getPageData())
+    },
+    handleClick (row) { // 打开编辑页面
+      for (let key in this.rowNow) {
+        this.rowNow[key] = row[key]
+      }
+      this.isEdit = true
+
+      this.operateForm = row // 使当前要编辑的数据绑定在表中
+    },
+    deleteRow (index, rows) {
+      this.$confirm('你确定要删除该记录！', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        rows.splice(index, 1) // 从rows数据里删除一个
+      }).catch(() => {
+      })
+    },
+    editSubmitForm (formName) {
+      this.$confirm('你确定要修改该记录！', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            var vm = this
+            vm.isEdit = false
+          }
+        })
+      }).catch(() => {
+        console.log('error submit!!')
+        return false
+      })
+    },
+    resetOperateForm () {
+      this.operateForm = {
+        name: '',
+        imgUrl: '',
+        position: '',
+        brief: '',
+        tel: '',
+        email: '',
+        socialPosition: '',
+        educationBackground: '',
+        studyDirection: '',
+        achievement: ''
+      }
+      this.isEdit = false
+      this.isAdd = false
     }
-  }
+  },
 }
 </script>
 

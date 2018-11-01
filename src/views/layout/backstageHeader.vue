@@ -87,6 +87,7 @@ export default {
   background: #222222;
   padding:0 15px;
   position: relative;
+  z-index: 2;
   &-menu-icon {
     height:100%;
     width:130px;

@@ -10,6 +10,7 @@ export const getAcademyData = (section, params) => http('GET', `/api/${section}?
 
 // 获取单个的数据
 export const editAcademyData = (section, id) => http('GET', `/api/${section}/${id}`)
+
 // 增加模块的数据
 export const addAcademyData = (section, params) => http('POST', `/api/${section}`, params)
 

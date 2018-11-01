@@ -1,5 +1,7 @@
 <template>
-  <div id="editor" style="text-align:left"></div>
+  <div id="editor" style="text-align:left" ref="wangEditor">
+    <p></p>
+  </div>
 </template>
 
 <script>
@@ -10,21 +12,22 @@ export default {
   props: [],
   data () {
     return {
+      editorContent: ''
     }
   },
   methods: {
 
   },
   mounted () {
-    var editor = new E('#editor')
+    var editor = new E(this.$refs.wangEditor)
 
     editor.customConfig.showLinkImg = false
     editor.customConfig.onchange = (html) => {
       this.editorContent = html
     }
-    editor.customConfig.zIndex = 100
+    editor.customConfig.zIndex = 1
     editor.customConfig.uploadFileName = 'pic'
-    editor.customConfig.uploadImgServer = '/api/image'
+    editor.customConfig.uploadImgServer = 'https://schooltest.zunway.pw/api/v1/image'
     editor.customConfig.uploadImgHooks = {
       before: function (xhr, editor, files) {
       },

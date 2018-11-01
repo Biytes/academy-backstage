@@ -35,6 +35,10 @@ export default [{
       name: 'gallery',
       path: '/gallery/:category',
       component: _import('gallery')
+    },  {
+      name: 'modified',
+      path: '/modified/:category',
+      component: _import('modified')
     }, {
       name: 'teacherinfo',
       path: '/teacherInfo',
@@ -55,10 +59,6 @@ export default [{
       name: 'activity',
       path: '/activity',
       component: _import('activity')
-    }, {
-      name: 'modified',
-      path: '/modified',
-      component: _import('modified')
     }, {
       name: 'banners',
       path: '/banners',
