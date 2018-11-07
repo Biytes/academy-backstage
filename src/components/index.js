@@ -11,10 +11,12 @@ import Vue from 'vue'
 // import CbIconfont from './iconfont'
 import customInput from './custom-input'
 import wangEditor from './wang-editor'
+import imageUploader from './image-uploader'
 
 const components = [
   customInput,
-  wangEditor
+  wangEditor,
+  imageUploader
 ]
 
 // 注册组件

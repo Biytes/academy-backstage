@@ -70,7 +70,7 @@ export default {
 
           let userInfo = {
             token: res.token,
-            type: res.type
+            type: this.type
           }
           // 存储信息
           this.saveUserInfo(userInfo)

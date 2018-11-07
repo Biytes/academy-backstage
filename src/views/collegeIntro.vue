@@ -48,21 +48,20 @@
             <template slot-scope="scope">
               <el-button
                 v-if="isWrite"
-                @click.native.prevent="deleteItemSubmit(scope.$index, tableData)"
+                @click.native.prevent="deleteItemSubmit(scope.row)"
                 type="text"
                 size="small">
                 <i class="iconfont icon-delete table-button-delete"></i>
               </el-button>
               <el-button
                 v-if="isWrite"
-                @click="editItem(scope.row, scope.$index)"
+                @click="editItem(scope.row)"
                 type="text"
                 size="small">
                 <i class="iconfont icon-edit06 table-button-edit"></i>
               </el-button>
               <el-button
-                v-if="isWrite"
-                @click="readItem(scope.row, scope.$index)"
+                @click="readItem(scope.row)"
                 type="text"
                 size="small">
                 <i class="iconfont icon-readme table-button-read"></i>
@@ -104,17 +103,21 @@
               v-model="operateForm.preview">
             </el-input>
           </el-form-item>
-          <el-form-item label="html文本" prop="content">
-            <el-input v-model="operateForm.content"></el-input>
+          <el-form-item label="html文本" prop="preview">
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 6, maxRows: 6}"
+              placeholder="请输入内容"
+              v-model="operateForm.content">
+            </el-input>
           </el-form-item>
           <el-form-item class="wang-editor">
-            <wang-editor></wang-editor>
+            <wang-editor ref="editor" :catchData="catchData"></wang-editor>
           </el-form-item>
           <el-form-item>
             <el-button v-show="isEdit " type="success" @click="editItemSubmit">完成</el-button>
             <el-button v-show="isAdd" type="success" @click="addItemSubmit">添加</el-button>
             <el-button v-show="isRead" type="success" @click="resetOperateForm" class="read-button">返回</el-button>
-            <el-button v-show="!isRead" type="danger" @click="resetOperateForm">重置</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -131,7 +134,7 @@ export default {
   data () {
     return {
       isLoading: false,
-      isWrite: false,
+      isWrite: true,
       section: '',
       category: '',
       tableData: [],
@@ -143,10 +146,9 @@ export default {
         content: ''
       },
       currentPage: 1,
-      total: 1,
+      total: 0,
       pageSize: 10,
       pageTableData: '',
-      editingRow: '',
       isEdit: false,
       isAdd: false,
       isRead: false
@@ -162,8 +164,7 @@ export default {
   },
   computed: {
     ...mapState([
-      'isLogin',
-      'token'
+      'isLogin'
     ])
   },
   watch: {
@@ -194,7 +195,7 @@ export default {
           }
           this.isLoading = false
         })
-        .catch(error => console.log(error))
+        .catch(error => console.log(error.response))
     },
     checkPermission () {
 
@@ -205,9 +206,8 @@ export default {
       this.operateForm.created_time = new Date()
       this.isAdd = true
     },
-    editItem (row, index) { // 打开编辑页面
+    editItem (row) { // 打开编辑页面
       this.isEdit = true
-
       this.isLoading = true
       editAcademyData(this.section, row.id)
         .then(res => {
@@ -215,13 +215,14 @@ export default {
             for (let key in this.operateForm) {
               this.operateForm[key] = res.data[key]
             }
+            this.$refs.editor.initialEditorContent(this.operateForm.content)
           }
         })
         .then(_ => {
           this.isLoading = false
         })
     },
-    readItem (row, index) {
+    readItem (row) {
       this.isRead = true
       this.isLoading = true
       editAcademyData(this.section, row.id)
@@ -231,6 +232,9 @@ export default {
               this.operateForm[key] = res.data[key]
             }
           }
+        })
+        .catch(res => {
+          console.log(res.response)
         })
         .then(_ => {
           this.isLoading = false
@@ -266,7 +270,7 @@ export default {
         .then(_ => this.resetOperateForm())
         .catch(error => console.log(error, 'error submit!!'))
     },
-    deleteItemSubmit (index, rows) {
+    deleteItemSubmit (row) {
       this.$confirm('你确定要删除该记录！', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -274,7 +278,7 @@ export default {
       })
         .then(_ => {
           this.isLoading = true
-          return deleteAcademyData(this.section, rows[index].id)
+          return deleteAcademyData(this.section, row.id)
         })
         .then(_ => this.getPageData())
         .catch(error => console.log(error, 'error delete!!'))
@@ -299,7 +303,7 @@ export default {
         })
         .then(_ => this.getPageData())
         .then(_ => this.resetOperateForm())
-        .catch(error => console.log(error, 'error submit!!'))
+        .catch(error => console.log(error, 'edit error!!'))
     },
     resetOperateForm () {
       console.log('reset')
@@ -309,6 +313,12 @@ export default {
       this.isRead = false
       this.isEdit = false
       this.isAdd = false
+      // 清空内容
+      this.$refs.editor.initialEditorContent('')
+    },
+    catchData (value) {
+      // 在这里接受子组件传过来的参数，赋值给data里的参数
+      this.operateForm.content = value
     },
     // 当路由发生变化
     onRouteChange () {
@@ -329,19 +339,6 @@ export default {
     margin-top: 20px;
     margin-bottom: 10px;
   }
-}
-.table-button-delete{
-  color:red;
-  font-size:25px;
-}
-
-.table-button-edit{
-  color:rgb(84, 80, 218);
-  font-size:25px;
-}
-
-.table-button-read{
-  font-size:25px;
 }
 .read-button {
   width: 50%;

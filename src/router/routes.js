@@ -2,7 +2,8 @@ const _import = file => resolve => require([`@views/${file}`], resolve)
 
 export default [{
   path: '/',
-  component: _import('layout/login')
+  component: _import('layout/login'),
+  alias: '/login'
 }, {
   path: '/backstage',
   component: _import('layout/backstage'),

@@ -3,6 +3,7 @@ import Vue from 'vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import store from '@store'
+import router from '@router'
 
 Vue.use(VueAxios, axios)
 
@@ -30,6 +31,7 @@ axios.interceptors.request.use(
     if (token) {
       config.headers.Authorization = token
     }
+
     return config
   },
   error => {
@@ -37,21 +39,30 @@ axios.interceptors.request.use(
   }
 )
 
-export const http = (type, url, params = {}) => {
-  switch (type) {
-    case 'GET':
-      return axios.get(stringify(url, params))
+export const http = (type, url, params = {}) => Promise
+  .resolve()
+  .then(_ => {
+    switch (type) {
+      case 'GET':
+        return axios.get(stringify(url, params))
 
-    case 'POST':
-      return axios.post(url, params)
+      case 'POST':
+        return axios.post(url, params)
 
-    case 'PATCH':
-      return axios.patch(url, params)
+      case 'PATCH':
+        return axios.patch(url, params)
 
-    case 'DELETE':
-      return axios.delete(url)
+      case 'DELETE':
+        return axios.delete(url)
 
-    default:
-      throw new Error('未指明异步请求的请求方式！')
-  }
-}
+      default:
+        throw new Error('未指明异步请求的请求方式！')
+    }
+  })
+  .then(res => res)
+  .catch(error => {
+    // 当token expired的时候 重新回login界面
+    if (error.response.status === 401) {
+      router.push('/login')
+    }
+  })

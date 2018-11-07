@@ -6,7 +6,7 @@
                  type="text"
                  size="small"
                  class="top-bar-button-right right pointer"><i class="iconfont icon-plus"></i></el-button>
-      <el-button @click="back"
+      <el-button @click="resetOperateForm"
                  type="text"
                  size="small"
                  class="top-bar-button-left left pointer"><i class="iconfont icon-arrowsleftline"></i></el-button>
@@ -14,50 +14,60 @@
 
     <el-card class="page-container">
 
-      <div class="tablePage" v-show="!isEdit && !isAdd">
+      <div class="tablePage" v-show="!isEdit && !isAdd" v-loading="isLoading" v-if="operateForm">
         <el-table
-          :data="Users"
+          :data="tableData"
           border
           style="width: 100%;color:#333;">
           <el-table-column
             fixed
-            prop="createDate"
+            align="center"
+            prop="created_time"
             label="创建日期"
             sortable>
           </el-table-column>
           <el-table-column
+            v-if="isStudent"
             prop="grade"
+            align="center"
             label="年级">
           </el-table-column>
           <el-table-column
+            v-if="isStudent"
             prop="major"
+            align="center"
             label="专业">
           </el-table-column>
           <el-table-column
+            v-if="isStudent"
             prop="banJi"
+            align="center"
             label="班级">
           </el-table-column>
           <el-table-column
             prop="username"
+            align="center"
             label="账号">
           </el-table-column>
           <el-table-column
             prop="password"
+            align="center"
             label="密码">
           </el-table-column>
           <el-table-column
             prop="clientType"
+            align="center"
             label="账户类型"
-            width="200"
-            :formatter="changeClientTypeFormat"
-            sortable>
+            width="150"
+            :formatter="changeClientTypeFormat">
           </el-table-column>
           <el-table-column
             fixed="right"
+            align="center"
             label="操作">
             <template slot-scope="scope">
-              <el-button @click.native.prevent="deleteRow(scope.$index, tableData)" type="text" size="small"><i class="iconfont icon-delete" style="color:red;font-size:30px;"></i></el-button>
-              <el-button @click="editRow(scope.row, scope.$index)" type="text" size="small"><i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i></el-button>
+              <el-button @click.native.prevent="deleteItemSubmit(scope.row)" type="text" size="small"><i class="iconfont icon-delete" style="color:red;font-size:30px;"></i></el-button>
+              <el-button @click="editRow(scope.row)" type="text" size="small"><i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -65,50 +75,31 @@
         @current-change="handleCurrentChange" -->
         <el-pagination
           background
-          :current-page="pagination.currentPage"
-          :page-sizes="[5,6,8,10]"
-          :page-size="pagination.pageSize"
-          layout="total, prev, pager, next, jumper"
-          :total="totalDataNumber">
+          :current-page.sync="currentPage"
+          :total="total"
+          :page-size="pageSize"
+          @current-change="getPageData"
+          layout="total, prev, pager, next, jumper">
         </el-pagination>
       </div>
 
-      <div class="editPage" v-show="isAdd^isEdit">
-        <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-          <!-- <el-form-item label="日期" prop="createDate">
-            <el-date-picker
-            v-model="ruleForm.createDate"
-            align="right"
-            type="date"
-            placeholder="选择日期"
-            format="yyyy 年 MM 月 dd 日"
-            @change = "changeTimeFormat(ruleForm.createDate)"
-            :picker-options="datePicker">
-            </el-date-picker>
-          </el-form-item> -->
-          <el-form-item label="账户类型" prop="clientType" align="left">
-            <el-select v-model="ruleForm.clientType" placeholder="请选择" size="medium">
-              <el-option
-                v-for="item in clientType.options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
+      <div class="editPage" v-show="isAdd^isEdit" v-loading="isLoading">
+        <el-form :model="operateForm" ref="operateForm" label-width="100px" class="demo-operateForm">
+          <el-form-item label="创建时间" prop="created_time" align="left">
+            <el-input v-model="operateForm.created_time"></el-input>
           </el-form-item>
-          <el-form-item label="年级" prop="grade" v-if="!ruleForm.clientType" align="left">
-            <el-select v-model="ruleForm.grade" placeholder="请选择" size="medium" @change="selectTypeChange(ruleForm.grade, ruleForm.major)">
+          <el-form-item label="年级" prop="grade" v-if="isStudent" align="left">
+            <el-select v-model="operateForm.grade" placeholder="请选择" size="medium" @change="selectTypeChange(operateForm.grade, operateForm.major)">
               <el-option
                 v-for="item in gradeType"
-                :key="item.grade"
-                :label="item.grade"
-                :value="item.grade">
+                :key="item"
+                :label="item"
+                :value="item">
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="专业" prop="major" v-if="!ruleForm.clientType" align="left">
-            <el-select v-model="ruleForm.major" placeholder="请选择" size="medium" @change="selectTypeChange(ruleForm.grade, ruleForm.major)">
+          <el-form-item label="专业" prop="major" v-if="isStudent" align="left">
+            <el-select v-model="operateForm.major" placeholder="请选择" size="medium" @change="selectTypeChange(operateForm.grade, operateForm.major)">
               <el-option
                 v-for="item in majorType"
                 :key="item.name"
@@ -117,8 +108,8 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="班级" prop="banJi" v-if="!ruleForm.clientType" align="left">
-            <el-select v-model="ruleForm.banJi" placeholder="请选择" size="medium">
+          <el-form-item label="班级" prop="banJi" v-if="isStudent" align="left">
+            <el-select v-model="operateForm.banJi" placeholder="请选择" size="medium">
               <el-option
                 v-for="item in banJiType"
                 :key="item.value"
@@ -128,15 +119,14 @@
             </el-select>
           </el-form-item>
           <el-form-item label="账号" prop="username" align="left">
-            <el-input v-model="ruleForm.username" required></el-input>
+            <el-input v-model="operateForm.username" required></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password" align="left">
-            <el-input v-model="ruleForm.password" required></el-input>
+            <el-input v-model="operateForm.password" required></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button v-show="!isAdd" type="success" @click="editSubmitForm('ruleForm')">完成</el-button>
-            <el-button v-show="isAdd" type="success" @click="addItemSubmit('ruleForm')">添加</el-button>
-            <el-button type="danger" @click="resetForm('ruleForm')">重置</el-button>
+            <el-button v-show="!isAdd" type="success" @click="editItemSubmit">完成</el-button>
+            <el-button v-show="isAdd" type="success" @click="addItemSubmit">添加</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -147,161 +137,214 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
+import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
+
 export default {
-  mounted () {
-    this.setDefaultForm()
-  },
-  created () {
-  },
   data () {
     return {
-      majorType: {
-      },
-      banJiType: {
-      },
-      clientType: {
-        options: [{
-          value: 0,
-          label: '学生'
-        }, {
-          value: 1,
-          label: '老师'
-        }]
-      },
-      ruleForm: {
-        createDate: '',
-        username: '',
-        password: '',
-        grade: '',
-        major: '',
-        banJi: '',
-        clientType: 0
-      },
-      pagination: {
-        currentPage: 1,
-        pageSize: 6
-      },
-      editingRow: '',
+      section: '',
+      gradeType: [],
+      majorType: [],
+      banJiType: [],
+      tableData: [],
+      operateForm: {},
+      currentPage: 1,
+      pageSize: 6,
+      total: 0,
+      isStudent: false,
+      isLoading: false,
       isEdit: false,
-      isAdd: false,
-      imgCount: 0,
-      datePicker: {
-        disabledDate (time) {
-          return time.getTime() > Date.now()
-        },
-        shortcuts: [{
-          text: '今天',
-          onClick (picker) {
-            picker.$emit('pick', new Date())
-          }
-        }, {
-          text: '昨天',
-          onClick (picker) {
-            const date = new Date()
-            date.setTime(date.getTime() - 3600 * 1000 * 24)
-            picker.$emit('pick', date)
-          }
-        }, {
-          text: '一周前',
-          onClick (picker) {
-            const date = new Date()
-            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7)
-            picker.$emit('pick', date)
-          }
-        }]
-      }
+      isAdd: false
     }
+  },
+  mounted () {
+    // 当前页面分类
+    // 初始化数据
+    this.initialPageData()
   },
   computed: {
-    Users () {
-      return this.$store.state.testData.Users
-    },
-    totalDataNumber () {
-      return this.$store.state.testData.Users.length
-    },
+    ...mapState([
+      'userInfo',
+      'isLogin'
+    ]),
     type () {
       return this.$store.state.testData.type
-    },
-    gradeType () {
-      return this.$store.state.testData.type.filter(grade => grade.grade)
-    },
-    isLogin () {
-      return this.$store.state.isLogin
     }
   },
+  watch: {
+    '$route': 'onRouteChange'
+  },
   methods: {
-    selectTypeChange (grade, major) { // 年级和班级选择器改变的时候
-      for (let i in this.gradeType) {
-        if (this.gradeType[i].grade === grade) {
-          this.majorType = this.gradeType[i].major
-          break
-        }
-      }
-      for (let i in this.majorType) {
-        if (this.majorType[i].name === major) {
-          this.banJiType = this.majorType[i].banJi
-          this.ruleForm.banJi = this.banJiType[0].label
-          break
-        }
-      }
+    // 当路由发生变化
+    initialPageData () {
+      this.section = this.$route.params.category // teacher or student
+      this.isStudent = this.section === 'student'
+
+      this.resetOperateForm()
+
+      this.getPageData()
+        .then(_ => this.checkPermission())
     },
-    setDefaultForm () { // 设置默认的表单属性
-      // 设置默认的ruleForm
-      this.ruleForm.clientType = 0
-      let now = new Date()
-      let y = now.getFullYear() - 1 // 获取年
-      this.ruleForm.grade = `${y}` // 初始化年份
-      this.ruleForm.major = '计算机科学与技术' // 初始化专业
-      this.majorType = this.type[this.type.length - 1].major // 初始化专业类型
-      this.banJiType = this.majorType[0].banJi // 初始化专业的班级数量
-      this.ruleForm.banJi = this.banJiType[0].label // 初始化班级 #1班#
+    getPageData () {
+      // 获取页面数据
+      let params = {
+        page: this.currentPage
+      }
+      
+      return Promise
+        .resolve()
+        .then(_ => {
+          this.isLoading = true
+        })
+        .then(_ => getAcademyData(this.section, params))
+        .then(res => {
+          console.log(res)
+          if (res.status === 200) {
+            let data = res.data
+            this.tableData = data.results
+            // this.isWrite = data.results.findIndex(item => item.permissions.write) >= 0
+            this.total = data.count
+            this.pageSize = this.total < 10 ? this.total : 10
+          }
+          this.isLoading = false
+        })
+        .catch(error => console.log(error.response))
     },
     addItem () {
-      this.setDefaultForm()
+      this.resetOperateFormData()
       this.isAdd = true
       this.isEdit = false
     },
-    back () {
-      this.resetRuleForm()
+    editRow (row) { // 打开编辑页面
+      this.isEdit = true
+      this.isLoading = true
+      editAcademyData(this.section, row.id)
+        .then(res => {
+          if (res.status === 200) {
+            for (let key in this.operateForm) {
+              this.operateForm[key] = res.data[key]
+            }
+          }
+        })
+        .then(_ => {
+          this.isLoading = false
+        })
     },
     addItemSubmit () { // 确定添加纪录
       this.$confirm('确定要添加该信息吗', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        if (this.validateForm()) {
-          this.createTimeFormat()
-          this.Users.push({
-            createDate: this.ruleForm.createDate,
-            username: this.ruleForm.username,
-            password: this.ruleForm.password,
-            grade: this.ruleForm.grade,
-            major: this.ruleForm.major,
-            banJi: this.ruleForm.banJi,
-            clientType: this.ruleForm.clientType
-          })
-          // uploadData
-          this.resetRuleForm()
-          this.$message({
-            type: 'success',
-            message: '添加成功'
-          })
-        } else {
-          this.$message({
-            type: 'error',
-            message: '添加失败'
-          })
-        }
-      }).catch(() => {
-        console.log('add error!!')
       })
+      .then(_ => {
+        this.isLoading = true
+        let params = this.getParams()
+        return addAcademyData(this.section, params)
+        
+        // 确定表单数据
+      })
+      .then(_ => {
+        this.$message({
+          type: 'success',
+          message: '添加成功'
+        })
+      })
+      .then(_ => this.getPageData())
+      .then(_ => this.resetOperateForm())
+      .catch(error => console.log('error submit!!', error))
     },
-    validateForm () { // 验证表单 还没写***********
+    deleteItemSubmit (row) { // 删除记录
+      this.$confirm('你确定要删除该记录！', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(_ => {
+          this.isLoading = true
+          return deleteAcademyData(this.section, row.id)
+        })
+        .then(_ => this.getPageData())
+        .catch(error => console.log('delete error!!', error))
+    },
+    editItemSubmit (formName) {
+      this.$confirm('确定要修改该信息吗', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(_ => {
+
+          this.isLoading = true
+          let params = this.getParams()
+          return updateAcademyData(this.section, this.operateForm.id, this.operateForm)
+        })
+        .then(res => {
+          if (res.status === 200) {
+            this.$message({
+              type: 'success',
+              message: '修改成功'
+            })
+          }
+        })
+        .then(_ => this.getPageData())
+        .then(_ => this.resetOperateForm())
+        .catch(error => console.log(error, 'edit error!!'))
+    },
+    // 辅助类方法
+    resetOperateForm () {
+      this.resetOperateFormData()
+      this.isEdit = false
+      this.isAdd = false
+    },
+    resetOperateFormData () {
+      if (this.section === 'teacher') {
+        this.operateForm = {
+          id: '',
+          created_time: '',
+          username: '',
+          password: '',
+          clientType: '老师'
+        }
+      } else {
+        this.operateForm = {
+          id: '',
+          created_time: '',
+          username: '',
+          password: '',
+          grade: '',
+          major: '',
+          banJi: '',
+          clientType: '学生'
+        }
+
+        this.gradeType = this.type.map(item => item.grade)
+        this.majorType = this.type[this.type.length - 1].major // 初始化专业类型
+        this.banJiType = this.majorType[0].banJi // 初始化专业的班级数量
+        this.operateForm.grade = this.gradeType[this.gradeType.length - 1]
+        this.operateForm.major = this.majorType[0].name
+        this.operateForm.banJi = this.banJiType[0].label // 初始化班级 #1班#
+      }
+    },
+    changeClientTypeFormat: (row, column) => {
+      let type = row[column.property]
+      if (type === '2') {
+        return '学生'
+      } else if (type === '1') {
+        return '老师'
+      }
+    },
+    selectTypeChange (grade, major) { // 年级和班级选择器改变的时候
+
+      this.majorType = this.type[this.gradeType.findIndex(item => item === grade)].major
+
+      this.banJiType = this.majorType[this.majorType.findIndex(item => item.name === major)].banJi
+    },
+    validateForm () { // 验证表单
       // 老师 1 学生 0
-      if (this.ruleForm.clientType) { // 选项为老师的时候
+      if (this.operateForm.clientType) { // 选项为老师的时候
         // 验证账号密码长度
-        let username = this.ruleForm.username.length
+        let username = this.operateForm.username.length
         if (username < 3 && username > 15) { // 判断用户名长度
           this.$message({
             type: 'error',
@@ -309,7 +352,7 @@ export default {
           })
           return false
         } else {
-          let password = this.ruleForm.password.length
+          let password = this.operateForm.password.length
           if (password < 3 && password > 15) {
             this.$message({
               type: 'error',
@@ -322,7 +365,7 @@ export default {
         }
       } else { // 选项为学生的时候
         // 验证账号密码长度
-        let username = this.ruleForm.username.length
+        let username = this.operateForm.username.length
         if (username < 3 && username > 15) { // 判断用户名长度
           this.$message({
             type: 'error',
@@ -330,7 +373,7 @@ export default {
           })
           return false
         } else {
-          let password = this.ruleForm.password.length
+          let password = this.operateForm.password.length
           if (password < 3 && password > 15) { // 判断密码长度
             this.$message({
               type: 'error',
@@ -338,21 +381,21 @@ export default {
             })
             return false
           } else {
-            if (!this.ruleForm.grade) { // 当年级为空的时候
+            if (!this.operateForm.grade) { // 当年级为空的时候
               this.$message({
                 type: 'error',
                 message: '年级不能为空'
               })
               return false
             } else {
-              if (!this.ruleForm.major) { // 专业为空时
+              if (!this.operateForm.major) { // 专业为空时
                 this.$message({
                   type: 'error',
                   message: '专业不能为空'
                 })
                 return false
               } else {
-                if (!this.ruleForm.banJi) { // 班级为空时
+                if (!this.operateForm.banJi) { // 班级为空时
                   this.$message({
                     type: 'error',
                     message: '班级不能为空'
@@ -367,84 +410,30 @@ export default {
         }
       }
     },
-    editRow (row, index) { // 打开编辑页面
-      this.isEdit = true
-      this.editingRow = index
-      for (let key in row) {
-        this.ruleForm[key] = row[key]
-      } // 使当前要编辑的数据绑定在表中
+    checkPermission () {
     },
-    deleteRow (index, rows) { // 删除记录
-      this.$confirm('你确定要删除该记录！', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        rows.splice(index, 1) // 从rows数据里删除一个
-        // uploadData
-      }).catch(() => {
-        console.log('delete error!!')
-      })
-    },
-    editSubmitForm (formName) {
-      this.$confirm('确定要修改该信息吗', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        if (this.validateForm()) {
-          for (let key in this.ruleForm) {
-            this.Users[this.editingRow][key] = this.ruleForm[key]
-          }
-          // uploadData
-          this.resetRuleForm()
-          this.$message({
-            type: 'success',
-            message: '修改成功'
-          })
-        } else {
+    getParams () {
+      // 确定数据
+      if (this.section === 'teacher') {
+        return {
+          username: this.operateForm.username,
+          password: this.operateForm.password
         }
-      }).catch(() => {
-        console.log('edit error!!')
-        return false
-      })
-    },
-    resetForm (formName) {
-      this.$refs[formName].resetFields()
-    },
-    resetRuleForm () {
-      for (let key in this.ruleForm) {
-        this.ruleForm[key] = ''
-      }
-      this.isEdit = false
-      this.isAdd = false
-    },
-    createTimeFormat () {
-      let now = new Date()
-      let y = now.getFullYear() // 获取年
-      let m = now.getMonth() + 1 // 获取月
-      let d = now.getDate() // 获取日
-      let h = now.getHours() // 获取小时
-      let mm = now.getMinutes() // 获取分钟
-      let s = now.getSeconds() + 1 // 获取秒
-      m = m < 10 ? '0' + m : m // 判断月是否大于10
-      d = d < 10 ? ('0' + d) : d // 判断日期是否大10
-      h = h < 10 ? '0' + h : h // 判断小时是否大10
-      mm = mm < 10 ? '0' + mm : mm // 判断分钟是否大10
-      s = s < 10 ? '0' + s : s // 判断秒数是否大10
-      this.ruleForm.createDate = y + '-' + m + '-' + d + ' ' + h + ':' + mm + ':' + s // 返回时间格式
-    },
-    changeClientTypeFormat: (row, column) => {
-      let type = row[column.property]
-      if (type === 0) {
-        return '学生'
-      } else if (type === 1) {
-        return '老师'
+      } else {
+        return {
+          username: this.operateForm.username,
+          password: this.operateForm.password,
+          grade: this.operateForm.grade,
+          stu_class: this.operateForm.stu_class,
+          major: this.operateForm.major
+        }
       }
     },
-    uploadData () {
-      // 完成更新数据
-    }
+    // 当路由发生变化
+    onRouteChange () {
+      // 当前页面分类
+      this.initialPageData()
+    },
   }
 }
 </script>

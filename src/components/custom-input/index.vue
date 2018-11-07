@@ -1,6 +1,7 @@
 <template lang="html">
   <span class="customInput">
     <input :class="pattern"
+           :style="width + 'px'"
            :id="label"
            :type="type"
            :placeholder="placeholder"
@@ -24,7 +25,7 @@ export default {
   // type:input类型
   // label:
   // placeholder
-  props: ['type', 'label', 'placeholder', 'pattern', 'value', 'focus'],
+  props: ['type', 'label', 'placeholder', 'pattern', 'value', 'focus', 'width'],
   methods: {
     // 双向绑定
     handleInput (event) {
