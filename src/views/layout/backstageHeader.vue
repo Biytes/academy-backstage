@@ -179,7 +179,6 @@ export default {
 }
 
 @media (min-width: 1200px) and (max-width: 1366px) {
-  
   .backstage-header {
     height:75px;
     &-logo {

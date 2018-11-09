@@ -44,7 +44,8 @@ module.exports = {
       '@router': resolve('src/router'),
       '@components': resolve('src/components'),
       '@mock': resolve('src/mock'),
-      '@api': resolve('src/runtime/api')
+      '@api': resolve('src/runtime/api'),
+      '@utils': resolve('src/runtime/utils')
     }
   },
   module: {

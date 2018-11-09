@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="page teacher-info" v-if="isLogin">
+  <div class="page teacher-info">
 
     <div class="top-bar">
       <el-button v-if="isWrite"
@@ -28,6 +28,14 @@
             width="100">
           </el-table-column>
           <el-table-column
+            label="图片"
+            align="center"
+            width="200">
+              <template slot-scope="scope">
+                <img  @click="showImagePage(scope.row.imageUrl)" :src="scope.row.imageUrl" height="100" alt="">
+              </template>
+          </el-table-column>
+          <el-table-column
             prop="position"
             label="职位"
             width="180">
@@ -51,30 +59,32 @@
             label="操作"
             width="150">
             <template slot-scope="scope">
-              <el-button 
-                v-if="isWrite"
-                @click.native.prevent="deleteItemSubmit(scope.$index, tableData)" 
-                type="text" 
-                size="small">
-                <i class="iconfont icon-delete" style="color:red;font-size:30px;"></i>
-              </el-button>
-              <el-button 
-                v-if="isWrite"
-                @click="editItem(scope.row, scope.$index)" 
-                type="text" 
-                size="small">
-                <i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i>
-              </el-button>
-              <el-button
-                @click="readItem(scope.row, scope.$index)"
-                type="text"
-                size="small">
-                <i class="iconfont icon-readme table-button-read"></i>
-              </el-button>
+              <div>
+                <el-button
+                  v-if="isWrite"
+                  @click.native.prevent="deleteItemSubmit(scope.$index, tableData)"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-delete" style="color:red;font-size:30px;"></i>
+                </el-button>
+                <el-button
+                  v-if="isWrite"
+                  @click="editItem(scope.row, scope.$index)"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i>
+                </el-button>
+                <el-button
+                  @click="readItem(scope.row, scope.$index)"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-readme table-button-read"></i>
+                </el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination  
+        <el-pagination
           background
           :current-page.sync="currentPage"
           :total="total"
@@ -93,9 +103,11 @@
           </el-form-item>
           <el-form-item label="教师图片:" prop="imageUrl" align="left">
             <image-uploader :syncImage.sync="operateForm.imageUrl"
+                            ref="imageUploader"
+                            type="id"
                             width="300"
                             height="300"></image-uploader>
-          </el-form-item>          
+          </el-form-item>
           <el-form-item label="简洁简介" prop="brief">
             <el-input type="textarea" v-model="operateForm.brief"></el-input>
           </el-form-item>
@@ -114,8 +126,8 @@
               :autosize="{ minRows: 6, maxRows: 6}"
               placeholder="请输入内容"
               v-model="operateForm.educationBackground"></el-input>
-                </el-form-item>
-                <el-form-item label="个人简介" prop="workingExperience" size="large">
+          </el-form-item>
+          <el-form-item label="个人简介" prop="workingExperience" size="large">
             <el-input
               type="textarea"
               :autosize="{ minRows: 6, maxRows: 6}"
@@ -152,8 +164,8 @@ export default {
   mounted () {
     this.section = this.$route.name
 
+    this.checkWritePermission()
     this.getPageData()
-      .then(_ => this.checkPermission())
   },
   data () {
     return {
@@ -560,7 +572,7 @@ export default {
   },
   computed: {
     ...mapState([
-      'isLogin'
+      'permissions'
     ])
   },
   methods: {
@@ -581,15 +593,16 @@ export default {
             let data = res.data
             this.tableData = data.results
             this.total = data.count
-            // this.isWrite = data.results.findIndex(item => item.permissions.write) >= 0
             this.pageSize = this.total < 10 ? this.total : 10
           }
         })
-        .then(_ => this.isLoading = false)
-        .catch(error => console.log(error))
+        .then(_ => {
+          this.isLoading = false
+        })
+        .catch(error => this.showError('get', error))
     },
-    checkPermission () {
-
+    checkWritePermission () {
+      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
     },
     // 控制page状态
     addItem () {
@@ -633,24 +646,24 @@ export default {
             education: this.operateForm.educationBackground,
             research_findings: this.operateForm.achievement,
             research_area: this.operateForm.researchArea,
-            workingExperience: this.operateForm.workingExperience,
-            socialPosition: this.operateForm.socialPosition,
+            social_position: this.operateForm.socialPosition,
             tel: this.operateForm.tel,
             email: this.operateForm.email,
             image: this.operateForm.imageUrl
           }
 
           return addAcademyData(this.section, params)
+            .then(_ => {
+              this.$message({
+                type: 'success',
+                message: '添加成功'
+              })
+            })
+            .then(_ => this.getPageData())
+            .then(_ => this.resetOperateForm())
+            .catch(error => this.showError('add', error))
         })
-        .then(_ => {
-          this.$message({
-            type: 'success',
-            message: '添加成功'
-          })
-        })
-        .then(_ => this.getPageData())
-        .then(_ => this.resetOperateForm())
-        .catch(error => console.los(error, 'add error'))
+        .catch(_ => {})
     },
     deleteItemSubmit (index, rows) {
       this.$confirm('你确定要删除该记录！', {
@@ -658,20 +671,21 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       })
-      .then(_ => {
-        this.loading = true
-        return deleteAcademyData(this.section, rows[index].id)
-      })
-      .then(res => {
-        if (res.status === 200) {
-          this.$message({
-            type: 'success',
-            message: '删除成功'
-          })
-        }
-      })
-      .then(_ => this.getPageData())
-      .catch(error => console.log(error, 'delete error'))
+        .then(_ => {
+          this.loading = true
+          return deleteAcademyData(this.section, rows[index].id)
+            .then(res => {
+              if (res.status === 200) {
+                this.$message({
+                  type: 'success',
+                  message: '删除成功'
+                })
+              }
+            })
+            .then(_ => this.getPageData())
+            .catch(error => this.showError('error', error))
+        })
+        .catch(_ => {})
     },
     editItemSubmit (formName) {
       this.$confirm('你确定要修改该记录！', {
@@ -682,18 +696,24 @@ export default {
         .then(_ => {
           this.isLoading = true
           return updateAcademyData(this.section, this.operateForm.id, this.operateForm)
-        })
-        .then(res => {
-          if (res.status === 200) {
-            this.$message({
-              type: 'success',
-              message: '修改成功'
+            .then(res => {
+              if (res.status === 200) {
+                this.$message({
+                  type: 'success',
+                  message: '修改成功'
+                })
+              }
             })
-          }
+            .then(_ => this.getPageData())
+            .then(_ => this.resetOperateForm())
+            .catch(error => this.showError('edit', error))
         })
-        .then(_ => this.getPageData())
-        .then(_ => this.resetOperateForm())
-        .catch(error => console.log(error, 'error submit!!'))
+        .catch(_ => {})
+    },
+    showError (type, error) {
+      this.$message.error('操作失败')
+      this.isLoading = false
+      console.log(`${type} error`, error)
     },
     resetOperateForm () {
       this.operateForm = {
@@ -708,11 +728,15 @@ export default {
         researchArea: '',
         achievement: ''
       }
+      this.$refs.imageUploader.clearUrl()
       this.isEdit = false
       this.isAdd = false
       this.isRead = false
-    }
-  },
+    },
+    ...mapMutations([
+      'showImagePage'
+    ])
+  }
 }
 </script>
 

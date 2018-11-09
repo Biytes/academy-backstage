@@ -20,17 +20,29 @@ export default {
   },
 
   // 保存用户信息Token
-  [SAVE_USER_INFO] (state, userInfo) {
+  [SAVE_USER_INFO] (state, res) {
+    let user = res.user
+
+    let userInfo = {
+      name: user.username,
+      token: res.token,
+      type: this.type
+    }
+
     state.userInfo = userInfo
+    state.permissions = user.user_permissions
   },
 
   // 登出 logout 清除状态
   [LOGOUT] (state) {
     state.isLogin = false
     state.userInfo = {
+      name: '',
       token: '',
       type: '0'
     }
+
+    state.permissions = ''
   },
 
   // 切换图片

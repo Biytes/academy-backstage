@@ -49,7 +49,6 @@ export default {
     }
   },
   mounted () {
-    
   },
   computed: {
     ...mapState([
@@ -68,12 +67,8 @@ export default {
         .then(res => {
           res = res.data // 把数据取出来
 
-          let userInfo = {
-            token: res.token,
-            type: this.type
-          }
           // 存储信息
-          this.saveUserInfo(userInfo)
+          this.saveUserInfo(res)
 
           this.login()
 

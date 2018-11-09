@@ -4,7 +4,6 @@
 
 <script>
 import E from 'wangeditor'
-import axios from 'axios'
 export default {
   name: 'wang-editor',
   data () {
@@ -18,21 +17,21 @@ export default {
       return this.$store.state.userInfo.token
     }
   },
-  props:['catchData'],    //接收父组件的方法
+  props: ['catchData'], // 接收父组件的方法
   mounted () {
-    var editor = new E(this.$refs.editorElem)        //创建富文本实例
+    var editor = new E(this.$refs.editorElem) // 创建富文本实例
     editor.customConfig.onchange = html => {
-        this.editorContent = html
-        this.catchData(html)  //把这个html通过catchData的方法传入父组件
+      this.editorContent = html
+      this.catchData(html) // 把这个html通过catchData的方法传入父组件
     }
     editor.customConfig.zIndex = 1
     editor.customConfig.uploadImgServer = 'https://schooltest.zunway.pw/api/v1/image'
     editor.customConfig.uploadFileName = 'image' // 改了就是字段名
     editor.customConfig.uploadImgHeaders = {
-        'Accept': '*/*',
-        'Authorization':'Token ' + this.token    //头部token
+      'Accept': '*/*',
+      'Authorization': 'Token ' + this.token // 头部token
     }
-    // editor.customConfig.menus = [          //菜单配置
+    // editor.customConfig.menus = [          // 菜单配置
     //     'head',
     //     'list',  // 列表
     //     'justify',  // 对齐方式
@@ -44,21 +43,18 @@ export default {
     //     'foreColor',  // 文字颜色
     //     'undo',  // 撤销
     //     'redo',  // 重复
-    //   ] 
-                //下面是最重要的的方法
+    //   ]
+    // 下面是最重要的的方法
     editor.customConfig.uploadImgHooks = {
       before: function (xhr, editor, files) {
         // 图片上传之前触发
         // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，files 是选择的图片文件
-        
         // 如果返回的结果是 {prevent: true, msg: 'xxxx'} 则表示用户放弃上传
         // return {
         //     prevent: true,
         //     msg: '放弃上传'
         // }
-
         console.log(files)
-
       },
       success: function (xhr, editor, result) {
         // 图片上传并返回结果，图片插入成功之后触发
@@ -98,8 +94,6 @@ export default {
   methods: {
     // 初始化Editor
     initialEditorContent (html) {
-      // console.log(html)
-      
       this.editor.txt.html(html)
     }
   }

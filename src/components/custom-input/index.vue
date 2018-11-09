@@ -45,7 +45,7 @@ $label-color: #fff;
 $label-background-color: #7AB893;
 $input-width: 310px;
 $text-indent: 100px;
-$font-size: 16px; 
+$font-size: 16px;
 
 .customInput{
   position: relative;

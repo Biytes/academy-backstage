@@ -213,7 +213,7 @@ export default {
               router: '/modified/student'
             }
           ]
-        },
+        }
       ],
       elSingleMenuItems: [
         {

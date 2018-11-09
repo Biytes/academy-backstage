@@ -1,12 +1,14 @@
 <template lang="html">
-  <div class="page banners-info" v-if="isLogin">
+  <div class="page banners-info">
 
     <div class="top-bar">
-      <el-button @click="addItem"
+      <el-button v-if="isWrite"
+                 @click="addItem"
                  type="text"
                  size="small"
                  class="top-bar-button-right right pointer"><i class="iconfont icon-plus"></i></el-button>
-      <el-button @click="back"
+      <el-button v-if="isWrite"
+                 @click="resetOperateForm"
                  type="text"
                  size="small"
                  class="top-bar-button-left left pointer"><i class="iconfont icon-arrowsleftline"></i></el-button>
@@ -14,18 +16,16 @@
 
     <el-card class="page-container">
 
-      <div class="tablePage" v-show="!isEdit && !isAdd">
+      <div class="tablePage" v-show="!isEdit && !isAdd" v-loading="isLoading">
         <el-table
           :data="tableData"
           border
           style="width: 100%;color:#333;">
           <el-table-column
             fixed
-            prop="date"
+            prop="created_time"
             label="日期"
-            align="center"
-            width="200"
-            sortable>
+            width="200">
           </el-table-column>
           <el-table-column
             label="图片"
@@ -41,7 +41,7 @@
             align="center">
           </el-table-column>
           <el-table-column
-            prop="briefContent"
+            prop="brief"
             label="内容简介"
             min-width="200"
             align="left">
@@ -69,219 +69,239 @@
             </template>
           </el-table-column>
         </el-table>
-        <!-- @size-change="handleSizeChange"
-        @current-change="handleCurrentChange" -->
         <el-pagination
           background
-          :current-page="pagination.currentPage"
-          :page-size="pagination.pageSize"
-          layout="total, prev, pager, next, jumper"
-          :total="totalDataNumber">
+          :current-page.sync="currentPage"
+          :total="total"
+          :page-size="pageSize"
+          @current-change="getPageData"
+          layout="total, prev, pager, next, jumper">
         </el-pagination>
       </div>
-
-      <div class="editPage" v-show="isAdd^isEdit">
-        <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-          <el-form-item label="日期" prop="date" align="left">
+      <div class="editPage" v-show="isAdd || isEdit || isRead" v-loading="isLoading">
+        <el-form :model="operateForm" ref="operateForm" label-width="100px" class="demo-operateForm">
+          <el-form-item label="日期" prop="created_time" align="left">
             <el-date-picker
-              v-model="ruleForm.date"
+              v-model="operateForm.created_time"
               align="right"
-              type="date"
+              type="datetime"
               placeholder="选择日期"
-              format="yyyy 年 MM 月 dd 日"
-              @change = "changeTimeFormat()">
+              value-format="yyyy 年 MM 月 dd 日 HH:mm:ss">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="标题" prop="title">
-            <el-input v-model="ruleForm.title"></el-input>
+            <el-input v-model="operateForm.title"></el-input>
           </el-form-item>
-          <el-form-item label="上传图片:" prop="imageUrl" align="left">
-            <label for="imgUrl" class="image-upload"><img id="showImg" :src="ruleForm.imageUrl" alt=""></label>
-            <input id="imgUrl" @change="changepic" type="file" ref="certicification_pic" />
+          <el-form-item label="教师图片:" prop="imageUrl" align="left">
+            <image-uploader :syncImage.sync="operateForm.imageUrl"
+                            ref="imageUploader"
+                            type="id"
+                            width="300"
+                            height="300"></image-uploader>
           </el-form-item>
-          <el-form-item label="内容简介" prop="briefContent">
+          <el-form-item label="内容简介" prop="brief">
             <el-input
               type="textarea"
               :autosize="{ minRows: 6, maxRows: 6}"
               placeholder="请输入内容"
-              v-model="ruleForm.briefContent">
+              v-model="operateForm.brief">
             </el-input>
           </el-form-item>
-          <el-form-item label="简介" prop="content">
-            <el-input v-model="ruleForm.content"></el-input>
-          </el-form-item>
-          <el-form-item class="wang-editor">
-            <wang-editor></wang-editor>
-          </el-form-item>
           <el-form-item>
-            <el-button v-show="!isAdd" type="success" @click="editSubmitForm('ruleForm')">完成</el-button>
-            <el-button v-show="isAdd" type="success" @click="addItemSubmit('ruleForm')">添加</el-button>
-            <el-button type="danger" @click="resetForm('ruleForm')">重置</el-button>
+            <el-button v-show="isEdit " type="success" @click="editItemSubmit">完成</el-button>
+            <el-button v-show="isAdd" type="success" @click="addItemSubmit">添加</el-button>
+            <el-button v-show="isRead" type="success" @click="resetOperateForm" class="read-button">返回</el-button>
+            <el-button v-show="!isRead" type="danger" @click="resetOperateForm">重置</el-button>
           </el-form-item>
         </el-form>
       </div>
-
     </el-card>
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex'
+import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
 
 export default {
   mounted () {
+    this.section = this.$route.name
 
-  },
-  created () {
+    this.checkWritePermission()
+    this.getPageData()
   },
   data () {
     return {
-      ruleForm: {
-        title: '',
-        date: '',
-        imageUrl: '',
-        briefContent: '',
-        content: ''
-      },
-      pagination: {
-        currentPage: 1,
-        pageSize: 6
-      },
-      pageTableData: [],
-      editingRow: '',
+      isLoading: false,
       isEdit: false,
-      isAdd: false
+      isAdd: false,
+      isWrite: true,
+      isRead: false,
+      section: '',
+      currentPage: 1,
+      total: 0,
+      pageSize: 10,
+      operateForm: {
+        id: '',
+        title: '',
+        created_time: '',
+        imageUrl: '',
+        brief: ''
+      },
+      tableData: []
     }
   },
   computed: {
-    tableData () {
-      return this.$store.state.testData.banners
-    },
-    totalDataNumber () {
-      return this.$store.state.testData.tableData.length
-    },
-    isLogin () {
-      return this.$store.state.isLogin
-    }
+    ...mapState([
+      'permissions'
+    ])
   },
   methods: {
+    getPageData () {
+      let params = {
+        page: this.currentPage
+      }
+
+      return Promise
+        .resolve()
+        .then(_ => {
+          this.isLoading = true
+        })
+        .then(_ => getAcademyData(this.section, params))
+        .then(res => {
+          console.log(res)
+          if (res.status === 200) {
+            let data = res.data
+            this.tableData = data.results
+            this.total = data.count
+            this.pageSize = this.total < 10 ? this.total : 10
+          }
+        })
+        .then(_ => {
+          this.isLoading = false
+        })
+        .catch(error => this.showError('get', error))
+    },
+    checkWritePermission () {
+      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
+    },
+    // 控制page状态
     addItem () {
+      this.resetOperateForm()
+      this.operateForm.created_time = new Date()
       this.isAdd = true
-      this.isEdit = false
     },
-    back () {
-      this.resetRuleForm()
+    editItem (row) { // 打开编辑页面
+      for (let key in this.rowNow) {
+        this.rowNow[key] = row[key]
+      }
+      this.isEdit = true
+      this.operateForm = row // 使当前要编辑的数据绑定在表中
     },
-    addItemSubmit () { // 确定添加纪录
-      this.$confirm('确定要添加该信息吗', {
+    readItem (row, index) {
+      this.isRead = true
+      this.isLoading = true
+      editAcademyData(this.section, row.id)
+        .then(res => {
+          if (res.status === 200) {
+            for (let key in this.operateForm) {
+              this.operateForm[key] = res.data[key]
+            }
+          }
+        })
+        .then(_ => {
+          this.isLoading = false
+        })
+    },
+    addItemSubmit () {
+      this.$confirm('你确定要添加该记录！', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
-        .then(() => {
-          // TODO 添加一条信息
-          // this.addCommunistInfo()
-          this.tableData.push({
-            title: this.ruleForm.title,
-            date: this.ruleForm.date,
-            imageUrl: this.ruleForm.imageUrl,
-            briefContent: this.ruleForm.briefContent,
-            content: this.ruleForm.content
-          })
-          // uploadData
-          this.resetRuleForm()
-          this.$message({
-            type: 'success',
-            message: '添加成功'
-          })
+        .then(_ => {
+          this.loading = true
+          let params = {
+            title: this.operateForm.title,
+            image: this.operateForm.imageUrl,
+            brief: this.operateForm.brief
+          }
+          return addAcademyData(this.section, params)
+            .then(_ => {
+              this.$message({
+                type: 'success',
+                message: '添加成功'
+              })
+            })
+            .then(_ => this.getPageData())
+            .then(_ => this.resetOperateForm())
+            .catch(error => this.showError('add', error))
         })
-        .catch(() => {
-        })
+        .catch(_ => {})
     },
-    editRow (row, index) { // 打开编辑页面
-      this.isEdit = true
-      this.editingRow = index
-      for (let key in row) {
-        this.ruleForm[key] = row[key]
-      } // 使当前要编辑的数据绑定在表中
-    },
-    deleteRow (index, rows) { // 删除记录
+    deleteItemSubmit (index, rows) {
       this.$confirm('你确定要删除该记录！', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        // TODO deleteCommunistInfo() 传id
-        rows.splice(index, 1) // 从rows数据里删除一个
-        // uploadData
-      }).catch(() => {
       })
+        .then(_ => {
+          this.loading = true
+          return deleteAcademyData(this.section, rows[index].id)
+            .then(res => {
+              if (res.status === 200) {
+                this.$message({
+                  type: 'success',
+                  message: '删除成功'
+                })
+              }
+            })
+            .then(_ => this.getPageData())
+            .catch(error => this.showError('error', error))
+        })
+        .catch(_ => {})
     },
-    editSubmitForm (formName) {
-      this.$confirm('确定要修改该信息吗', {
+    editItemSubmit (formName) {
+      this.$confirm('你确定要修改该记录！', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        // TODO updateCommunistInfo(params) 传id 和各个数据
-        for (let key in this.ruleForm) {
-          this.tableData[this.editingRow][key] = this.ruleForm[key]
-        }
-        // uploadData
-        this.resetRuleForm()
-        this.$message({
-          type: 'success',
-          message: '修改成功'
-        })
-      }).catch(() => {
-        console.log('error submit!!')
-        return false
       })
+        .then(_ => {
+          this.isLoading = true
+          return updateAcademyData(this.section, this.operateForm.id, this.operateForm)
+            .then(res => {
+              if (res.status === 200) {
+                this.$message({
+                  type: 'success',
+                  message: '修改成功'
+                })
+              }
+            })
+            .then(_ => this.getPageData())
+            .then(_ => this.resetOperateForm())
+            .catch(error => this.showError('edit', error))
+        })
+        .catch(_ => {})
     },
-    resetForm (formName) {
-      this.$refs[formName].resetFields()
+    showError (type, error) {
+      this.$message.error('操作失败')
+      this.isLoading = false
+      console.log(`${type} error`, error)
     },
-    resetRuleForm () {
-      for (let key in this.ruleForm) {
-        this.ruleForm[key] = ''
+    resetOperateForm () {
+      this.operateForm = {
+        id: '',
+        title: '',
+        imageUrl: '',
+        brief: ''
       }
+      this.$refs.imageUploader.clearUrl()
       this.isEdit = false
       this.isAdd = false
-    },
-    changepic (e) {
-      console.log(e)
-      // 获取img blob 格式 URL
-      var url = null
-      var file = e.target.files[0] // 也可以用下面的形式/
-      // var file = this.$refs['certicification_pic'].files[0]
-      /* window.URL = window.URL || window.webkitURL; */
-      if (window.createObjcectURL !== undefined) {
-        url = window.createOjcectURL(file)
-      } else if (window.URL !== undefined) {
-        url = window.URL.createObjectURL(file)
-      } else if (window.webkitURL !== undefined) {
-        url = window.webkitURL.createObjectURL(file)
-      }
-      this.ruleForm.imageUrl = url
-    },
-    changeTimeFormat () {
-      let date = new Date(this.ruleForm.date)
-      let now = new Date()
-      let y = date.getFullYear() // 获取年
-      let m = date.getMonth() + 1 // 获取月
-      let d = date.getDate() // 获取日
-      let h = now.getHours() // 获取小时
-      let mm = now.getMinutes() // 获取分钟
-      let s = now.getSeconds() + 1 // 获取秒
-      m = m < 10 ? '0' + m : m // 判断月是否大于10
-      d = d < 10 ? ('0' + d) : d // 判断日期是否大10
-      h = h < 10 ? '0' + h : h // 判断小时是否大10
-      mm = mm < 10 ? '0' + mm : mm // 判断分钟是否大10
-      s = s < 10 ? '0' + s : s // 判断秒数是否大10
-      this.ruleForm.date = y + '-' + m + '-' + d + ' ' + h + ':' + mm + ':' + s // 返回时间格式
+      this.isRead = false
     },
     ...mapMutations([
-      'loading',
       'showImagePage'
     ])
   }
@@ -290,64 +310,19 @@ export default {
 
 <style lang="scss" scoped>
 
-.page.banners-info {
+.page.teacher-info {
   .el-pagination{
     margin-top: 20px;
     margin-bottom: 10px;
   }
+}
+.table-button-delete{
+  color:red;
+  font-size:25px;
+}
 
-  input[type="file"]#imgUrl {
-      width: 0.1px;
-      height: 0.1px;
-      opacity: 0;
-      overflow: hidden;
-      position: absolute;
-      z-index: -1;
-  }
-  #showImg {
-    display: inline-block;
-    vertical-align: bottom;
-    width: 300px;
-    height:300px;
-  }
-
-  .image-upload {
-    display: inline-block;
-    border:2px dashed grey;
-    color: grey;
-    vertical-align: bottom;
-    position: relative;
-    cursor: pointer;
-
-    &:after {
-      content: '+';
-      position: absolute;
-      font-size: 2.5rem;
-      color: grey;
-      top: calc(50% - 1.7rem);
-      left: calc(50% - 1.25rem);
-      z-index: 1;
-    }
-
-    &:hover {
-      border:2px dashed #000;
-      color: #000;
-    }
-
-    &-text,
-    .item-description-text {
-      vertical-align: top;
-    }
-  }
-
-  .table-button-delete{
-    color:red;
-    font-size:25px;
-  }
-
-  .table-button-edit{
-    color:rgb(84, 80, 218);
-    font-size:25px;
-  }
+.table-button-edit{
+  color:rgb(84, 80, 218);
+  font-size:25px;
 }
 </style>

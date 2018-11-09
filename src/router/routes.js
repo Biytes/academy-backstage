@@ -36,7 +36,7 @@ export default [{
       name: 'gallery',
       path: '/gallery/:category',
       component: _import('gallery')
-    },  {
+    }, {
       name: 'modified',
       path: '/modified/:category',
       component: _import('modified')

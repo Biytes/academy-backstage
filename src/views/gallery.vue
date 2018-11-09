@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="page gallery" v-if="isLogin">
+  <div class="page gallery">
     <div class="top-bar">
       <span class="select-name">年级:</span>
       <el-select v-model="gradeType.value" placeholder="请选择" size="mini" @change="selectChange()">
@@ -225,9 +225,6 @@ export default {
     shelves () {
       console.log(this.$route.params.id) // 利用id获取需要的数据
       return this.$store.state.testData.shelves
-    },
-    isLogin () {
-      return this.$store.state.isLogin
     }
   },
   methods: {

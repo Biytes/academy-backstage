@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="page college-intro" v-if="isLogin">
+  <div class="page college-intro">
 
     <div class="top-bar">
       <el-button v-if="isWrite"
@@ -103,14 +103,6 @@
               v-model="operateForm.preview">
             </el-input>
           </el-form-item>
-          <el-form-item label="html文本" prop="preview">
-            <el-input
-              type="textarea"
-              :autosize="{ minRows: 6, maxRows: 6}"
-              placeholder="请输入内容"
-              v-model="operateForm.content">
-            </el-input>
-          </el-form-item>
           <el-form-item class="wang-editor">
             <wang-editor ref="editor" :catchData="catchData"></wang-editor>
           </el-form-item>
@@ -127,7 +119,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { mapState } from 'vuex'
 import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
 
 export default {
@@ -159,12 +151,12 @@ export default {
     this.section = this.$route.name
     this.category = this.$route.params.category
 
+    this.checkWritePermission()
     this.getPageData()
-      .then(_ => this.checkPermission())
   },
   computed: {
     ...mapState([
-      'isLogin'
+      'permissions'
     ])
   },
   watch: {
@@ -189,16 +181,15 @@ export default {
           if (res.status === 200) {
             let data = res.data
             this.tableData = data.results
-            this.isWrite = data.results.findIndex(item => item.permissions.write) >= 0
             this.total = data.count
             this.pageSize = this.total < 10 ? this.total : 10
           }
           this.isLoading = false
         })
-        .catch(error => console.log(error.response))
+        .catch(error => this.showError('get', error))
     },
-    checkPermission () {
-
+    checkWritePermission () {
+      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
     },
     // 改变页面状态
     addItem () {
@@ -221,6 +212,10 @@ export default {
         .then(_ => {
           this.isLoading = false
         })
+        .catch(error => {
+          this.showError('get', error)
+          this.resetOperateForm()
+        })
     },
     readItem (row) {
       this.isRead = true
@@ -231,13 +226,15 @@ export default {
             for (let key in this.operateForm) {
               this.operateForm[key] = res.data[key]
             }
+            this.$refs.editor.initialEditorContent(this.operateForm.content)
           }
-        })
-        .catch(res => {
-          console.log(res.response)
         })
         .then(_ => {
           this.isLoading = false
+        })
+        .catch(error => {
+          this.showError('get', error)
+          this.resetOperateForm()
         })
     },
     // 对数据进行操作
@@ -259,16 +256,16 @@ export default {
           }
 
           return addAcademyData(this.section, params)
+            .then(_ => {
+              this.$message({
+                type: 'success',
+                message: '添加成功'
+              })
+            })
+            .then(_ => this.getPageData())
+            .then(_ => this.resetOperateForm())
+            .catch(error => this.showError('add', error))
         })
-        .then(_ => {
-          this.$message({
-            type: 'success',
-            message: '添加成功'
-          })
-        })
-        .then(_ => this.getPageData())
-        .then(_ => this.resetOperateForm())
-        .catch(error => console.log(error, 'error submit!!'))
     },
     deleteItemSubmit (row) {
       this.$confirm('你确定要删除该记录！', {
@@ -279,9 +276,9 @@ export default {
         .then(_ => {
           this.isLoading = true
           return deleteAcademyData(this.section, row.id)
+            .then(_ => this.getPageData())
+            .catch(error => this.showError('delete', error))
         })
-        .then(_ => this.getPageData())
-        .catch(error => console.log(error, 'error delete!!'))
     },
     editItemSubmit () {
       this.$confirm('确定要修改该信息吗', {
@@ -292,18 +289,18 @@ export default {
         .then(_ => {
           this.isLoading = true
           return updateAcademyData(this.section, this.operateForm.id, this.operateForm)
-        })
-        .then(res => {
-          if (res.status === 200) {
-            this.$message({
-              type: 'success',
-              message: '修改成功'
+            .then(res => {
+              if (res.status === 200) {
+                this.$message({
+                  type: 'success',
+                  message: '修改成功'
+                })
+              }
             })
-          }
+            .then(_ => this.getPageData())
+            .then(_ => this.resetOperateForm())
+            .catch(error => this.showError('edit', error))
         })
-        .then(_ => this.getPageData())
-        .then(_ => this.resetOperateForm())
-        .catch(error => console.log(error, 'edit error!!'))
     },
     resetOperateForm () {
       console.log('reset')
@@ -316,6 +313,11 @@ export default {
       // 清空内容
       this.$refs.editor.initialEditorContent('')
     },
+    showError (type, error) {
+      this.$message.error('操作失败')
+      this.isLoading = false
+      console.log(`${type} error`, error)
+    },
     catchData (value) {
       // 在这里接受子组件传过来的参数，赋值给data里的参数
       this.operateForm.content = value
@@ -323,11 +325,9 @@ export default {
     // 当路由发生变化
     onRouteChange () {
       this.category = this.$route.params.category
+      this.currentPage = 1
       this.getPageData()
-    },
-    ...mapMutations([
-      'loading'
-    ])
+    }
   }
 }
 </script>

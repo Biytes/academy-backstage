@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="page modified-info" v-if="isLogin">
+  <div class="page modified-info">
 
     <div class="top-bar">
       <el-button @click="addItem"
@@ -40,7 +40,7 @@
           </el-table-column>
           <el-table-column
             v-if="isStudent"
-            prop="banJi"
+            prop="stu_class"
             align="center"
             label="班级">
           </el-table-column>
@@ -50,24 +50,26 @@
             label="账号">
           </el-table-column>
           <el-table-column
-            prop="password"
-            align="center"
-            label="密码">
-          </el-table-column>
-          <el-table-column
             prop="clientType"
             align="center"
             label="账户类型"
-            width="150"
-            :formatter="changeClientTypeFormat">
+            width="150">
           </el-table-column>
           <el-table-column
             fixed="right"
             align="center"
             label="操作">
             <template slot-scope="scope">
-              <el-button @click.native.prevent="deleteItemSubmit(scope.row)" type="text" size="small"><i class="iconfont icon-delete" style="color:red;font-size:30px;"></i></el-button>
-              <el-button @click="editRow(scope.row)" type="text" size="small"><i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i></el-button>
+              <el-button @click.native.prevent="deleteItemSubmit(scope.row)"
+                         type="text"
+                         size="small">
+                         <i class="iconfont icon-delete" style="color:red;font-size:30px;"></i>
+                         </el-button>
+              <el-button @click="editRow(scope.row)"
+                         type="text"
+                         size="small">
+                         <i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i>
+                         </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -85,8 +87,14 @@
 
       <div class="editPage" v-show="isAdd^isEdit" v-loading="isLoading">
         <el-form :model="operateForm" ref="operateForm" label-width="100px" class="demo-operateForm">
-          <el-form-item label="创建时间" prop="created_time" align="left">
-            <el-input v-model="operateForm.created_time"></el-input>
+          <el-form-item label="日期" prop="created_time" align="left">
+            <el-date-picker
+              v-model="operateForm.created_time"
+              align="right"
+              type="datetime"
+              placeholder="选择日期"
+              value-format="yyyy 年 MM 月 dd 日 HH:mm:ss">
+            </el-date-picker>
           </el-form-item>
           <el-form-item label="年级" prop="grade" v-if="isStudent" align="left">
             <el-select v-model="operateForm.grade" placeholder="请选择" size="medium" @change="selectTypeChange(operateForm.grade, operateForm.major)">
@@ -108,13 +116,13 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="班级" prop="banJi" v-if="isStudent" align="left">
-            <el-select v-model="operateForm.banJi" placeholder="请选择" size="medium">
+          <el-form-item label="班级" prop="stu_class" v-if="isStudent" align="left">
+            <el-select v-model="operateForm.stu_class" placeholder="请选择" size="medium">
               <el-option
                 v-for="item in banJiType"
                 :key="item.value"
                 :label="item.label"
-                :value="item.value">
+                :value="item.label">
               </el-option>
             </el-select>
           </el-form-item>
@@ -132,12 +140,10 @@
       </div>
 
     </el-card>
-    
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
 import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
 
 export default {
@@ -164,10 +170,6 @@ export default {
     this.initialPageData()
   },
   computed: {
-    ...mapState([
-      'userInfo',
-      'isLogin'
-    ]),
     type () {
       return this.$store.state.testData.type
     }
@@ -178,20 +180,19 @@ export default {
   methods: {
     // 当路由发生变化
     initialPageData () {
+      this.tableData = []
       this.section = this.$route.params.category // teacher or student
       this.isStudent = this.section === 'student'
-
+      this.currentPage = 1
       this.resetOperateForm()
-
       this.getPageData()
-        .then(_ => this.checkPermission())
     },
     getPageData () {
       // 获取页面数据
       let params = {
         page: this.currentPage
       }
-      
+
       return Promise
         .resolve()
         .then(_ => {
@@ -202,33 +203,60 @@ export default {
           console.log(res)
           if (res.status === 200) {
             let data = res.data
-            this.tableData = data.results
-            // this.isWrite = data.results.findIndex(item => item.permissions.write) >= 0
+            this.tableData = this.processData(data.results)
             this.total = data.count
             this.pageSize = this.total < 10 ? this.total : 10
           }
           this.isLoading = false
         })
-        .catch(error => console.log(error.response))
+        .catch(error => this.showError('get', error.response))
+    },
+    // 处理数据
+    processData (data) {
+      let results = data.map(item => {
+        return {
+          pk: item.user.pk,
+          created_time: item.user.date_joined,
+          username: item.user.username,
+          grade: item.grade || '',
+          major: item.major || '',
+          stu_class: item.stu_class || '',
+          clientType: this.section === 'teacher' ? '老师' : '学生'
+        }
+      })
+
+      return results
     },
     addItem () {
-      this.resetOperateFormData()
+      this.resetOperateForm()
+      this.operateForm.created_time = new Date()
       this.isAdd = true
-      this.isEdit = false
     },
     editRow (row) { // 打开编辑页面
       this.isEdit = true
       this.isLoading = true
-      editAcademyData(this.section, row.id)
+      editAcademyData(this.section, row.pk)
         .then(res => {
           if (res.status === 200) {
-            for (let key in this.operateForm) {
-              this.operateForm[key] = res.data[key]
+            let item = res.data
+            this.operateForm = {
+              pk: item.user.pk,
+              created_time: item.user.date_joined,
+              username: item.user.username,
+              password: '',
+              grade: item.grade || '',
+              major: item.major || '',
+              stu_class: item.stu_class || '',
+              clientType: this.section === 'teacher' ? '老师' : '学生'
             }
           }
         })
         .then(_ => {
           this.isLoading = false
+        })
+        .catch(error => {
+          this.$message.error('获取信息失败', error)
+          this.resetOperateForm()
         })
     },
     addItemSubmit () { // 确定添加纪录
@@ -237,22 +265,23 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       })
-      .then(_ => {
-        this.isLoading = true
-        let params = this.getParams()
-        return addAcademyData(this.section, params)
-        
-        // 确定表单数据
-      })
-      .then(_ => {
-        this.$message({
-          type: 'success',
-          message: '添加成功'
+        .then(_ => {
+          this.isLoading = true
+          let params = this.getParams()
+          return addAcademyData(this.section, params)
+          // 确定表单数据
+            .then(res => {
+              if (res.status === 200) {
+                this.$message({
+                  type: 'success',
+                  message: '添加成功'
+                })
+              }
+            })
+            .then(_ => this.getPageData())
+            .then(_ => this.resetOperateForm())
+            .catch(error => this.showError('add', error))
         })
-      })
-      .then(_ => this.getPageData())
-      .then(_ => this.resetOperateForm())
-      .catch(error => console.log('error submit!!', error))
     },
     deleteItemSubmit (row) { // 删除记录
       this.$confirm('你确定要删除该记录！', {
@@ -262,10 +291,18 @@ export default {
       })
         .then(_ => {
           this.isLoading = true
-          return deleteAcademyData(this.section, row.id)
+          return deleteAcademyData(this.section, row.pk)
+            .then(res => {
+              if (res.status === 200) {
+                this.$message({
+                  type: 'success',
+                  message: '删除成功'
+                })
+              }
+            })
+            .then(_ => this.getPageData())
+            .catch(error => this.showError('delete', error))
         })
-        .then(_ => this.getPageData())
-        .catch(error => console.log('delete error!!', error))
     },
     editItemSubmit (formName) {
       this.$confirm('确定要修改该信息吗', {
@@ -274,48 +311,45 @@ export default {
         type: 'warning'
       })
         .then(_ => {
-
           this.isLoading = true
           let params = this.getParams()
-          return updateAcademyData(this.section, this.operateForm.id, this.operateForm)
-        })
-        .then(res => {
-          if (res.status === 200) {
-            this.$message({
-              type: 'success',
-              message: '修改成功'
+          return updateAcademyData(this.section, this.operateForm.pk, params)
+            .then(res => {
+              console.log(res)
+              if (res.status === 200) {
+                this.$message({
+                  type: 'success',
+                  message: '修改成功'
+                })
+              }
             })
-          }
+            .then(_ => this.getPageData())
+            .then(_ => this.resetOperateForm())
+            .catch(error => this.showError('edit', error))
         })
-        .then(_ => this.getPageData())
-        .then(_ => this.resetOperateForm())
-        .catch(error => console.log(error, 'edit error!!'))
     },
     // 辅助类方法
     resetOperateForm () {
-      this.resetOperateFormData()
       this.isEdit = false
       this.isAdd = false
-    },
-    resetOperateFormData () {
       if (this.section === 'teacher') {
         this.operateForm = {
-          id: '',
+          pk: '',
           created_time: '',
           username: '',
           password: '',
-          clientType: '老师'
+          clientType: '1'
         }
       } else {
         this.operateForm = {
-          id: '',
+          pk: '',
           created_time: '',
           username: '',
           password: '',
           grade: '',
           major: '',
-          banJi: '',
-          clientType: '学生'
+          stu_class: '',
+          clientType: '2'
         }
 
         this.gradeType = this.type.map(item => item.grade)
@@ -323,19 +357,32 @@ export default {
         this.banJiType = this.majorType[0].banJi // 初始化专业的班级数量
         this.operateForm.grade = this.gradeType[this.gradeType.length - 1]
         this.operateForm.major = this.majorType[0].name
-        this.operateForm.banJi = this.banJiType[0].label // 初始化班级 #1班#
+        this.operateForm.stu_class = this.banJiType[0].label // 初始化班级 #1班#
       }
     },
-    changeClientTypeFormat: (row, column) => {
-      let type = row[column.property]
-      if (type === '2') {
-        return '学生'
-      } else if (type === '1') {
-        return '老师'
+    showError (type, error) {
+      this.$message.error('操作失败')
+      this.isLoading = false
+      console.log(`${type} error`, error)
+    },
+    getParams () {
+      // 确定数据
+      if (this.section === 'teacher') {
+        return {
+          username: this.operateForm.username,
+          password: this.operateForm.password
+        }
+      } else {
+        return {
+          username: this.operateForm.username,
+          password: this.operateForm.password,
+          grade: this.operateForm.grade,
+          stu_class: this.operateForm.stu_class,
+          major: this.operateForm.major
+        }
       }
     },
     selectTypeChange (grade, major) { // 年级和班级选择器改变的时候
-
       this.majorType = this.type[this.gradeType.findIndex(item => item === grade)].major
 
       this.banJiType = this.majorType[this.majorType.findIndex(item => item.name === major)].banJi
@@ -395,7 +442,7 @@ export default {
                 })
                 return false
               } else {
-                if (!this.operateForm.banJi) { // 班级为空时
+                if (!this.operateForm.stu_class) { // 班级为空时
                   this.$message({
                     type: 'error',
                     message: '班级不能为空'
@@ -410,30 +457,11 @@ export default {
         }
       }
     },
-    checkPermission () {
-    },
-    getParams () {
-      // 确定数据
-      if (this.section === 'teacher') {
-        return {
-          username: this.operateForm.username,
-          password: this.operateForm.password
-        }
-      } else {
-        return {
-          username: this.operateForm.username,
-          password: this.operateForm.password,
-          grade: this.operateForm.grade,
-          stu_class: this.operateForm.stu_class,
-          major: this.operateForm.major
-        }
-      }
-    },
     // 当路由发生变化
     onRouteChange () {
       // 当前页面分类
       this.initialPageData()
-    },
+    }
   }
 }
 </script>

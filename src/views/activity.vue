@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="page event-info" v-if="isLogin">
+  <div class="page event-info">
 
     <div class="top-bar">
       <el-button @click="addItem"
@@ -123,8 +123,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
-import { getAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
+import { mapState } from 'vuex'
 
 export default {
   mounted () {
@@ -152,7 +151,7 @@ export default {
   },
   computed: {
     ...mapState([
-      'isLogin'
+      'permissions'
     ])
   },
   methods: {
@@ -255,10 +254,7 @@ export default {
       // s = s < 10 ? '0' + s : s // 判断秒数是否大10
       // this.ruleForm.date = y + '-' + m + '-' + d + ' ' + h + ':' + mm + ':' + s // 返回时间格式
       console.log(this.ruleForm.startTime)
-    },
-    ...mapMutations([
-      'loading'
-    ])
+    }
   }
 }
 </script>

@@ -1,8 +1,10 @@
 export default {
   userInfo: {
     type: '0', // 0为管理员 1为老师 2为学生
-    token: ''
+    token: '',
+    username: 'admin'
   },
+  permissions: '',
   isLogin: false, // 是否登录成功
   loading: false,
   showImage: {
