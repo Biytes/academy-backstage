@@ -272,7 +272,7 @@ export default {
 </script>
 
 <style lang="scss">
-$height: 810px;
+$height: 85vh;
 // 响应式 更改height就行了
 
 // scroll bar
@@ -312,11 +312,4 @@ $height: 810px;
   }
 
 }
-@media screen and (max-width: 1366px) {
-  $height: 530px;
-  #backstage-menu {
-    height: $height;
-  }
-}
-
 </style>

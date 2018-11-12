@@ -93,7 +93,7 @@
               align="right"
               type="datetime"
               placeholder="选择日期"
-              value-format="yyyy 年 MM 月 dd 日 HH:mm:ss">
+              value-format="yyyy年 MM月 dd日 HH:mm:ss">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="年级" prop="grade" v-if="isStudent" align="left">

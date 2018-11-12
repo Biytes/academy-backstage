@@ -38,7 +38,7 @@
             prop="preview"
             label="内容简介"
             min-width="350"
-            align="left">
+            align="center">
           </el-table-column>
           <el-table-column
             fixed="right"
@@ -89,7 +89,7 @@
               align="right"
               type="datetime"
               placeholder="选择日期"
-              value-format="yyyy 年 MM 月 dd 日 HH:mm:ss">
+              value-format="yyyy年 MM月 dd日 HH:mm:ss">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="标题" prop="title">
@@ -121,7 +121,6 @@
 <script>
 import { mapState } from 'vuex'
 import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
-
 export default {
   data () {
     return {
@@ -140,7 +139,6 @@ export default {
       currentPage: 1,
       total: 0,
       pageSize: 10,
-      pageTableData: '',
       isEdit: false,
       isAdd: false,
       isRead: false
@@ -154,13 +152,13 @@ export default {
     this.checkWritePermission()
     this.getPageData()
   },
+  watch: {
+    '$route': 'onRouteChange'
+  },
   computed: {
     ...mapState([
       'permissions'
     ])
-  },
-  watch: {
-    '$route': 'onRouteChange'
   },
   methods: {
     getPageData () {
@@ -326,6 +324,7 @@ export default {
     onRouteChange () {
       this.category = this.$route.params.category
       this.currentPage = 1
+      this.resetOperateForm()
       this.getPageData()
     }
   }

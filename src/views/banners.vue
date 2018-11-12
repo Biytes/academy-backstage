@@ -32,7 +32,7 @@
             align="center"
             width="200">
               <template slot-scope="scope">
-                <img  @click="showImagePage(scope.row.imageUrl)" :src="scope.row.imageUrl" height="100" alt="">
+                <img  @click="showImagePage(`https://schooltest.zunway.pw/media/${scope.row.image_url}`)" :src="`https://schooltest.zunway.pw/media/${scope.row.image_url}`" height="100" alt="">
               </template>
           </el-table-column>
           <el-table-column
@@ -44,7 +44,7 @@
             prop="brief"
             label="内容简介"
             min-width="200"
-            align="left">
+            align="center">
           </el-table-column>
           <el-table-column
             fixed="right"
@@ -86,7 +86,7 @@
               align="right"
               type="datetime"
               placeholder="选择日期"
-              value-format="yyyy 年 MM 月 dd 日 HH:mm:ss">
+              value-format="yyyy年 MM月 dd日 HH:mm:ss">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="标题" prop="title">

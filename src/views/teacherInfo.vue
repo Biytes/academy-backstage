@@ -25,14 +25,15 @@
             fixed
             prop="name"
             label="名字"
-            width="100">
+            width="150"
+            align="center">
           </el-table-column>
           <el-table-column
             label="图片"
             align="center"
             width="200">
               <template slot-scope="scope">
-                <img  @click="showImagePage(scope.row.imageUrl)" :src="scope.row.imageUrl" height="100" alt="">
+                <img  @click="showImagePage(`https://schooltest.zunway.pw/media/${scope.row.image_url}`)" :src="`https://schooltest.zunway.pw/media/${scope.row.image_url}`" height="100" alt="">
               </template>
           </el-table-column>
           <el-table-column
@@ -41,18 +42,15 @@
             width="180">
           </el-table-column>
           <el-table-column
-            prop="researchArea"
-            label="研究方向">
-          </el-table-column>
-          <el-table-column
-            prop="educationBackground"
-            label="教育背景">
+            prop=tel
+            label="电话"
+            align="center">
           </el-table-column>
           <el-table-column
             prop="brief"
             label="个人简介"
             min-width="300"
-            align="left">
+            align="center">
           </el-table-column>
           <el-table-column
             fixed="right"
@@ -117,32 +115,8 @@
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="operateForm.email"></el-input>
           </el-form-item>
-          <el-form-item label="社会任职" prop="socialPosition" v-show="operateForm.socialPosition">
-            <el-input v-for="(socialItem, index) in operateForm.socialPosition" v-model="socialItem.position" :key="index"></el-input> <!--改成arrary-->
-          </el-form-item>
-          <el-form-item label="教育背景" prop="educationBackground">
-            <el-input
-              type="textarea"
-              :autosize="{ minRows: 6, maxRows: 6}"
-              placeholder="请输入内容"
-              v-model="operateForm.educationBackground"></el-input>
-          </el-form-item>
-          <el-form-item label="个人简介" prop="workingExperience" size="large">
-            <el-input
-              type="textarea"
-              :autosize="{ minRows: 6, maxRows: 6}"
-              placeholder="请输入内容"
-              v-model="operateForm.briefContent"></el-input>
-          </el-form-item>
-          <el-form-item label="研究方向" prop="researchArea">
-            <el-input v-model="operateForm.workingExperience"></el-input>
-          </el-form-item>
-          <el-form-item label="学术成果" prop="achievement" v-show="operateForm.achievement">
-            <el-input
-              type="textarea"
-              :autosize="{ minRows: 6, maxRows: 6}"
-              placeholder="请输入内容"
-              v-model="operateForm.achievement"></el-input>
+          <el-form-item prop="content">
+            <wang-editor ref="editor" :catchData="catchData"></wang-editor>
           </el-form-item>
           <el-form-item>
             <el-button v-show="isEdit " type="success" @click="editItemSubmit">完成</el-button>
@@ -187,11 +161,7 @@ export default {
         brief: '',
         tel: '',
         email: '',
-        socialPosition: [],
-        educationBackground: '',
-        workingExperience: '',
-        researchArea: '',
-        achievement: ''
+        content: ''
       },
       tableData: [],
       headmasters: [
@@ -610,11 +580,20 @@ export default {
       this.isAdd = true
     },
     editItem (row) { // 打开编辑页面
-      for (let key in this.rowNow) {
-        this.rowNow[key] = row[key]
-      }
       this.isEdit = true
-      this.operateForm = row // 使当前要编辑的数据绑定在表中
+      this.isLoading = true
+      editAcademyData(this.section, row.id)
+        .then(res => {
+          if (res.status === 200) {
+            for (let key in this.operateForm) {
+              this.operateForm[key] = res.data[key]
+            }
+          }
+          this.$refs.editor.initialEditorContent(this.operateForm.content)
+        })
+        .then(_ => {
+          this.isLoading = false
+        })
     },
     readItem (row, index) {
       this.isRead = true
@@ -626,6 +605,7 @@ export default {
               this.operateForm[key] = res.data[key]
             }
           }
+          this.$refs.editor.initialEditorContent(this.operateForm.content)
         })
         .then(_ => {
           this.isLoading = false
@@ -643,13 +623,10 @@ export default {
             name: this.operateForm.name,
             position: this.operateForm.position,
             brief: this.operateForm.brief,
-            education: this.operateForm.educationBackground,
-            research_findings: this.operateForm.achievement,
-            research_area: this.operateForm.researchArea,
-            social_position: this.operateForm.socialPosition,
             tel: this.operateForm.tel,
             email: this.operateForm.email,
-            image: this.operateForm.imageUrl
+            image: this.operateForm.imageUrl,
+            content: this.operateForm.content
           }
 
           return addAcademyData(this.section, params)
@@ -672,7 +649,7 @@ export default {
         type: 'warning'
       })
         .then(_ => {
-          this.loading = true
+          this.isLoading = true
           return deleteAcademyData(this.section, rows[index].id)
             .then(res => {
               if (res.status === 200) {
@@ -715,6 +692,10 @@ export default {
       this.isLoading = false
       console.log(`${type} error`, error)
     },
+    catchData (value) {
+      // 在这里接受子组件传过来的参数，赋值给data里的参数
+      this.operateForm.content = value
+    },
     resetOperateForm () {
       this.operateForm = {
         name: '',
@@ -723,10 +704,7 @@ export default {
         brief: '',
         tel: '',
         email: '',
-        socialPosition: '',
-        educationBackground: '',
-        researchArea: '',
-        achievement: ''
+        content: ''
       }
       this.$refs.imageUploader.clearUrl()
       this.isEdit = false

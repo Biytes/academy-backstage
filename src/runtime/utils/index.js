@@ -5,3 +5,4 @@
 
 export { default as Http } from './http'
 export * from './storage'
+export * from './misc'

@@ -75,7 +75,7 @@
               align="right"
               type="date"
               placeholder="选择日期:"
-              format="yyyy 年 MM 月 dd 日"
+              format="yyyy年 MM月 dd日"
               value-format="yyyy-MM-dd"
               :picker-options="datePicker">
             </el-date-picker>

@@ -18,19 +18,9 @@ a {
 }
 
 .page-container {
-  $height: 760px;
+  height: 80vh;
   padding: 10px;
   overflow: auto;
-  
-  @media screen and (min-width: 1400px) {
-    $height: 760px;
-    height: $height;
-  }
-
-  @media (min-width: 1200px) and (max-width: 1366px) {
-    $height: 500px;
-    height: $height;
-  }
 }
 
 .page-container::-webkit-scrollbar {
@@ -62,8 +52,6 @@ a {
 .pointer {
   cursor: pointer;
 }
-
-
 
 .clearfloat:after {
   display: block;

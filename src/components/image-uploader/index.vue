@@ -7,6 +7,7 @@
 
 <script>
 
+import { mapState } from 'vuex'
 export default {
   name: 'image-uploader',
   props: {
@@ -33,7 +34,10 @@ export default {
   computed: {
     style () {
       return `width: ${this.width}px;height: ${this.height}px;`
-    }
+    },
+    ...mapState([
+      'token'
+    ])
   },
   mounted () {
   },
@@ -49,10 +53,12 @@ export default {
       params.append('image', file)
 
       let config = {
-        headers: {'Content-Type': 'multipart/form-data'}
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': 'Token ' + this.token}
       }
 
-      this.axios.post('/api/image', params, config)
+      this.axios.post('https://schooltest.zunway.pw/api/v1/image', params, config)
         .then(res => {
           console.log(res)
           this.imageUrl = res.data.image

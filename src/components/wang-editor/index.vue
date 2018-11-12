@@ -107,6 +107,6 @@ export default {
   height: auto !important; // !important是重点，因为原div是行内样式设置的高度300px
 }
 .w-e-text img {
-  width: 60% !important;
+  width: 80% !important;
 }
 </style>

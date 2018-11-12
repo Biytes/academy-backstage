@@ -13,7 +13,7 @@
       </div>
 
     </div>
-    <div class="login-container">
+    <div class="login-container" v-loading="isLoading">
       <customInput type="text"
                     label="username"
                     pattern="gate"
@@ -39,10 +39,12 @@
 <script>
 import { checkAuth } from '@api/index'
 import { mapState, mapMutations } from 'vuex'
+import { setStorageExpirable } from '@utils/index'
 
 export default {
   data () {
     return {
+      isLoading: false,
       username: 'jinhai',
       password: '123456',
       type: '0'
@@ -57,32 +59,39 @@ export default {
   },
   methods: {
     async loginSubmit () {
+      this.isLoading = true
       let params = {
         username: this.username,
         password: this.password,
         type: this.type
       }
 
-      checkAuth(params)
-        .then(res => {
-          res = res.data // 把数据取出来
+      try {
+        let res = await checkAuth(params)
 
-          // 存储信息
-          this.saveUserInfo(res)
+        res = res.data // 把数据取出来
 
-          this.login()
+        let userInfo = JSON.stringify(res)
+        setStorageExpirable('userInfo', userInfo, 200 * 60 * 1000)
 
-          let path = res.type === '2' ? '/certificate' : '/collegeIntro/about'
+        // 存储信息
+        this.saveUserInfo(res)
 
-          this.$router.push({ path: path })
+        this.login()
+
+        this.$message.success('登陆成功')
+        let path = this.type === '2' ? '/certificate' : '/collegeIntro/about'
+
+        this.$router.push({ path })
+      } catch (e) {
+        console.log(e)
+        this.$message({
+          type: 'error',
+          message: '用户信息不正确'
         })
-        .catch(_ => {
-          console.log(_)
-          this.$message({
-            type: 'error',
-            message: '用户信息不正确'
-          })
-        })
+      } finally {
+        this.isLoading = false
+      }
     },
     ...mapMutations([
       'login',
