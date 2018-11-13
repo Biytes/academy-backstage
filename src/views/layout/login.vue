@@ -86,10 +86,7 @@ export default {
         this.$router.push({ path })
       } catch (e) {
         console.log(e)
-        this.$message({
-          type: 'error',
-          message: '用户信息不正确'
-        })
+        this.$message.error('用户信息不正确')
       } finally {
         this.isLoading = false
       }

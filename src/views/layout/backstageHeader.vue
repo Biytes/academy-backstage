@@ -66,10 +66,7 @@ export default {
         this.logout()
 
         this.$router.push({ path: '/' })
-        this.$message({
-          type: 'warning',
-          message: '用户已注销'
-        })
+        this.$message.warning('用户已注销')
       })
     },
     ...mapMutations([

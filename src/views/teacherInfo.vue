@@ -548,8 +548,8 @@ export default {
         .resolve()
         .then(_ => {
           this.isLoading = true
+          return getAcademyData(this.section, params)
         })
-        .then(_ => getAcademyData(this.section, params))
         .then(res => {
           console.log(res)
           if (res.status === 200) {

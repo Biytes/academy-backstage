@@ -197,8 +197,8 @@ export default {
         .resolve()
         .then(_ => {
           this.isLoading = true
+          return getAcademyData(this.section, params)
         })
-        .then(_ => getAcademyData(this.section, params))
         .then(res => {
           console.log(res)
           if (res.status === 200) {
@@ -235,7 +235,6 @@ export default {
       editAcademyData(this.section, row.pk)
         .then(res => {
           if (res.status === 200) {
-            let item = res.data
             this.operateForm = this.processData(res.data)
           }
         })
@@ -304,7 +303,7 @@ export default {
             })
             .then(_ => this.getPageData())
             .then(_ => this.resetOperateForm())
-            .catch(error => this.showError('edit', error))
+            .catch(error => this.showError(error))
         })
     },
     // 辅助类方法

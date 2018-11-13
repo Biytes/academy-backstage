@@ -176,6 +176,7 @@ export default {
             this.total = data.count
             this.pageSize = this.total < 10 ? this.total : 10
           }
+          this.isLoading = false
         })
         .catch(error => this.showError(error))
     },
@@ -268,7 +269,7 @@ export default {
               }
             })
             .then(_ => this.getPageData())
-            .catch(error => this.showError('error', error))
+            .catch(error => this.showError(error))
         })
         .catch(_ => {})
     },
@@ -288,7 +289,7 @@ export default {
             })
             .then(_ => this.getPageData())
             .then(_ => this.resetOperateForm())
-            .catch(error => this.showError('edit', error))
+            .catch(error => this.showError(error))
         })
         .catch(_ => {})
     },

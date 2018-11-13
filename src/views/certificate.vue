@@ -210,7 +210,6 @@ export default {
       currentPage: 1,
       pageSize: 6,
       total: 0,
-      
       isWrite: true,
       isLoading: false,
       isAddPage: false,
@@ -431,7 +430,11 @@ export default {
               style: 'background:' + this.randomColor()
             }
             return addAcademyData('certificatetag', params)
-              .then(_ => this.$message.success('标签添加成功'))
+              .then(res => {
+                if (res.status === 200) {
+                  this.$message.success('标签添加成功')
+                }
+              })
               .then(_ => this.getTags())
               .catch(error => this.showError(error))
           }

@@ -182,8 +182,8 @@ export default {
         .resolve()
         .then(_ => {
           this.isLoading = true
+          return getAcademyData(this.section, params)
         })
-        .then(_ => getAcademyData(this.section, params))
         .then(res => {
           console.log(res)
           if (res.status === 200) {
@@ -194,7 +194,7 @@ export default {
           }
           this.isLoading = false
         })
-        .catch(error => this.showError('get', error))
+        .catch(error => this.showError(error))
     },
     checkWritePermission () {
       this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
@@ -236,7 +236,7 @@ export default {
         .then(res => {
           if (res.status === 200) {
             this.operateForm = this.processData(res.data)
-             this.isLoading = false
+            this.isLoading = false
           }
         })
         .catch(error => {
