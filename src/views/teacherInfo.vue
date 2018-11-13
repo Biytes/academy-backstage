@@ -39,11 +39,7 @@
           <el-table-column
             prop="position"
             label="职位"
-            width="180">
-          </el-table-column>
-          <el-table-column
-            prop="telephone"
-            label="电话"
+            width="180"
             align="center">
           </el-table-column>
           <el-table-column
@@ -110,9 +106,6 @@
           <el-form-item label="简洁简介" prop="brief">
             <el-input type="textarea" v-model="operateForm.brief"></el-input>
           </el-form-item>
-          <el-form-item label="电话" prop="tel">
-            <el-input v-model="operateForm.tel"></el-input>
-          </el-form-item>
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="operateForm.email"></el-input>
           </el-form-item>
@@ -160,7 +153,6 @@ export default {
         image: '',
         position: '',
         brief: '',
-        tel: '',
         email: '',
         content: ''
       },
@@ -566,22 +558,19 @@ export default {
             this.total = data.count
             this.pageSize = this.total < 10 ? this.total : 10
           }
-        })
-        .then(_ => {
           this.isLoading = false
         })
-        .catch(error => this.showError('get', error))
+        .catch(error => this.showError(error))
     },
     checkWritePermission () {
       this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
     },
-    processData (item) {
+    processData (item = {}) {
       return {
         id: item.id,
         imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}`,
         image: item.image,
         name: item.name,
-        tel: item.telephone,
         brief: item.brief,
         position: item.position,
         email: item.email,
@@ -607,6 +596,10 @@ export default {
           }
           this.isLoading = false
         })
+        .catch(error => {
+          this.showError(error)
+          this.resetOperateForm()
+        })
     },
     readItem (row) {
       this.resetOperateForm()
@@ -621,6 +614,10 @@ export default {
           }
           this.isLoading = false
         })
+        .catch(error => {
+          this.showError(error)
+          this.resetOperateForm()
+        })
     },
     addItemSubmit () {
       this.$confirm('你确定要添加该记录！', {
@@ -634,7 +631,6 @@ export default {
             name: this.operateForm.name,
             position: this.operateForm.position,
             brief: this.operateForm.brief,
-            tel: this.operateForm.tel,
             email: this.operateForm.email,
             image: this.operateForm.image,
             content: this.operateForm.content
@@ -642,14 +638,11 @@ export default {
 
           return addAcademyData(this.section, params)
             .then(_ => {
-              this.$message({
-                type: 'success',
-                message: '添加成功'
-              })
+              this.$message.success('添加成功')
             })
             .then(_ => this.getPageData())
             .then(_ => this.resetOperateForm())
-            .catch(error => this.showError('add', error))
+            .catch(error => this.showError(error))
         })
         .catch(_ => {})
     },
@@ -664,14 +657,11 @@ export default {
           return deleteAcademyData(this.section, rows[index].id)
             .then(res => {
               if (res.status === 200) {
-                this.$message({
-                  type: 'success',
-                  message: '删除成功'
-                })
+                this.$message.success('删除成功')
               }
             })
             .then(_ => this.getPageData())
-            .catch(error => this.showError('error', error))
+            .catch(error => this.showError(error))
         })
         .catch(_ => {})
     },
@@ -686,39 +676,26 @@ export default {
           return updateAcademyData(this.section, this.operateForm.id, this.operateForm)
             .then(res => {
               if (res.status === 200) {
-                this.$message({
-                  type: 'success',
-                  message: '修改成功'
-                })
+                this.$message.success('修改成功')
               }
             })
             .then(_ => this.getPageData())
             .then(_ => this.resetOperateForm())
-            .catch(error => this.showError('edit', error))
+            .catch(error => this.showError(error))
         })
         .catch(_ => {})
     },
-    showError (type, error) {
-      this.$message.error(`${type} error`)
+    showError (error) {
+      this.$message.error(error.data.msg)
+      console.log('error status:', error.status, 'error:', error)
       this.isLoading = false
-      console.log(`${type} error`, error)
     },
     catchData (value) {
       // 在这里接受子组件传过来的参数，赋值给data里的参数
       this.operateForm.content = value
     },
     resetOperateForm () {
-      this.operateForm = {
-        id: '',
-        imageUrl: '',
-        image: '',
-        name: '',
-        tel: '',
-        brief: '',
-        position: '',
-        email: '',
-        content: ''
-      }
+      this.operateForm = this.processData()
       this.$refs.imageUploader.clearUrl()
       this.isEdit = false
       this.isAdd = false

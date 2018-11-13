@@ -166,8 +166,8 @@ export default {
         .resolve()
         .then(_ => {
           this.isLoading = true
+          return getAcademyData(this.section, params)
         })
-        .then(_ => getAcademyData(this.section, params))
         .then(res => {
           console.log(res)
           if (res.status === 200) {
@@ -177,12 +177,9 @@ export default {
             this.pageSize = this.total < 10 ? this.total : 10
           }
         })
-        .then(_ => {
-          this.isLoading = false
-        })
-        .catch(error => this.showError('get', error))
+        .catch(error => this.showError(error))
     },
-    processData (item) {
+    processData (item = {}) {
       return {
         id: item.id,
         title: item.title,
@@ -213,7 +210,7 @@ export default {
           this.isLoading = false
         })
         .catch(error => {
-          this.showError('get', error)
+          this.showError(error)
           this.resetOperateForm()
         })
     },
@@ -229,7 +226,7 @@ export default {
           this.isLoading = false
         })
         .catch(error => {
-          this.showError('get', error)
+          this.showError(error)
           this.resetOperateForm()
         })
     },
@@ -248,14 +245,11 @@ export default {
           }
           return addAcademyData(this.section, params)
             .then(_ => {
-              this.$message({
-                type: 'success',
-                message: '添加成功'
-              })
+              this.$message.success('添加成功')
             })
             .then(_ => this.getPageData())
             .then(_ => this.resetOperateForm())
-            .catch(error => this.showError('add', error))
+            .catch(error => this.showError(error))
         })
         .catch(_ => {})
     },
@@ -270,10 +264,7 @@ export default {
           return deleteAcademyData(this.section, row.id)
             .then(res => {
               if (res.status === 200) {
-                this.$message({
-                  type: 'success',
-                  message: '删除成功'
-                })
+                this.$message('删除成功')
               }
             })
             .then(_ => this.getPageData())
@@ -292,10 +283,7 @@ export default {
           return updateAcademyData(this.section, this.operateForm.id, this.operateForm)
             .then(res => {
               if (res.status === 200) {
-                this.$message({
-                  type: 'success',
-                  message: '修改成功'
-                })
+                this.$message.success('修改成功')
               }
             })
             .then(_ => this.getPageData())
@@ -304,20 +292,13 @@ export default {
         })
         .catch(_ => {})
     },
-    showError (type, error) {
-      this.$message.error(`${type} error`)
+    showError (error) {
+      this.$message.error(error.data.msg)
+      console.log('error status:', error.status, 'error:', error)
       this.isLoading = false
-      console.log(`${type} error`, error)
     },
     resetOperateForm () {
-      this.operateForm = {
-        id: '',
-        title: '',
-        created_time: '',
-        image: '',
-        imageUrl: '',
-        brief: ''
-      }
+      this.operateForm = this.processData()
       this.$refs.imageUploader.clearUrl()
       this.isEdit = false
       this.isAdd = false

@@ -41,6 +41,12 @@
             align="center">
           </el-table-column>
           <el-table-column
+            prop="ctr"
+            label="点击量"
+            align="center"
+            width="100">
+          </el-table-column>
+          <el-table-column
             fixed="right"
             label="操作"
             width="150"
@@ -106,10 +112,10 @@
           <el-form-item class="wang-editor">
             <wang-editor ref="editor" :catchData="catchData"></wang-editor>
           </el-form-item>
-          <el-form-item>
+          <el-form-item class="operate-button">
             <el-button v-show="isEdit " type="success" @click="editItemSubmit">完成</el-button>
             <el-button v-show="isAdd" type="success" @click="addItemSubmit">添加</el-button>
-            <el-button v-show="isRead" type="success" @click="resetOperateForm" class="read-button">返回</el-button>
+            <el-button v-show="isRead" type="success" @click="resetOperateForm">返回</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -121,7 +127,6 @@
 <script>
 import { mapState } from 'vuex'
 import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
-
 export default {
   data () {
     return {
@@ -131,15 +136,17 @@ export default {
       tableData: [],
       operateForm: {
         id: '',
+        preview: '',
         title: '',
         created_time: '',
-        preview: '',
-        content: ''
+        updated_time: '',
+        file: '',
+        content: '',
+        ctr: ''
       },
       currentPage: 1,
       total: 0,
       pageSize: 10,
-      pageTableData: '',
       isEdit: false,
       isAdd: false,
       isRead: false
@@ -168,22 +175,34 @@ export default {
         .resolve()
         .then(_ => {
           this.isLoading = true
+          return getAcademyData(this.section, params)
         })
-        .then(_ => getAcademyData(this.section, params))
         .then(res => {
           console.log(res)
           if (res.status === 200) {
             let data = res.data
-            this.tableData = data.results
+            this.tableData = data.results.map(item => this.processData(item))
             this.total = data.count
             this.pageSize = this.total < 10 ? this.total : 10
           }
           this.isLoading = false
         })
-        .catch(error => this.showError('get', error))
+        .catch(error => this.showError(error))
     },
     checkWritePermission () {
       this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
+    },
+    processData (item) {
+      return {
+        id: item.id,
+        preview: item.preview,
+        title: item.title,
+        created_time: item.created_time,
+        updated_time: item.updated_time,
+        file: item.file,
+        content: item.content,
+        ctr: item.ctr
+      }
     },
     // 改变页面状态
     addItem () {
@@ -197,9 +216,7 @@ export default {
       editAcademyData(this.section, row.id)
         .then(res => {
           if (res.status === 200) {
-            for (let key in this.operateForm) {
-              this.operateForm[key] = res.data[key]
-            }
+            this.operateForm = this.processData(res.data)
             this.$refs.editor.initialEditorContent(this.operateForm.content)
           }
         })
@@ -207,7 +224,7 @@ export default {
           this.isLoading = false
         })
         .catch(error => {
-          this.showError('get', error)
+          this.showError(error)
           this.resetOperateForm()
         })
     },
@@ -217,9 +234,7 @@ export default {
       editAcademyData(this.section, row.id)
         .then(res => {
           if (res.status === 200) {
-            for (let key in this.operateForm) {
-              this.operateForm[key] = res.data[key]
-            }
+            this.operateForm = this.processData(res.data)
             this.$refs.editor.initialEditorContent(this.operateForm.content)
           }
         })
@@ -227,7 +242,7 @@ export default {
           this.isLoading = false
         })
         .catch(error => {
-          this.showError('get', error)
+          this.showError(error)
           this.resetOperateForm()
         })
     },
@@ -249,16 +264,16 @@ export default {
           }
 
           return addAcademyData(this.section, params)
-            .then(_ => {
-              this.$message({
-                type: 'success',
-                message: '添加成功'
-              })
+            .then(res => {
+              if (res.status === 200) {
+                this.$message.success('添加成功')
+              }
             })
             .then(_ => this.getPageData())
             .then(_ => this.resetOperateForm())
-            .catch(error => this.showError('add', error))
+            .catch(error => this.showError(error))
         })
+        .catch(_ => {})
     },
     deleteItemSubmit (row) {
       this.$confirm('你确定要删除该记录！', {
@@ -269,8 +284,13 @@ export default {
         .then(_ => {
           this.isLoading = true
           return deleteAcademyData(this.section, row.id)
+            .then(res => {
+              if (res.status === 200) {
+                this.$message.success('删除成功')
+              }
+            })
             .then(_ => this.getPageData())
-            .catch(error => this.showError('delete', error))
+            .catch(error => this.showError(error))
         })
     },
     editItemSubmit () {
@@ -284,32 +304,28 @@ export default {
           return updateAcademyData(this.section, this.operateForm.id, this.operateForm)
             .then(res => {
               if (res.status === 200) {
-                this.$message({
-                  type: 'success',
-                  message: '修改成功'
-                })
+                this.$message.success('修改成功')
               }
             })
             .then(_ => this.getPageData())
             .then(_ => this.resetOperateForm())
-            .catch(error => this.showError('edit', error))
+            .catch(error => this.showError(error))
         })
     },
     resetOperateForm () {
       console.log('reset')
-      for (let key in this.operateForm) {
-        this.operateForm[key] = ''
-      }
+      this.operateForm = this.processData()
+
       this.isRead = false
       this.isEdit = false
       this.isAdd = false
       // 清空内容
       this.$refs.editor.initialEditorContent('')
     },
-    showError (type, error) {
-      this.$message.error(`${type} error`)
+    showError (error) {
+      this.$message.error(error.data.msg)
+      console.log('error status:', error.status, 'error:', error)
       this.isLoading = false
-      console.log(`${type} error`, error)
     },
     catchData (value) {
       // 在这里接受子组件传过来的参数，赋值给data里的参数
@@ -327,7 +343,7 @@ export default {
     margin-bottom: 10px;
   }
 }
-.read-button {
-  width: 50%;
+.operate-button  .el-button{
+  width: 30%;
 }
 </style>

@@ -67,6 +67,14 @@
               v-if="isWrite"
               v-show="isEditMode">+</li>
         </ul>
+        <el-pagination
+          background
+          :current-page.sync="currentPage"
+          :total="total"
+          :page-size="pageSize"
+          @current-change="getPageData"
+          layout="total, prev, pager, next, jumper">
+        </el-pagination>
       </div>
       <div v-show="isAddPage || isEditPage" v-loading="isLoading">
 
@@ -199,6 +207,10 @@ export default {
         stuClass: '',
         tags: []
       },
+      currentPage: 1,
+      pageSize: 6,
+      total: 0,
+      
       isWrite: true,
       isLoading: false,
       isAddPage: false,
@@ -221,21 +233,27 @@ export default {
   methods: {
     getPageData () {
       // 获取页面数据
+      let params = {
+        page: this.currentPage
+      }
+
       return Promise
         .resolve()
         .then(_ => {
           this.isLoading = true
+          return getAcademyData(this.section, params)
         })
-        .then(_ => getAcademyData(this.section))
         .then(res => {
           console.log(res)
           if (res.status === 200) {
             let data = res.data
             this.tableData = data.results.map(item => this.processData(item))
+            this.total = data.count
+            this.pageSize = this.total < 10 ? this.total : 10
           }
           this.isLoading = false
         })
-        .catch(error => this.showError('get', error))
+        .catch(error => this.showError(error))
     },
     getTags () {
       this.isLoading = true
@@ -249,7 +267,7 @@ export default {
           })
           this.isLoading = false
         })
-        .catch(error => this.showError('get Tags', error))
+        .catch(error => this.showError(error))
     },
     processData (item) {
       return {
@@ -279,10 +297,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.showAddPage()
-        this.$message({
-          type: 'success',
-          message: '请输入应填的信息!'
-        })
+        this.$message.success('请输入应填的信息!')
       })
     },
     showDescription (item) {
@@ -314,6 +329,7 @@ export default {
           this.resetOperateForm()
           this.isAddPage = true
         })
+        .catch(_ => {})
     },
     editItem (id) {
       this.isLoading = true
@@ -327,7 +343,7 @@ export default {
           }
           this.isLoading = false
         })
-        .catch(error => this.showError('get', error))
+        .catch(error => this.showError(error))
     },
     addItemSubmit () {
       this.$confirm('确定要添加新证书吗', {
@@ -355,11 +371,7 @@ export default {
             })
             .then(_ => this.getPageData())
             .then(_ => this.hideOperatePage())
-            .catch(error => {
-              // 失败了的话就不变，提示错误
-              this.isLoading = false
-              this.showError('add', error)
-            })
+            .catch(error => this.showError(error))
         })
     },
     editItemSubmit () {
@@ -388,11 +400,7 @@ export default {
             })
             .then(_ => this.getPageData())
             .then(_ => this.hideOperatePage())
-            .catch(error => {
-              // 失败了的话就不变，提示错误
-              this.isLoading = false
-              this.showError('edit', error)
-            })
+            .catch(error => this.showError(error))
         })
     },
     deleteItemSubmit (id) {
@@ -405,7 +413,7 @@ export default {
           this.isLoading = true
           return deleteAcademyData(this.section, id)
             .then(_ => this.getPageData())
-            .catch(error => this.showError('delete', error))
+            .catch(error => this.showError(error))
         })
         .catch(_ => {})
     },
@@ -416,10 +424,7 @@ export default {
       })
         .then(({ value }) => {
           if (value === null) {
-            this.$message({
-              type: 'warning',
-              message: '输入错误, 标签不能为空, 请重新输入'
-            })
+            this.$message.warning('输入错误, 标签不能为空, 请重新输入')
           } else {
             let params = {
               name: value,
@@ -428,7 +433,7 @@ export default {
             return addAcademyData('certificatetag', params)
               .then(_ => this.$message.success('标签添加成功'))
               .then(_ => this.getTags())
-              .catch(error => this.showError('add Tag', error))
+              .catch(error => this.showError(error))
           }
         })
         .catch(_ => {
@@ -469,10 +474,10 @@ export default {
       var b = this.random(256) | 0
       return 'rgb(' + r + ',' + g + ',' + b + ')'
     },
-    showError (type, error) {
-      this.$message.error(`${type} error`)
+    showError (error) {
+      this.$message.error(error.data.msg)
+      console.log('error status:', error.status, 'error:', error)
       this.isLoading = false
-      console.log(`${type} error`, error)
     },
     ...mapMutations([
       'showImagePage'
@@ -704,6 +709,9 @@ export default {
         color:rgb(37, 36, 36);
       }
     }
+  }
+  .el-pagination {
+    text-align: center;
   }
 }
 

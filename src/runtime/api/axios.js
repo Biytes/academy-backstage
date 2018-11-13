@@ -61,8 +61,11 @@ export const http = (type, url, params = {}) => Promise
   })
   .then(res => res)
   .catch(error => {
+    error = error.response
     // 当token expired的时候 重新回login界面
-    if (error.response.status === 401) {
+    if (error.status === 401) {
       router.push('/login')
+    } else {
+      throw error
     }
   })

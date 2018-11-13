@@ -188,7 +188,7 @@ export default {
           console.log(res)
           if (res.status === 200) {
             let data = res.data
-            this.tableData = data.results
+            this.tableData = data.results.map(item => this.processData(item))
             this.total = data.count
             this.pageSize = this.total < 10 ? this.total : 10
           }
@@ -198,6 +198,15 @@ export default {
     },
     checkWritePermission () {
       this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
+    },
+    processData (item = {}) {
+      return {
+        id: item.id,
+        title: item.title,
+        desc: item.desc,
+        end_date: item.end_date,
+        start_date: item.start_date
+      }
     },
     // 改变页面状态
     addItem () {
@@ -211,16 +220,12 @@ export default {
       editAcademyData(this.section, row.id)
         .then(res => {
           if (res.status === 200) {
-            for (let key in this.operateForm) {
-              this.operateForm[key] = res.data[key]
-            }
+            this.operateForm = this.processData(res.data)
+            this.isLoading = false
           }
         })
-        .then(_ => {
-          this.isLoading = false
-        })
         .catch(error => {
-          this.showError('get', error)
+          this.showError(error)
           this.resetOperateForm()
         })
     },
@@ -230,16 +235,12 @@ export default {
       editAcademyData(this.section, row.id)
         .then(res => {
           if (res.status === 200) {
-            for (let key in this.operateForm) {
-              this.operateForm[key] = res.data[key]
-            }
+            this.operateForm = this.processData(res.data)
+             this.isLoading = false
           }
         })
-        .then(_ => {
-          this.isLoading = false
-        })
         .catch(error => {
-          this.showError('get', error)
+          this.showError(error)
           this.resetOperateForm()
         })
     },
@@ -262,14 +263,11 @@ export default {
 
           return addAcademyData(this.section, params)
             .then(_ => {
-              this.$message({
-                type: 'success',
-                message: '添加成功'
-              })
+              this.$message.success('添加成功')
             })
             .then(_ => this.getPageData())
             .then(_ => this.resetOperateForm())
-            .catch(error => this.showError('add', error))
+            .catch(error => this.showError(error))
         })
     },
     deleteItemSubmit (row) {
@@ -283,14 +281,11 @@ export default {
           return deleteAcademyData(this.section, row.id)
             .then(res => {
               if (res.status === 200) {
-                this.$message({
-                  type: 'success',
-                  message: '删除成功'
-                })
+                this.$message.success('删除成功')
               }
             })
             .then(_ => this.getPageData())
-            .catch(error => this.showError('delete', error))
+            .catch(error => this.showError(error))
         })
     },
     editItemSubmit () {
@@ -304,30 +299,25 @@ export default {
           return updateAcademyData(this.section, this.operateForm.id, this.operateForm)
             .then(res => {
               if (res.status === 200) {
-                this.$message({
-                  type: 'success',
-                  message: '修改成功'
-                })
+                this.$message.success('修改成功')
               }
             })
             .then(_ => this.getPageData())
             .then(_ => this.resetOperateForm())
-            .catch(error => this.showError('edit', error))
+            .catch(error => this.showError(error))
         })
     },
     resetOperateForm () {
       console.log('reset')
-      for (let key in this.operateForm) {
-        this.operateForm[key] = ''
-      }
+      this.operateForm = this.processData()
       this.isRead = false
       this.isEdit = false
       this.isAdd = false
     },
-    showError (type, error) {
-      this.$message.error(`${type} error`)
+    showError (error) {
+      this.$message.error(error.data.msg)
+      console.log('error status:', error.status, 'error:', error)
       this.isLoading = false
-      console.log(`${type} error`, error)
     },
     catchData (value) {
       // 在这里接受子组件传过来的参数，赋值给data里的参数

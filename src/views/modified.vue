@@ -203,29 +203,26 @@ export default {
           console.log(res)
           if (res.status === 200) {
             let data = res.data
-            this.tableData = this.processData(data.results)
+            this.tableData = data.results.map(item => this.processData(item))
             this.total = data.count
             this.pageSize = this.total < 10 ? this.total : 10
           }
           this.isLoading = false
         })
-        .catch(error => this.showError('get', error.response))
+        .catch(error => this.showError(error))
     },
     // 处理数据
-    processData (data) {
-      let results = data.map(item => {
-        return {
-          pk: item.user.pk,
-          created_time: item.user.date_joined,
-          username: item.user.username,
-          grade: item.grade || '',
-          major: item.major || '',
-          stu_class: item.stu_class || '',
-          clientType: this.section === 'teacher' ? '老师' : '学生'
-        }
-      })
-
-      return results
+    processData (item) {
+      return {
+        pk: item.user.pk,
+        created_time: item.user.date_joined,
+        password: '',
+        username: item.user.username,
+        grade: item.grade || '',
+        major: item.major || '',
+        stu_class: item.stu_class || '',
+        clientType: this.section === 'teacher' ? '老师' : '学生'
+      }
     },
     addItem () {
       this.resetOperateForm()
@@ -239,23 +236,14 @@ export default {
         .then(res => {
           if (res.status === 200) {
             let item = res.data
-            this.operateForm = {
-              pk: item.user.pk,
-              created_time: item.user.date_joined,
-              username: item.user.username,
-              password: '',
-              grade: item.grade || '',
-              major: item.major || '',
-              stu_class: item.stu_class || '',
-              clientType: this.section === 'teacher' ? '老师' : '学生'
-            }
+            this.operateForm = this.processData(res.data)
           }
         })
         .then(_ => {
           this.isLoading = false
         })
         .catch(error => {
-          this.$message.error('获取信息失败', error)
+          this.$message.error(error)
           this.resetOperateForm()
         })
     },
@@ -272,15 +260,12 @@ export default {
           // 确定表单数据
             .then(res => {
               if (res.status === 200) {
-                this.$message({
-                  type: 'success',
-                  message: '添加成功'
-                })
+                this.$message.success('添加成功')
               }
             })
             .then(_ => this.getPageData())
             .then(_ => this.resetOperateForm())
-            .catch(error => this.showError('add', error))
+            .catch(error => this.showError(error))
         })
     },
     deleteItemSubmit (row) { // 删除记录
@@ -294,14 +279,11 @@ export default {
           return deleteAcademyData(this.section, row.pk)
             .then(res => {
               if (res.status === 200) {
-                this.$message({
-                  type: 'success',
-                  message: '删除成功'
-                })
+                this.$message.success('删除成功')
               }
             })
             .then(_ => this.getPageData())
-            .catch(error => this.showError('delete', error))
+            .catch(error => this.showError(error))
         })
     },
     editItemSubmit (formName) {
@@ -317,10 +299,7 @@ export default {
             .then(res => {
               console.log(res)
               if (res.status === 200) {
-                this.$message({
-                  type: 'success',
-                  message: '修改成功'
-                })
+                this.$message.success('修改成功')
               }
             })
             .then(_ => this.getPageData())
@@ -338,7 +317,7 @@ export default {
           created_time: '',
           username: '',
           password: '',
-          clientType: '1'
+          clientType: '老师'
         }
       } else {
         this.operateForm = {
@@ -349,7 +328,7 @@ export default {
           grade: '',
           major: '',
           stu_class: '',
-          clientType: '2'
+          clientType: '学生'
         }
 
         this.gradeType = this.type.map(item => item.grade)
@@ -360,10 +339,10 @@ export default {
         this.operateForm.stu_class = this.banJiType[0].label // 初始化班级 #1班#
       }
     },
-    showError (type, error) {
-      this.$message.error(`${type} error`)
+    showError (error) {
+      this.$message.error(error.data.msg)
+      console.log('error status:', error.status, 'error:', error)
       this.isLoading = false
-      console.log(`${type} error`, error)
     },
     getParams () {
       // 确定数据

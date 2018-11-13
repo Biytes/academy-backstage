@@ -106,7 +106,7 @@ export default {
   min-height: 500px;
   height: auto !important; // !important是重点，因为原div是行内样式设置的高度300px
 }
-.w-e-text img {
-  width: 80% !important;
+.w-e-text {
+  min-height: 500px;
 }
 </style>
