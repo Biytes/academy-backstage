@@ -30,78 +30,100 @@
       </el-select>
     </div>
     <el-card class="page-container">
-      <div v-for="(shelf, shelfIndex) in shelves" :key="shelfIndex" class="shelf" v-show="!addPage && !editPage">
-        <h3 class="shelf-name clearfloat">{{shelf.shelfName}}
+      <div class="shelf" v-show="!isAddPage && !isEditPage" v-loading="isLoading">
+        <h3 class="shelf-name clearfloat">
+          {{ this.section }}
           <div class="shelf-mode-control">
-            <span :class="{'shelf-mode-active': !shelf.editShelfMode}" @click="readMode(shelf)">Read</span>/
-            <span :class="{'shelf-mode-active': shelf.editShelfMode}" @click="editMode(shelf)">Edit</span>
+            <span :class="{'shelf-mode-active': !isEditMode}"
+                  @click="readMode">Read</span>
+            <span v-if="isWrite">/</span>
+            <span v-if="isWrite"
+                  :class="{'shelf-mode-active': isEditMode}"
+                  @click="editMode">Edit</span>
           </div>
         </h3>
         <ul class="shelf-inner">
-          <li v-for="(item, itemIndex) in shelf.Items" :key="itemIndex"  class="shelf-item">
+          <li v-for="item in tableData" :key="item.id"  class="shelf-item">
             <div class="shelf-item-info">
-              <img @click="showImagePage(item.imgUrl)" class="item-img" :src="item.imgUrl" alt="">
+              <img @click="showImagePage(item.imageUrl)" class="item-img" :src="item.imageUrl" alt="">
               <p class="item-name">
-                {{item.name}}
+                {{ item.name }}
               </p>
               <p class="item-owner clearfloat">
-                {{item.owner}}
-                <i class="item-icon-detail iconfont icon-detail" title="详情" @click="showDescription(item)" v-show="!shelf.editShelfMode"></i>
-                <a :href="item.imgUrl" download><i class="item-icon-download iconfont icon-download" title="下载" v-show="!shelf.editShelfMode"></i></a>
-                <i class="item-icon-edit iconfont icon-edit" title="编辑" @click="editItem(shelf, itemIndex)" v-show="shelf.editShelfMode"></i>
-                <i class="item-icon-delete iconfont icon-delete" title="删除" @click="deleteItem(shelf, itemIndex)" v-show="shelf.editShelfMode"></i>
+                {{ item.owner }}
+                <i class="item-icon-detail iconfont icon-detail" title="详情" @click="showDescription(item)" v-show="!isEditMode"></i>
+                <a :href="item.imageUrl" download><i class="item-icon-download iconfont icon-download" title="下载" v-show="!isEditMode"></i></a>
+                <i class="item-icon-edit iconfont icon-edit" title="编辑" @click="editItem(item.id)" v-show="isEditMode"></i>
+                <i class="item-icon-delete iconfont icon-delete" title="删除" @click="deleteItemSubmit(item.id)" v-show="isEditMode"></i>
               </p>
-              <p class="item-time clearfloat">获奖时间:<span>{{item.awardTime}}</span></p>
+              <p class="item-time clearfloat">获奖时间:<span>{{ item.awardTime }}</span></p>
               <div class="item-tags">                             <!--明天改-->
-                <span v-for="(tag, tagIndex) in tagsColor" v-show="contains(item.tags, tag.name)" :key="tagIndex" :style="tag.style" class="item-tag">{{tag.name}}</span>
+                <span v-for="tag in tags" v-show="tags.some(item => item === tag.name)" :key="tag.id" class="item-tag">{{ tag.name }}</span>
               </div>
             </div>
           </li>
-          <li class="shelf-add-item" @click="showShelfAddItemPage(shelf)" v-show="shelf.editShelfMode">+</li>
+          <li class="shelf-add-item"
+              @click="addItem()"
+              v-if="isWrite"
+              v-show="isEditMode">+</li>
         </ul>
       </div>
-      <div v-show="addPage || editPage">
+      <div v-show="isAddPage || isEditPage" v-loading="isLoading">
 
-        <el-form :model="addForm" ref="ruleForm" label-width="100px" class="demo-ruleForm add-page">
+        <el-form :model="operateForm" label-width="100px" class="demo-ruleForm add-page">
           <el-form-item label="证书名称:" prop="name">
-            <el-input v-model="addForm.name"></el-input>
+            <el-input v-model="operateForm.name"></el-input>
           </el-form-item>
           <el-form-item label="获奖得主:" prop="owner">
-            <el-input v-model="addForm.owner"></el-input>
+            <el-input v-model="operateForm.owner"></el-input>
+          </el-form-item>
+          <el-form-item label="年级" prop="grade">
+            <el-input placeholder="年级" v-model="operateForm.grade"></el-input>
+          </el-form-item>
+          <el-form-item label="专业" prop="major">
+            <el-input placeholder="专业" v-model="operateForm.major"></el-input>
+          </el-form-item>
+          <el-form-item label="班级" prop="stu_class">
+            <el-input placeholder="班级" v-model="operateForm.stu_class">
+              <template slot="append"><span>班</span></template>
+            </el-input>
           </el-form-item>
           <el-form-item label="得奖时间:" prop="awardTime" align="left">
             <el-date-picker
-              v-model="addForm.awardTime"
+              v-model="operateForm.awardTime"
               align="right"
               type="date"
               placeholder="选择日期:"
               format="yyyy年 MM月 dd日"
-              value-format="yyyy-MM-dd"
-              :picker-options="datePicker">
+              value-format="yyyy-MM-dd">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="上传图片:" prop="imgUrl">
-            <label for="imgUrl" class="image-upload"><img id="showImg" :src="addForm.imgUrl" alt=""></label>
-            <input id="imgUrl" @change="changepic" type="file" ref="certicification_pic" />
+          <el-form-item label="上传图片:" prop="imageUrl" align="left">
+            <image-uploader :syncImage.sync="operateForm.image"
+                            ref="imageUploader"
+                            width="300"
+                            height="300"></image-uploader>
           </el-form-item>
           <el-form-item label="证书类型:" prop="tags">
-            <el-checkbox-group v-model="addForm.tags" size="medium" style="display: inline-block;">
-              <el-checkbox-button v-for="tag in tags" :label="tag" :key="tag">{{tag}}</el-checkbox-button>
+            <el-checkbox-group v-model="operateForm.tags" size="medium" style="display: inline-block;">
+              <el-checkbox-button v-for="tag in tags"
+                                  :label="tag.id"
+                                  :key="tag.id">{{tag.name}}</el-checkbox-button>
             </el-checkbox-group>
-            <i class="iconfont icon-plus" id="addTags" @click="addTags()"></i>
+            <i class="iconfont icon-plus" id="addTags" @click="addTags"></i>
           </el-form-item>
           <el-form-item label="证书描述:" prop="description">
             <el-input
               type="textarea"
               :autosize="{ minRows: 6, maxRows: 6}"
               placeholder="请输入内容"
-              v-model="addForm.description">
+              v-model="operateForm.description">
             </el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="success" style="width:45%;" @click="shelfAddItem()" v-show="addPage">添加</el-button>
-            <el-button type="success" style="width:45%;" @click="shelfEditItem()" v-show="editPage">完成</el-button>
-            <el-button type="warning" style="width:45%;" @click="backToRead()">返回</el-button>
+            <el-button type="success" style="width:45%;" @click="addItemSubmit()" v-show="isAddPage">添加</el-button>
+            <el-button type="success" style="width:45%;" @click="editItemSubmit()" v-show="isEditPage">完成</el-button>
+            <el-button type="warning" style="width:45%;" @click="hideOperatePage()">返回</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -110,7 +132,8 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
+import { mapState, mapMutations } from 'vuex'
 
 export default {
   data () {
@@ -160,90 +183,102 @@ export default {
         }],
         value: ''
       },
-      tags: ['LQB', 'ACM', '广州', '深圳'],
-      tagsColor: [{
-        name: 'ACM',
-        style: {
-          background: 'rgb(231, 172, 251)'
-        }
-      }, {
-        name: 'LQB',
-        style: {
-          background: 'rgb(65, 179, 244)'
-        }
-      }, {
-        name: '深圳',
-        style: {
-          background: 'rgb(87, 119, 209)'
-        }
-      }, {
-        name: '广州',
-        style: {
-          background: 'rgb(207, 90, 48)'
-        }
-      }],
-      addForm: {
+      tags: [],
+      tableData: [],
+      section: '',
+      operateForm: {
+        id: '',
+        image: '',
+        imageUrl: '',
         name: '',
-        owner: '',
+        description: '',
         awardTime: '',
-        imgUrl: '',
-        tags: [''],
-        description: ''
+        owner: '',
+        grade: '',
+        major: '',
+        stuClass: '',
+        tags: []
       },
-      addPage: false,
-      editPage: false,
-      editingShelfId: '',
-      editingItemIndex: '',
-      datePicker: {
-        disabledDate (time) {
-          return time.getTime() > Date.now()
-        },
-        shortcuts: [{
-          text: '今天',
-          onClick (picker) {
-            picker.$emit('pick', new Date())
-          }
-        }, {
-          text: '昨天',
-          onClick (picker) {
-            const date = new Date()
-            date.setTime(date.getTime() - 3600 * 1000 * 24)
-            picker.$emit('pick', date)
-          }
-        }, {
-          text: '一周前',
-          onClick (picker) {
-            const date = new Date()
-            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7)
-            picker.$emit('pick', date)
-          }
-        }]
-      }
+      isWrite: true,
+      isLoading: false,
+      isAddPage: false,
+      isEditPage: false,
+      isEditMode: false
     }
   },
   computed: {
-    shelves () {
-      console.log(this.$route.params.id) // 利用id获取需要的数据
-      return this.$store.state.testData.shelves
-    }
+    ...mapState([
+      'permissions'
+    ])
+  },
+  mounted () {
+    this.section = this.$route.name
+
+    this.checkWritePermission()
+    this.getPageData()
+    this.getTags()
   },
   methods: {
+    getPageData () {
+      // 获取页面数据
+      return Promise
+        .resolve()
+        .then(_ => {
+          this.isLoading = true
+        })
+        .then(_ => getAcademyData(this.section))
+        .then(res => {
+          console.log(res)
+          if (res.status === 200) {
+            let data = res.data
+            this.tableData = data.results.map(item => this.processData(item))
+          }
+          this.isLoading = false
+        })
+        .catch(error => this.showError('get', error))
+    },
+    getTags () {
+      this.isLoading = true
+      getAcademyData('certificatetag')
+        .then(res => {
+          this.tags = res.data.results.map(item => {
+            return {
+              id: item.id,
+              name: item.name
+            }
+          })
+          this.isLoading = false
+        })
+        .catch(error => this.showError('get Tags', error))
+    },
+    processData (item) {
+      return {
+        id: item.id,
+        image: item.image,
+        imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}`,
+        name: item.name,
+        description: item.desc,
+        awardTime: item.award_time,
+        owner: item.owner,
+        grade: item.grade,
+        major: item.major,
+        stuClass: item.stu_class,
+        tags: item.tags
+      }
+    },
+    checkWritePermission () {
+      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
+    },
     selectChange () {
       // 通过这个val 来判断
     },
-    readMode (shelf) {
-      shelf.editShelfMode = false
-    },
-    editMode (shelf) {
-      shelf.editShelfMode = true
-    },
-    showShelfAddItemPage (shelf) {
+    showAddItemPage () {
       this.$confirm('添加新证书', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.showAddPage(shelf)
+        this.showAddPage()
         this.$message({
           type: 'success',
           message: '请输入应填的信息!'
@@ -263,158 +298,162 @@ export default {
         confirmButtonText: '确定'
       })
     },
-    showAddPage (shelf) {
-      this.addPage = true
-      this.editPage = false
-      this.editingShelfId = shelf.id
+    readMode () {
+      this.isEditMode = false
     },
-    shelfAddItem () {
+    editMode () {
+      this.isEditMode = true
+    },
+    addItem () {
       this.$confirm('确定要添加新证书吗', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.shelves[this.editingShelfId].Items.push({ // 赋值
-          name: this.addForm.name,
-          owner: this.addForm.owner,
-          awardTime: this.addForm.awardTime,
-          imgUrl: this.addForm.imgUrl,
-          tags: this.addForm.tags,
-          description: this.addForm.description
-        })
-        // 清除
-        this.clearForm()
-        this.$message({
-          type: 'success',
-          message: '添加成功'
-        })
-      }).catch(() => {
       })
+        .then(_ => {
+          this.resetOperateForm()
+          this.isAddPage = true
+        })
     },
-    shelfEditItem () {
+    editItem (id) {
+      this.isLoading = true
+      this.resetOperateForm()
+      this.isEditPage = true
+      editAcademyData(this.section, id)
+        .then(res => {
+          if (res.status === 200) {
+            this.operateForm = this.processData(res.data)
+            this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
+          }
+          this.isLoading = false
+        })
+        .catch(error => this.showError('get', error))
+    },
+    addItemSubmit () {
+      this.$confirm('确定要添加新证书吗', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(_ => {
+          this.isLoading = true
+          let params = {
+            name: this.operateForm.name,
+            desc: this.operateForm.description,
+            image: this.operateForm.image,
+            award_time: this.operateForm.awardTime,
+            owner: this.operateForm.owner,
+            grade: this.operateForm.grade,
+            major: this.operateForm.major,
+            stu_class: this.operateForm.stuClass,
+            tags: this.operateForm.tags
+          }
+
+          return addAcademyData(this.section, params)
+            .then(_ => {
+              this.$message.success('添加成功')
+            })
+            .then(_ => this.getPageData())
+            .then(_ => this.hideOperatePage())
+            .catch(error => {
+              // 失败了的话就不变，提示错误
+              this.isLoading = false
+              this.showError('add', error)
+            })
+        })
+    },
+    editItemSubmit () {
+      this.$confirm('确定要添加新证书吗', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(_ => {
+          this.isLoading = true
+          let params = {
+            name: this.operateForm.name,
+            desc: this.operateForm.description,
+            image: this.operateForm.imageUrl,
+            award_time: this.operateForm.awardTime,
+            owner: this.operateForm.owner,
+            grade: this.operateForm.grade,
+            major: this.operateForm.major,
+            stu_class: this.operateForm.stuClass,
+            tags: this.operateForm.tags
+          }
+
+          return updateAcademyData(this.section, this.operateForm.id, params)
+            .then(_ => {
+              this.$message.success('编辑成功')
+            })
+            .then(_ => this.getPageData())
+            .then(_ => this.hideOperatePage())
+            .catch(error => {
+              // 失败了的话就不变，提示错误
+              this.isLoading = false
+              this.showError('edit', error)
+            })
+        })
+    },
+    deleteItemSubmit (id) {
       this.$confirm('确定保存本次编辑吗', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        var shelfId = this.editingShelfId
-        var itemId = this.editingItemIndex
-        for (let key in this.addForm) {
-          this.shelves[shelfId].Items[itemId][key] = this.addForm[key]
-        } // 遍历属性赋值
-        // 清除
-        this.clearForm()
-        this.$message({
-          type: 'success',
-          message: '编辑成功'
-        })
-      }).catch(() => {
       })
-    },
-    clearForm () {
-      this.addPage = false
-      this.editPage = false
-      this.addForm.name = ''
-      this.addForm.owner = ''
-      this.addForm.awardTime = ''
-      this.addForm.imgUrl = ' '
-      this.addForm.tags = ['']
-      this.addForm.description = ''
+        .then(_ => {
+          this.isLoading = true
+          return deleteAcademyData(this.section, id)
+            .then(_ => this.getPageData())
+            .catch(error => this.showError('delete', error))
+        })
+        .catch(_ => {})
     },
     addTags () {
       this.$prompt('请输入新标签', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消'
-      }).then(({ value }) => {
-        console.log(value)
-        if (value === null) {
-          this.$message({
-            type: 'warning',
-            message: '输入错误, 标签不能为空, 请重新输入'
-          })
-        } else {
-          this.tags[this.tags.length] = value
-          this.tagsColor.push({
-            name: value,
-            style: 'background:' + this.randomColor()
-          })
-          this.$message({
-            type: 'success',
-            message: '新标签是: ' + value
-          })
-        }
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '取消输入'
+      })
+        .then(({ value }) => {
+          if (value === null) {
+            this.$message({
+              type: 'warning',
+              message: '输入错误, 标签不能为空, 请重新输入'
+            })
+          } else {
+            let params = {
+              name: value,
+              style: 'background:' + this.randomColor()
+            }
+            return addAcademyData('certificatetag', params)
+              .then(_ => this.$message.success('标签添加成功'))
+              .then(_ => this.getTags())
+              .catch(error => this.showError('add Tag', error))
+          }
         })
-      })
+        .catch(_ => {
+          this.$message('取消输入')
+        })
     },
-    backToRead () {
-      this.addPage = false
-      this.editPage = false
-      this.addForm.name = ''
-      this.addForm.owner = ''
-      this.addForm.awardTime = ''
-      this.addForm.imgUrl = ' '
-      this.addForm.tagArray = ['ACM']
-      this.addForm.description = ''
-      this.editingItemIndex = ''
-      this.editingShelfId = ''
+    hideOperatePage () {
+      this.isAddPage = false
+      this.isEditPage = false
+      this.resetOperateForm()
     },
-    contains (arr, obj) {
-      return arr.some(item => item === obj)
-    },
-    changepic (e) {
-      console.log(e)
-      // 获取img blob 格式 URL
-      var url = null
-      var file = e.target.files[0] // 也可以用下面的形式/
-      // var file = this.$refs['certicification_pic'].files[0]
-      /* window.URL = window.URL || window.webkitURL; */
-      if (window.createObjcectURL !== undefined) {
-        url = window.createOjcectURL(file)
-      } else if (window.URL !== undefined) {
-        url = window.URL.createObjectURL(file)
-      } else if (window.webkitURL !== undefined) {
-        url = window.webkitURL.createObjectURL(file)
+    resetOperateForm () {
+      this.operateForm = {
+        id: '',
+        imageUrl: '',
+        name: '',
+        description: '',
+        awardTime: '',
+        owner: '',
+        grade: '',
+        major: '',
+        stuClass: '',
+        tags: []
       }
-      this.addForm.imgUrl = url
-    },
-    // changeTimeFormat () {
-    //   var date = new Date(this.addForm.awardTime)
-    //   var y = date.getFullYear() // 获取年
-    //   var m = date.getMonth() + 1 // 获取月
-    //   var d = date.getDate() // 获取日
-    //   m = m < 10 ? '0' + m : m // 判断月是否大于10
-    //   d = d < 10 ? ('0' + d) : d // 判断日期是否大10
-    //   this.addForm.awardTime = y + '-' + m + '-' + d // 返回时间格式
-    // },
-    editItem (shelf, index) {
-      this.$confirm('确定要编辑证书吗', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.editingShelfId = shelf.id
-        this.editingItemIndex = index
-        for (let key in this.addForm) {
-          this.addForm[key] = shelf.Items[index][key]
-        } // 遍历属性
-        this.editPage = true
-      }).catch(() => {
-      })
-    },
-    deleteItem (shelf, index) {
-      this.$confirm('确定要删除证书吗', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        console.log(index)
-        shelf.Items.splice(index, 1)
-      }).catch(() => {
-      })
+      this.$refs.imageUploader.clearUrl()
     },
     random (max, min) {
       if (typeof max !== 'number') {
@@ -430,8 +469,12 @@ export default {
       var b = this.random(256) | 0
       return 'rgb(' + r + ',' + g + ',' + b + ')'
     },
+    showError (type, error) {
+      this.$message.error(`${type} error`)
+      this.isLoading = false
+      console.log(`${type} error`, error)
+    },
     ...mapMutations([
-      'loading',
       'showImagePage'
     ])
   }
@@ -500,7 +543,7 @@ export default {
         padding: 15px 17px 5px;
 
         .item-img {
-          height:200px;
+          height:250px;
           width:auto;
         }
 

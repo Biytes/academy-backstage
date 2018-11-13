@@ -32,7 +32,7 @@
             align="center"
             width="200">
               <template slot-scope="scope">
-                <img  @click="showImagePage(`https://schooltest.zunway.pw/media/${scope.row.image_url}`)" :src="`https://schooltest.zunway.pw/media/${scope.row.image_url}`" height="100" alt="">
+                <img  @click="showImagePage(scope.row.imageUrl)" :src="scope.row.imageUrl" height="100" alt="">
               </template>
           </el-table-column>
           <el-table-column
@@ -54,13 +54,13 @@
             <template slot-scope="scope">
               <div>
                 <el-button
-                  @click.native.prevent="deleteRow(scope.$index, tableData)"
+                  @click.native.prevent="deleteItemSubmit(scope.row)"
                   type="text"
                   size="small">
                   <i class="iconfont icon-delete table-button-delete"></i>
                 </el-button>
                 <el-button
-                  @click="editRow(scope.row, scope.$index)"
+                  @click="editItem(scope.row)"
                   type="text"
                   size="small">
                   <i class="iconfont icon-edit06 table-button-edit"></i>
@@ -92,8 +92,8 @@
           <el-form-item label="标题" prop="title">
             <el-input v-model="operateForm.title"></el-input>
           </el-form-item>
-          <el-form-item label="教师图片:" prop="imageUrl" align="left">
-            <image-uploader :syncImage.sync="operateForm.imageUrl"
+          <el-form-item label="教师图片:" prop="image" align="left">
+            <image-uploader :syncImage.sync="operateForm.image"
                             ref="imageUploader"
                             type="id"
                             width="300"
@@ -145,7 +145,7 @@ export default {
         id: '',
         title: '',
         created_time: '',
-        imageUrl: '',
+        image: '',
         brief: ''
       },
       tableData: []
@@ -172,7 +172,7 @@ export default {
           console.log(res)
           if (res.status === 200) {
             let data = res.data
-            this.tableData = data.results
+            this.tableData = data.results.map(item => this.processData(item))
             this.total = data.count
             this.pageSize = this.total < 10 ? this.total : 10
           }
@@ -181,6 +181,16 @@ export default {
           this.isLoading = false
         })
         .catch(error => this.showError('get', error))
+    },
+    processData (item) {
+      return {
+        id: item.id,
+        title: item.title,
+        created_time: item.created_time,
+        imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}`,
+        image: item.image,
+        brief: item.brief
+      }
     },
     checkWritePermission () {
       this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
@@ -192,11 +202,20 @@ export default {
       this.isAdd = true
     },
     editItem (row) { // 打开编辑页面
-      for (let key in this.rowNow) {
-        this.rowNow[key] = row[key]
-      }
       this.isEdit = true
-      this.operateForm = row // 使当前要编辑的数据绑定在表中
+      this.isLoading = true
+      editAcademyData(this.section, row.id)
+        .then(res => {
+          if (res.status === 200) {
+            this.operateForm = this.processData(res.data)
+            this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
+          }
+          this.isLoading = false
+        })
+        .catch(error => {
+          this.showError('get', error)
+          this.resetOperateForm()
+        })
     },
     readItem (row, index) {
       this.isRead = true
@@ -204,13 +223,14 @@ export default {
       editAcademyData(this.section, row.id)
         .then(res => {
           if (res.status === 200) {
-            for (let key in this.operateForm) {
-              this.operateForm[key] = res.data[key]
-            }
+            this.operateForm = this.processData(res.data)
+            this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
           }
-        })
-        .then(_ => {
           this.isLoading = false
+        })
+        .catch(error => {
+          this.showError('get', error)
+          this.resetOperateForm()
         })
     },
     addItemSubmit () {
@@ -223,7 +243,7 @@ export default {
           this.loading = true
           let params = {
             title: this.operateForm.title,
-            image: this.operateForm.imageUrl,
+            image: this.operateForm.image,
             brief: this.operateForm.brief
           }
           return addAcademyData(this.section, params)
@@ -239,7 +259,7 @@ export default {
         })
         .catch(_ => {})
     },
-    deleteItemSubmit (index, rows) {
+    deleteItemSubmit (row) {
       this.$confirm('你确定要删除该记录！', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -247,7 +267,7 @@ export default {
       })
         .then(_ => {
           this.loading = true
-          return deleteAcademyData(this.section, rows[index].id)
+          return deleteAcademyData(this.section, row.id)
             .then(res => {
               if (res.status === 200) {
                 this.$message({
@@ -285,7 +305,7 @@ export default {
         .catch(_ => {})
     },
     showError (type, error) {
-      this.$message.error('操作失败')
+      this.$message.error(`${type} error`)
       this.isLoading = false
       console.log(`${type} error`, error)
     },
@@ -293,6 +313,8 @@ export default {
       this.operateForm = {
         id: '',
         title: '',
+        created_time: '',
+        image: '',
         imageUrl: '',
         brief: ''
       }
@@ -310,7 +332,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.page.teacher-info {
+.page.banners-info {
   .el-pagination{
     margin-top: 20px;
     margin-bottom: 10px;

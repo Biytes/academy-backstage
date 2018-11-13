@@ -16,7 +16,7 @@
 
     <el-card class="page-container">
 
-      <div class="tablePage" v-show="!isEdit && !isAdd" v-loading="isLoading">
+      <div class="tablePage" v-show="!isEdit && !isAdd && !isRead" v-loading="isLoading">
         <el-table
           :data="tableData"
           border
@@ -33,7 +33,7 @@
             align="center"
             width="200">
               <template slot-scope="scope">
-                <img  @click="showImagePage(`https://schooltest.zunway.pw/media/${scope.row.image_url}`)" :src="`https://schooltest.zunway.pw/media/${scope.row.image_url}`" height="100" alt="">
+                <img  @click="showImagePage(scope.row.imageUrl)" :src="scope.row.imageUrl" height="100" alt="">
               </template>
           </el-table-column>
           <el-table-column
@@ -42,7 +42,7 @@
             width="180">
           </el-table-column>
           <el-table-column
-            prop=tel
+            prop="telephone"
             label="电话"
             align="center">
           </el-table-column>
@@ -67,13 +67,13 @@
                 </el-button>
                 <el-button
                   v-if="isWrite"
-                  @click="editItem(scope.row, scope.$index)"
+                  @click="editItem(scope.row)"
                   type="text"
                   size="small">
                   <i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i>
                 </el-button>
                 <el-button
-                  @click="readItem(scope.row, scope.$index)"
+                  @click="readItem(scope.row)"
                   type="text"
                   size="small">
                   <i class="iconfont icon-readme table-button-read"></i>
@@ -99,9 +99,10 @@
           <el-form-item label="职位" prop="position">
             <el-input v-model="operateForm.position" required></el-input>
           </el-form-item>
-          <el-form-item label="教师图片:" prop="imageUrl" align="left">
-            <image-uploader :syncImage.sync="operateForm.imageUrl"
+          <el-form-item label="教师图片:" prop="image" align="left">
+            <image-uploader :syncImage.sync="operateForm.image"
                             ref="imageUploader"
+                            :imageUrl="operateForm.imageUrl"
                             type="id"
                             width="300"
                             height="300"></image-uploader>
@@ -156,7 +157,7 @@ export default {
       operateForm: {
         id: '',
         name: '',
-        imageUrl: '',
+        image: '',
         position: '',
         brief: '',
         tel: '',
@@ -561,7 +562,7 @@ export default {
           console.log(res)
           if (res.status === 200) {
             let data = res.data
-            this.tableData = data.results
+            this.tableData = data.results.map(item => this.processData(item))
             this.total = data.count
             this.pageSize = this.total < 10 ? this.total : 10
           }
@@ -574,40 +575,50 @@ export default {
     checkWritePermission () {
       this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
     },
+    processData (item) {
+      return {
+        id: item.id,
+        imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}`,
+        image: item.image,
+        name: item.name,
+        tel: item.telephone,
+        brief: item.brief,
+        position: item.position,
+        email: item.email,
+        content: item.content
+      }
+    },
     // 控制page状态
     addItem () {
       this.resetOperateForm()
+      this.$refs.editor.initialEditorContent(this.operateForm.content)
       this.isAdd = true
     },
     editItem (row) { // 打开编辑页面
+      this.resetOperateForm()
       this.isEdit = true
       this.isLoading = true
       editAcademyData(this.section, row.id)
         .then(res => {
           if (res.status === 200) {
-            for (let key in this.operateForm) {
-              this.operateForm[key] = res.data[key]
-            }
+            this.operateForm = this.processData(res.data)
+            this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
+            this.$refs.editor.initialEditorContent(this.operateForm.content)
           }
-          this.$refs.editor.initialEditorContent(this.operateForm.content)
-        })
-        .then(_ => {
           this.isLoading = false
         })
     },
-    readItem (row, index) {
+    readItem (row) {
+      this.resetOperateForm()
       this.isRead = true
       this.isLoading = true
       editAcademyData(this.section, row.id)
         .then(res => {
           if (res.status === 200) {
-            for (let key in this.operateForm) {
-              this.operateForm[key] = res.data[key]
-            }
+            this.operateForm = this.processData(res.data)
+            this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
+            this.$refs.editor.initialEditorContent(this.operateForm.content)
           }
-          this.$refs.editor.initialEditorContent(this.operateForm.content)
-        })
-        .then(_ => {
           this.isLoading = false
         })
     },
@@ -625,7 +636,7 @@ export default {
             brief: this.operateForm.brief,
             tel: this.operateForm.tel,
             email: this.operateForm.email,
-            image: this.operateForm.imageUrl,
+            image: this.operateForm.image,
             content: this.operateForm.content
           }
 
@@ -664,7 +675,7 @@ export default {
         })
         .catch(_ => {})
     },
-    editItemSubmit (formName) {
+    editItemSubmit () {
       this.$confirm('你确定要修改该记录！', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -688,7 +699,7 @@ export default {
         .catch(_ => {})
     },
     showError (type, error) {
-      this.$message.error('操作失败')
+      this.$message.error(`${type} error`)
       this.isLoading = false
       console.log(`${type} error`, error)
     },
@@ -698,11 +709,13 @@ export default {
     },
     resetOperateForm () {
       this.operateForm = {
-        name: '',
+        id: '',
         imageUrl: '',
-        position: '',
-        brief: '',
+        image: '',
+        name: '',
         tel: '',
+        brief: '',
+        position: '',
         email: '',
         content: ''
       }

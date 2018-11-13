@@ -14,20 +14,23 @@ export default {
     }
   },
   mounted () {
-    let userInfo = getStorageExpirable('userInfo')
-    userInfo = JSON.parse(userInfo)
-    if (userInfo) {
-      Promise
-        .resolve()
-        .then(_ => this.saveUserInfo(userInfo))
-        .then(_ => this.login())
-    } else {
-      this.$message.warning('token 过期')
-      let path = '/login'
-      this.$router.push({ path })
-    }
+    this.checkTokenValid()
   },
   methods: {
+    checkTokenValid () {
+      let userInfo = getStorageExpirable('userInfo')
+      userInfo = JSON.parse(userInfo)
+      if (userInfo) {
+        Promise
+          .resolve()
+          .then(_ => this.saveUserInfo(userInfo))
+          .then(_ => this.login())
+      } else {
+        this.$message.warning('token 过期')
+        let path = '/'
+        this.$router.push({ path, replace: true })
+      }
+    },
     ...mapMutations([
       'login',
       'saveUserInfo'

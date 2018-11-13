@@ -312,7 +312,7 @@ export default {
       this.$refs.editor.initialEditorContent('')
     },
     showError (type, error) {
-      this.$message.error('操作失败')
+      this.$message.error(`${type} error`)
       this.isLoading = false
       console.log(`${type} error`, error)
     },

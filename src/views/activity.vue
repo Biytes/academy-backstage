@@ -26,7 +26,7 @@
             prop="start_date"
             label="开始时间"
             align="center"
-            min-width="100"
+            min-width="150"
             sortable>
           </el-table-column>
           <el-table-column
@@ -34,13 +34,14 @@
             prop="end_date"
             label="结束时间"
             align="center"
-            min-width="100"
+            min-width="150"
             sortable>
           </el-table-column>
           <el-table-column
             prop="title"
             label="标题"
-            align="center">
+            align="center"
+            min-width="150">
           </el-table-column>
           <el-table-column
             prop="desc"
@@ -147,7 +148,7 @@ export default {
         id: '',
         title: '',
         desc: '',
-        start_time: '',
+        start_date: '',
         end_date: ''
       },
       currentPage: 1,
@@ -324,7 +325,7 @@ export default {
       this.isAdd = false
     },
     showError (type, error) {
-      this.$message.error('操作失败')
+      this.$message.error(`${type} error`)
       this.isLoading = false
       console.log(`${type} error`, error)
     },

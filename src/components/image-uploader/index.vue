@@ -18,10 +18,6 @@ export default {
     height: {
       type: String,
       default: '300'
-    },
-    type: {
-      type: String,
-      default: 'url'
     }
   },
   data () {
@@ -62,7 +58,7 @@ export default {
         .then(res => {
           console.log(res)
           this.imageUrl = res.data.image
-          let value = this.type === 'id' ? `https://schooltest.zunway.pw/api/v1/image/${res.data.id}` : res.data.image
+          let value = `https://schooltest.zunway.pw/api/v1/image/${res.data.id}`
           this.$emit('update:syncImage', value)
           this.isLoading = false
         })
@@ -72,6 +68,9 @@ export default {
     },
     clearUrl () {
       this.imageUrl = ''
+    },
+    catchData (imageUrl) {
+      this.imageUrl = imageUrl
     }
   }
 }

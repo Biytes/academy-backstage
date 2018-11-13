@@ -80,6 +80,7 @@ export default {
         this.login()
 
         this.$message.success('登陆成功')
+
         let path = this.type === '2' ? '/certificate' : '/collegeIntro/about'
 
         this.$router.push({ path })

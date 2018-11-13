@@ -1,9 +1,10 @@
 <template lang="html">
   <div id="backstage-menu">
 
-    <el-col>
+    <el-col style="height: 100%">
       <el-menu
         class="el-menu-vertical-demo"
+        style="height: 100%"
         @open="handleOpen"
         @close="handleClose"
         background-color="#404040"
@@ -226,16 +227,16 @@ export default {
           linkTitle: '新闻中心',
           router: '/collegeNews'
         },
-        {
-          index: '10',
-          linkTitle: '友情链接',
-          router: '/friendlyLink'
-        },
-        {
-          index: '11',
-          linkTitle: '微博发布',
-          router: '/reportBlog'
-        },
+        // {
+        //   index: '10',
+        //   linkTitle: '友情链接',
+        //   router: '/friendlyLink'
+        // },
+        // {
+        //   index: '11',
+        //   linkTitle: '微博发布',
+        //   router: '/reportBlog'
+        // },
         {
           index: '12',
           linkTitle: '活动发布',
