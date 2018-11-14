@@ -263,7 +263,7 @@ export default {
         .then(([accountInfo, accountPermissions]) => {
           if (accountInfo.status === 200 && accountPermissions.status === 200) {
             this.operateForm = this.processData(accountInfo.data)
-            this.user_permissions =  accountPermissions.data.user.user_permissions.map(item => item.id)
+            this.user_permissions = accountPermissions.data.user.user_permissions.map(item => item.id)
           }
         })
         .then(_ => {
