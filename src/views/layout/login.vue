@@ -47,7 +47,7 @@ export default {
       isLoading: false,
       username: 'jinhai',
       password: '123456',
-      type: '0'
+      type: 0
     }
   },
   mounted () {
@@ -81,7 +81,7 @@ export default {
 
         this.$message.success('登陆成功')
 
-        let path = this.type === '2' ? '/certificate' : '/collegeIntro/about'
+        let path = res.user.type === 2 ? '/certificate' : '/collegeIntro/about'
 
         this.$router.push({ path })
       } catch (e) {

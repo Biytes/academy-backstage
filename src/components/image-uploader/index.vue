@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="image-uploader" v-loading="isLoading">
-    <label for="imageUrl" class="image-upload" :style="style"><img id="showImage" :src="imageUrl" alt="" :style="style"></label>
+    <label for="imageUrl" :class="[imageUrl ? '' : 'is-empty', 'image-upload']" :style="style"><img id="showImage" :src="imageUrl" alt="" :style="style"></label>
     <input id="imageUrl" @change="changePic" type="file" accept="image/png, image/gif, image/jpeg, image/jpg" ref="upload_pic" />
   </div>
 </template>
@@ -58,7 +58,7 @@ export default {
         .then(res => {
           console.log(res)
           this.imageUrl = res.data.image
-          let value = `https://schooltest.zunway.pw/api/v1/image/${res.data.id}`
+          let value = res.data.id
           this.$emit('update:syncImage', value)
           this.isLoading = false
         })
@@ -79,6 +79,7 @@ export default {
 <style lang="scss">
 .image-uploader {
   display: inline-block;
+  box-sizing: border-box;
 
   input[type="file"]#imageUrl {
     width: 0.1px;
@@ -93,9 +94,17 @@ export default {
     vertical-align: bottom;
   }
 
+  .is-empty.image-upload {
+    border:2px dashed grey;
+    &:hover {
+      border:2px dashed #000;
+      color: #000;
+    }
+  }
+
   .image-upload {
     display: inline-block;
-    border:2px dashed grey;
+    border:2px dashed inherit;
     color: grey;
     vertical-align: bottom;
     position: relative;
@@ -109,11 +118,6 @@ export default {
       top: calc(50% - 1.7rem);
       left: calc(50% - 1.25rem);
       z-index: 1;
-    }
-
-    &:hover {
-      border:2px dashed #000;
-      color: #000;
     }
   }
 }

@@ -58,7 +58,7 @@
               </p>
               <p class="item-time clearfloat">获奖时间:<span>{{ item.awardTime }}</span></p>
               <div class="item-tags">                             <!--明天改-->
-                <span v-for="tag in tags" v-show="tags.some(item => item === tag.name)" :key="tag.id" class="item-tag">{{ tag.name }}</span>
+                <span v-for="tag in tags" v-show="contains(tag.name, item.tags)" :key="tag.id" :style="tag.style" class="item-tag">{{ tag.name }}</span>
               </div>
             </div>
           </li>
@@ -92,7 +92,7 @@
             <el-input placeholder="专业" v-model="operateForm.major"></el-input>
           </el-form-item>
           <el-form-item label="班级" prop="stu_class">
-            <el-input placeholder="班级" v-model="operateForm.stu_class">
+            <el-input placeholder="班级" v-model="operateForm.stuClass">
               <template slot="append"><span>班</span></template>
             </el-input>
           </el-form-item>
@@ -115,7 +115,7 @@
           <el-form-item label="证书类型:" prop="tags">
             <el-checkbox-group v-model="operateForm.tags" size="medium" style="display: inline-block;">
               <el-checkbox-button v-for="tag in tags"
-                                  :label="tag.id"
+                                  :label="tag.name"
                                   :key="tag.id">{{tag.name}}</el-checkbox-button>
             </el-checkbox-group>
             <i class="iconfont icon-plus" id="addTags" @click="addTags"></i>
@@ -224,7 +224,6 @@ export default {
   },
   mounted () {
     this.section = this.$route.name
-
     this.checkWritePermission()
     this.getPageData()
     this.getTags()
@@ -261,7 +260,8 @@ export default {
           this.tags = res.data.results.map(item => {
             return {
               id: item.id,
-              name: item.name
+              name: item.name,
+              style: item.style
             }
           })
           this.isLoading = false
@@ -284,7 +284,7 @@ export default {
       }
     },
     checkWritePermission () {
-      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
+      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(this.section)) >= 0
     },
     selectChange () {
       // 通过这个val 来判断
@@ -384,7 +384,7 @@ export default {
           let params = {
             name: this.operateForm.name,
             desc: this.operateForm.description,
-            image: this.operateForm.imageUrl,
+            image: this.operateForm.image,
             award_time: this.operateForm.awardTime,
             owner: this.operateForm.owner,
             grade: this.operateForm.grade,
@@ -462,6 +462,10 @@ export default {
         tags: []
       }
       this.$refs.imageUploader.clearUrl()
+    },
+    // 辅助函数
+    contains (target, array) {
+      return array.findIndex(item => item === target) >= 0
     },
     random (max, min) {
       if (typeof max !== 'number') {
@@ -652,56 +656,6 @@ export default {
 
     .item-description-text + .custom__input {
       height:150px;
-    }
-
-    input[type="file"]#imgUrl {
-      width: 0.1px;
-      height: 0.1px;
-      opacity: 0;
-      overflow: hidden;
-      position: absolute;
-      z-index: -1;
-    }
-    #showImg {
-      display: inline-block;
-      vertical-align: bottom;
-      width: 300px;
-      height:300px;
-    }
-
-    .image-upload {
-      display: inline-block;
-      border:2px dashed grey;
-      color: grey;
-      vertical-align: bottom;
-      position: relative;
-      cursor: pointer;
-
-      &:after {
-        content: '+';
-        position: absolute;
-        font-size: 2.5rem;
-        color: grey;
-        top: calc(50% - 1.7rem);
-        left: calc(50% - 1.25rem);
-        z-index: 1;
-      }
-
-      &:hover {
-        border:2px dashed #000;
-        color: #000;
-      }
-
-      &-text,
-      .item-description-text {
-        vertical-align: top;
-      }
-    }
-
-    .img-container {
-      width: calc(80% - 55px);
-      padding-left: 55px;
-      text-align: left;
     }
 
     #addTags {

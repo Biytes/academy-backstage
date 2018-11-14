@@ -26,11 +26,11 @@ export default {
     let userInfo = {
       name: user.username,
       token: res.token,
-      type: this.type
+      type: user.type
     }
 
     state.userInfo = userInfo
-    state.permissions = user.user_permissions
+    state.permissions = user.user_permissions.filter(item => item.codename.indexOf('write') >= 0)
   },
 
   // 登出 logout 清除状态

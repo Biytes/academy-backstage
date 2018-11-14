@@ -63,12 +63,17 @@
               <el-button @click.native.prevent="deleteItemSubmit(scope.row)"
                          type="text"
                          size="small">
-                         <i class="iconfont icon-delete" style="color:red;font-size:30px;"></i>
+                         <i class="iconfont icon-delete" title="删除账号" style="color:red;font-size:30px;"></i>
                          </el-button>
-              <el-button @click="editRow(scope.row)"
+              <el-button @click="editItem(scope.row)"
                          type="text"
                          size="small">
-                         <i class="iconfont icon-edit06" style="color:rgb(84, 80, 218);font-size:30px;"></i>
+                         <i class="iconfont icon-edit06" title="账号更改" style="color:rgb(84, 80, 218);font-size:30px;"></i>
+                         </el-button>
+              <el-button @click="editItemPassword(scope.row)"
+                         type="text"
+                         size="small">
+                         <i class="iconfont icon-password" title="修改密码" style="color:#333;font-size:28px;"></i>
                          </el-button>
             </template>
           </el-table-column>
@@ -132,6 +137,11 @@
           <el-form-item label="密码" prop="password" align="left">
             <el-input v-model="operateForm.password" required></el-input>
           </el-form-item>
+          <el-form-item label="权限管理" prop="user_permissions" align="left" v-if="permissionsList && !isStudent && isEdit">
+            <el-transfer v-model="user_permissions"
+                         :data="permissionsList"
+                         :titles="['未添加权限', '已拥有权限']"></el-transfer>
+          </el-form-item>
           <el-form-item>
             <el-button v-show="!isAdd" type="success" @click="editItemSubmit">完成</el-button>
             <el-button v-show="isAdd" type="success" @click="addItemSubmit">添加</el-button>
@@ -145,6 +155,7 @@
 
 <script>
 import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
+import { mapState } from 'vuex'
 
 export default {
   data () {
@@ -155,21 +166,35 @@ export default {
       banJiType: [],
       tableData: [],
       operateForm: {},
+      user_permissions: [],
       currentPage: 1,
       pageSize: 6,
       total: 0,
       isStudent: false,
       isLoading: false,
       isEdit: false,
-      isAdd: false
+      isAdd: false,
+      permissionsList: ''
     }
   },
   mounted () {
     // 当前页面分类
     // 初始化数据
     this.initialPageData()
+    const permissions = this.permissions
+    var data = []
+    for (let i = 0; i < permissions.length; i++) {
+      data.push({
+        key: permissions[i].id,
+        label: permissions[i].codename
+      })
+    }
+    this.permissionsList = data
   },
   computed: {
+    ...mapState([
+      'permissions'
+    ]),
     type () {
       return this.$store.state.testData.type
     }
@@ -229,13 +254,16 @@ export default {
       this.operateForm.created_time = new Date()
       this.isAdd = true
     },
-    editRow (row) { // 打开编辑页面
+    editItem (row) { // 打开编辑页面
       this.isEdit = true
       this.isLoading = true
-      editAcademyData(this.section, row.pk)
-        .then(res => {
-          if (res.status === 200) {
-            this.operateForm = this.processData(res.data)
+      let accountInfo = editAcademyData(this.section, row.pk)
+      let accountPermissions = editAcademyData(`${this.section}permission`, row.pk)
+      Promise.all([accountInfo, accountPermissions])
+        .then(([accountInfo, accountPermissions]) => {
+          if (accountInfo.status === 200 && accountPermissions.status === 200) {
+            this.operateForm = this.processData(accountInfo.data)
+            this.user_permissions =  accountPermissions.data.user.user_permissions.map(item => item.id)
           }
         })
         .then(_ => {
@@ -266,6 +294,7 @@ export default {
             .then(_ => this.resetOperateForm())
             .catch(error => this.showError(error))
         })
+        .catch(_ => {})
     },
     deleteItemSubmit (row) { // 删除记录
       this.$confirm('你确定要删除该记录！', {
@@ -284,8 +313,10 @@ export default {
             .then(_ => this.getPageData())
             .catch(error => this.showError(error))
         })
+        .catch(_ => {})
     },
-    editItemSubmit (formName) {
+    editItemSubmit () {
+      console.log(this.user_permissions)
       this.$confirm('确定要修改该信息吗', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -294,10 +325,14 @@ export default {
         .then(_ => {
           this.isLoading = true
           let params = this.getParams()
-          return updateAcademyData(this.section, this.operateForm.pk, params)
-            .then(res => {
-              console.log(res)
-              if (res.status === 200) {
+          let accountInfo = updateAcademyData(this.section, this.operateForm.pk, params)
+          console.log(this.user_permissions)
+          let accountPermissions = updateAcademyData(`${this.section}permission`, this.operateForm.pk, {
+            user_permissions: this.user_permissions
+          })
+          return Promise.all([accountInfo, accountPermissions])
+            .then(([accountInfo, accountPermissions]) => {
+              if (accountInfo.status === 200 && accountPermissions.status === 200) {
                 this.$message.success('修改成功')
               }
             })
@@ -305,6 +340,44 @@ export default {
             .then(_ => this.resetOperateForm())
             .catch(error => this.showError(error))
         })
+        .catch(_ => {})
+    },
+    editItemPassword (row) {
+      this.$prompt('请输入新密码', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      })
+        .then(({ value }) => {
+          if (value === null) {
+            this.$message.warning('输入错误, 标签不能为空, 请重新输入')
+          } else {
+            let params
+            this.isLoading = true
+            if (this.section === 'teacher') {
+              params = {
+                username: row.username,
+                password: value
+              }
+            } else {
+              params = {
+                username: row.username,
+                password: value,
+                grade: row.grade,
+                major: row.major,
+                stu_class: row.stu_class
+              }
+            }
+            return updateAcademyData(this.section, row.pk, params)
+              .then(res => {
+                if (res.status === 200) {
+                  this.$message.success('密码修改成功')
+                }
+                this.isLoading = false
+              })
+              .catch(error => this.showError(error))
+          }
+        })
+        .catch(_ => {})
     },
     // 辅助类方法
     resetOperateForm () {
@@ -329,7 +402,7 @@ export default {
           stu_class: '',
           clientType: '学生'
         }
-
+        this.user_permissions = []
         this.gradeType = this.type.map(item => item.grade)
         this.majorType = this.type[this.type.length - 1].major // 初始化专业类型
         this.banJiType = this.majorType[0].banJi // 初始化专业的班级数量
@@ -452,6 +525,7 @@ export default {
     margin-bottom: 10px;
   }
 }
+
 .table-button-delete{
   color:red;
   font-size:25px;

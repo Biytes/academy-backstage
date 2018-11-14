@@ -13,26 +13,26 @@
         :default-active="$route.path"
         router>
 
-        <section v-if="userInfo.type !== '2'">
+        <section v-if="userInfo.type !== 2">
           <el-submenu v-for="elMenuItem in elParentMenuItems" :key="`${elMenuItem.index}`" :index="elMenuItem.index">
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span>{{elMenuItem.linkTitle}}</span>
+              <span>{{ elMenuItem.linkTitle }}</span>
             </template>
             <el-menu-item-group>
               <el-menu-item v-for="subMenuItem in elMenuItem.subMenuItems" :index="subMenuItem.router" :key="`${subMenuItem.index}`" >
-                {{subMenuItem.linkTitle}}
+                {{ subMenuItem.linkTitle }}
               </el-menu-item>
             </el-menu-item-group>
           </el-submenu>
           <el-menu-item v-for="elMenuItem in elSingleMenuItems" :key="`${elMenuItem.index}`" :index="elMenuItem.router">
             <i class="el-icon-menu"></i>
-            <span>{{elMenuItem.linkTitle}}</span>
+            <span>{{ elMenuItem.linkTitle }}</span>
           </el-menu-item>
         </section>
 
-        <section class="student-menu" v-if="userInfo.type === '2'">
-          <el-menu-item index="/shelf">
+        <section class="student-menu" v-if="userInfo.type === 2">
+          <el-menu-item index="/certificate">
             <i class="el-icon-menu"></i>
             <span>学院证书</span>
           </el-menu-item>
@@ -274,8 +274,6 @@ export default {
 
 <style lang="scss">
 $height: 85vh;
-// 响应式 更改height就行了
-
 // scroll bar
 #backstage-menu::-webkit-scrollbar {
     width: 5px;
