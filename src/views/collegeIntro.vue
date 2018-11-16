@@ -212,6 +212,7 @@ export default {
         created_time: item.created_time,
         updated_time: item.updated_time,
         file: item.file,
+        file_detail: item.file_detail,
         content: item.content,
         ctr: item.ctr
       }
@@ -253,6 +254,7 @@ export default {
           // TODO: 添加一条信息
           let params = {
             category: this.category,
+            file: this.operateForm.file,
             title: this.operateForm.title,
             created_time: this.operateForm.created_time,
             preview: this.operateForm.preview,
@@ -310,7 +312,7 @@ export default {
     },
     previewData (res) {
       this.operateForm = this.processData(res.data)
-      this.$refs.fileUploader.initialData(this.operateForm.file)
+      this.$refs.fileUploader.initialData(this.operateForm.file_detail)
       this.$refs.editor.initialEditorContent(this.operateForm.content)
     },
     resetOperateForm () {

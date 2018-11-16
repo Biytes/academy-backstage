@@ -139,7 +139,7 @@ export default {
 <style lang="scss" scoped>
 .file-uploader {
   width: 400px;
-  padding: 0 40px;
+  padding: 0 10px;
   box-sizing: border-box;
   height: auto;
   line-height: normal;

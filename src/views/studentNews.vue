@@ -61,13 +61,13 @@
               </el-button>
               <el-button
                 v-if="isWrite"
-                @click="editItem(scope.row)"
+                @click="preViewItem(scope.row, 'edit')"
                 type="text"
                 size="small">
-                <i class="iconfont icon-edit06 table-button-edit"></i>
+                <i class="iconfont icon-edit table-button-edit"></i>
               </el-button>
               <el-button
-                @click="readItem(scope.row)"
+                @click="preViewItem(scope.row, 'edit')"
                 type="text"
                 size="small">
                 <i class="iconfont icon-readme table-button-read"></i>
@@ -109,6 +109,11 @@
               v-model="operateForm.preview">
             </el-input>
           </el-form-item>
+          <el-form-item label="附件" prop="file">
+            <file-uploader :syncFileList.sync="operateForm.file"
+                           ref="fileUploader">
+                </file-uploader>
+          </el-form-item>
           <el-form-item class="wang-editor">
             <wang-editor ref="editor" :catchData="catchData"></wang-editor>
           </el-form-item>
@@ -141,7 +146,7 @@ export default {
         title: '',
         created_time: '',
         updated_time: '',
-        file: '',
+        file: [],
         content: '',
         ctr: ''
       },
@@ -160,6 +165,7 @@ export default {
 
     this.checkWritePermission()
     this.getPageData()
+    // this.$router.push({path: '/component'})
   },
   watch: {
     '$route': 'onRouteChange'
@@ -206,6 +212,7 @@ export default {
         created_time: item.created_time,
         updated_time: item.updated_time,
         file: item.file,
+        file_detail: item.file_detail,
         content: item.content,
         ctr: item.ctr
       }
@@ -216,35 +223,18 @@ export default {
       this.operateForm.created_time = new Date()
       this.isAdd = true
     },
-    editItem (row) { // 打开编辑页面
-      this.isEdit = true
+    preViewItem (row, mode) { // 打开编辑页面
+      if (mode === 'edit') {
+        this.isEdit = true
+      } else {
+        this.isRead = true
+      }
       this.isLoading = true
       editAcademyData(this.section, row.id)
         .then(res => {
           if (res.status === 200) {
-            this.operateForm = this.processData(res.data)
-            this.$refs.editor.initialEditorContent(this.operateForm.content)
+            this.previewData(res)
           }
-        })
-        .then(_ => {
-          this.isLoading = false
-        })
-        .catch(error => {
-          this.showError(error)
-          this.resetOperateForm()
-        })
-    },
-    readItem (row) {
-      this.isRead = true
-      this.isLoading = true
-      editAcademyData(this.section, row.id)
-        .then(res => {
-          if (res.status === 200) {
-            this.operateForm = this.processData(res.data)
-            this.$refs.editor.initialEditorContent(this.operateForm.content)
-          }
-        })
-        .then(_ => {
           this.isLoading = false
         })
         .catch(error => {
@@ -264,6 +254,7 @@ export default {
           // TODO: 添加一条信息
           let params = {
             category: this.category,
+            file: this.operateForm.file,
             title: this.operateForm.title,
             created_time: this.operateForm.created_time,
             preview: this.operateForm.preview,
@@ -319,15 +310,21 @@ export default {
             .catch(error => this.showError(error))
         })
     },
+    previewData (res) {
+      this.operateForm = this.processData(res.data)
+      this.$refs.fileUploader.initialData(this.operateForm.file_detail)
+      this.$refs.editor.initialEditorContent(this.operateForm.content)
+    },
     resetOperateForm () {
       console.log('reset')
-      this.operateForm = this.processData()
+      this.operateForm = this.processData({})
 
       this.isRead = false
       this.isEdit = false
       this.isAdd = false
       // 清空内容
       this.$refs.editor.initialEditorContent('')
+      this.$refs.fileUploader.initialData([])
     },
     showError (error) {
       this.$message.error(error.data.msg)
