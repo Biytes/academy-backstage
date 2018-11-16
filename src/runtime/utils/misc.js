@@ -18,3 +18,18 @@ export const getStorageExpirable = key => {
   storage.removeItem(key)
   return null
 }
+
+export const random = (max, min) => {
+  if (typeof max !== 'number') {
+    return Math.random()
+  } else if (typeof min !== 'number') {
+    min = 0
+  }
+  return Math.random() * (max - min) + min
+}
+export const randomColor = _ => {
+  var r = this.random(256) | 0
+  var g = this.random(256) | 0
+  var b = this.random(256) | 0
+  return 'rgb(' + r + ',' + g + ',' + b + ')'
+}

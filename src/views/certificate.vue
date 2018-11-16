@@ -1,33 +1,32 @@
 <template lang="html">
   <div class="page certificate">
     <div class="top-bar">
-      <span class="select-name">年级:</span>
-      <el-select v-model="gradeType.value" placeholder="请选择" size="mini" @change="selectChange()">
-        <el-option
-          v-for="item in gradeType.options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-      <span class="select-name">专业:</span>
-      <el-select v-model="majorType.value" placeholder="请选择" size="mini" @change="selectChange()">
-        <el-option
-          v-for="item in majorType.options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-      <span class="select-name">比赛类型:</span>
-      <el-select v-model="awardType.value" placeholder="请选择" size="mini" @change="selectChange()">
-        <el-option
-          v-for="item in awardType.options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
+      <el-row>
+        <el-col :span="4">
+          <el-input placeholder="请输入年级"
+                    v-model="grade"
+                    size="mini"
+                    @keyup.enter.native="getPageData"></el-input>
+        </el-col>
+        <el-col :span="5" :push="1">
+          <el-select v-model="major" placeholder="请选择专业" size="mini" @change="getPageData()" class="left">
+            <el-option
+              v-for="item in majorType"
+              :key="item"
+              :label="item"
+              :value="item">
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="4">
+          <el-input placeholder="请输入班级"
+                    v-model="stu_class"
+                    size="mini"
+                    @keyup.enter.native="getPageData">
+            <template slot="append"><span>班</span></template>
+          </el-input>
+        </el-col>
+      </el-row>
     </div>
     <el-card class="page-container">
       <div class="shelf" v-show="!isAddPage && !isEditPage" v-loading="isLoading">
@@ -57,8 +56,8 @@
                 <i class="item-icon-delete iconfont icon-delete" title="删除" @click="deleteItemSubmit(item.id)" v-show="isEditMode"></i>
               </p>
               <p class="item-time clearfloat">获奖时间:<span>{{ item.awardTime }}</span></p>
-              <div class="item-tags">                             <!--明天改-->
-                <span v-for="tag in tags" v-show="contains(tag.name, item.tags)" :key="tag.id" :style="tag.style" class="item-tag">{{ tag.name }}</span>
+              <div class="item-tags">
+                <span v-for="tag in tags" v-show="contains(tag.name, item.tags)" :key="tag.id" :style="`background: ${tag.style}`" class="item-tag">{{ tag.name }}</span>
               </div>
             </div>
           </li>
@@ -113,12 +112,8 @@
                             height="300"></image-uploader>
           </el-form-item>
           <el-form-item label="证书类型:" prop="tags">
-            <el-checkbox-group v-model="operateForm.tags" size="medium" style="display: inline-block;">
-              <el-checkbox-button v-for="tag in tags"
-                                  :label="tag.name"
-                                  :key="tag.id">{{tag.name}}</el-checkbox-button>
-            </el-checkbox-group>
-            <i class="iconfont icon-plus" id="addTags" @click="addTags"></i>
+            <tags-editor :syncTagsList.sync="operateForm.tags"
+                         ref="tagsEditor"></tags-editor>
           </el-form-item>
           <el-form-item label="证书描述:" prop="description">
             <el-input
@@ -146,52 +141,9 @@ import { mapState, mapMutations } from 'vuex'
 export default {
   data () {
     return {
-      gradeType: {
-        options: [{
-          value: '2014',
-          label: '2014'
-        }, {
-          value: '2015',
-          label: '2015'
-        }, {
-          value: '2016',
-          label: '2016'
-        }, {
-          value: '2017',
-          label: '2017'
-        }, {
-          value: '2018',
-          label: '2018'
-        }],
-        value: ''
-      },
-      majorType: {
-        options: [{
-          value: '计算机科学与技术',
-          label: '计算机科学与技术'
-        }, {
-          value: '软件工程',
-          label: '软件工程'
-        }, {
-          value: '网络工程',
-          label: '网络工程'
-        }],
-        value: ''
-      },
-      awardType: {
-        options: [{
-          value: 'ACM',
-          label: 'ACM'
-        }, {
-          value: '蓝桥杯',
-          label: '蓝桥杯'
-        }, {
-          value: '省赛',
-          label: '省赛'
-        }],
-        value: ''
-      },
-      tags: [],
+      grade: '',
+      major: '',
+      stu_class: '',
       tableData: [],
       section: '',
       operateForm: {
@@ -210,6 +162,7 @@ export default {
       currentPage: 1,
       pageSize: 6,
       total: 0,
+      isShowEditTagDialog: false,
       isWrite: true,
       isLoading: false,
       isAddPage: false,
@@ -219,20 +172,25 @@ export default {
   },
   computed: {
     ...mapState([
-      'permissions'
+      'permissions',
+      'majorType',
+      'tags'
     ])
   },
   mounted () {
     this.section = this.$route.name
     this.checkWritePermission()
-    this.getPageData()
     this.getTags()
+      .then(_ => this.getPageData())
   },
   methods: {
     getPageData () {
       // 获取页面数据
       let params = {
-        page: this.currentPage
+        page: this.currentPage,
+        grade: this.grade || '',
+        major: this.major || '',
+        stu_class: this.stu_class || ''
       }
 
       return Promise
@@ -242,7 +200,6 @@ export default {
           return getAcademyData(this.section, params)
         })
         .then(res => {
-          console.log(res)
           if (res.status === 200) {
             let data = res.data
             this.tableData = data.results.map(item => this.processData(item))
@@ -255,15 +212,16 @@ export default {
     },
     getTags () {
       this.isLoading = true
-      getAcademyData('certificatetag')
+      return getAcademyData('certificatetag')
         .then(res => {
-          this.tags = res.data.results.map(item => {
+          let tags = res.data.results.map(item => {
             return {
               id: item.id,
               name: item.name,
               style: item.style
             }
           })
+          this.saveTags(tags)
           this.isLoading = false
         })
         .catch(error => this.showError(error))
@@ -339,6 +297,7 @@ export default {
           if (res.status === 200) {
             this.operateForm = this.processData(res.data)
             this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
+            this.$refs.tagsEditor.initialData(this.operateForm.tags)
           }
           this.isLoading = false
         })
@@ -467,27 +426,14 @@ export default {
     contains (target, array) {
       return array.findIndex(item => item === target) >= 0
     },
-    random (max, min) {
-      if (typeof max !== 'number') {
-        return Math.random()
-      } else if (typeof min !== 'number') {
-        min = 0
-      }
-      return Math.random() * (max - min) + min
-    },
-    randomColor () {
-      var r = this.random(256) | 0
-      var g = this.random(256) | 0
-      var b = this.random(256) | 0
-      return 'rgb(' + r + ',' + g + ',' + b + ')'
-    },
     showError (error) {
       this.$message.error(error.data.msg)
       console.log('error status:', error.status, 'error:', error)
       this.isLoading = false
     },
     ...mapMutations([
-      'showImagePage'
+      'showImagePage',
+      'saveTags'
     ])
   }
 }
@@ -657,18 +603,10 @@ export default {
     .item-description-text + .custom__input {
       height:150px;
     }
-
-    #addTags {
-      vertical-align: -webkit-baseline-middle;
-      cursor: pointer;
-      color:rgb(121, 124, 123);
-      &:hover {
-        color:rgb(37, 36, 36);
-      }
-    }
   }
   .el-pagination {
     text-align: center;
+    margin-top: 20px;
   }
 }
 

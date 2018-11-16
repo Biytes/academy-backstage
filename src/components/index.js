@@ -12,11 +12,15 @@ import Vue from 'vue'
 import customInput from './custom-input'
 import wangEditor from './wang-editor'
 import imageUploader from './image-uploader'
+import fileUploader from './file-uploader'
+import tagsEditor from './tags-editor'
 
 const components = [
   customInput,
   wangEditor,
-  imageUploader
+  imageUploader,
+  fileUploader,
+  tagsEditor
 ]
 
 // 注册组件

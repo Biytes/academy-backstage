@@ -2,14 +2,46 @@
   <div class="page modified-info">
 
     <div class="top-bar">
-      <el-button @click="addItem"
-                 type="text"
-                 size="small"
-                 class="top-bar-button-right right pointer"><i class="iconfont icon-plus"></i></el-button>
-      <el-button @click="resetOperateForm"
+      <el-row>
+        <el-col :span="1">
+          <el-button @click="resetOperateForm"
                  type="text"
                  size="small"
                  class="top-bar-button-left left pointer"><i class="iconfont icon-arrowsleftline"></i></el-button>
+        </el-col>
+        <el-col :span="22">
+          <el-row v-if="isStudent">
+            <el-col :span="4">
+              <el-input placeholder="请输入年级"
+                        v-model="grade"
+                        size="mini"
+                        @keyup.enter.native="getPageData"></el-input>
+            </el-col>
+            <el-col :span="5" :push="1">
+              <el-select v-model="major" placeholder="请选择专业" size="mini" @change="getPageData" class="left">
+                <el-option
+                  v-for="item in majorType"
+                  :key="item"
+                  :label="item"
+                  :value="item">
+                </el-option>
+              </el-select>
+            </el-col>
+            <el-col :span="4">
+              <el-input placeholder="请输入班级"
+                        v-model="stu_class"
+                        size="mini"
+                        @keyup.enter.native="getPageData">
+                <template slot="append"><span>班</span></template>
+              </el-input>
+            </el-col>
+          </el-row>
+        </el-col>
+        <el-button @click="addItem"
+          type="text"
+          size="small"
+          class="top-bar-button-right right pointer"><i class="iconfont icon-plus"></i></el-button>
+      </el-row>
     </div>
 
     <el-card class="page-container">
@@ -23,7 +55,7 @@
             fixed
             align="center"
             prop="created_time"
-            label="创建日期"
+            label="创建时间"
             sortable>
           </el-table-column>
           <el-table-column
@@ -43,6 +75,11 @@
             prop="stu_class"
             align="center"
             label="班级">
+            <template slot-scope="scope">
+              <span>
+                {{ scope.row.stu_class }}班
+              </span>
+            </template>
           </el-table-column>
           <el-table-column
             prop="username"
@@ -60,21 +97,23 @@
             align="center"
             label="操作">
             <template slot-scope="scope">
-              <el-button @click.native.prevent="deleteItemSubmit(scope.row)"
-                         type="text"
-                         size="small">
-                         <i class="iconfont icon-delete" title="删除账号" style="color:red;font-size:30px;"></i>
-                         </el-button>
-              <el-button @click="editItem(scope.row)"
-                         type="text"
-                         size="small">
-                         <i class="iconfont icon-edit06" title="账号更改" style="color:rgb(84, 80, 218);font-size:30px;"></i>
-                         </el-button>
-              <el-button @click="editItemPassword(scope.row)"
-                         type="text"
-                         size="small">
-                         <i class="iconfont icon-password" title="修改密码" style="color:#333;font-size:28px;"></i>
-                         </el-button>
+              <div>
+                <el-button @click.native.prevent="deleteItemSubmit(scope.row)"
+                          type="text"
+                          size="small">
+                          <i class="iconfont icon-delete" title="删除账号" style="color:red;font-size:30px;"></i>
+                          </el-button>
+                <el-button @click="editItem(scope.row)"
+                          type="text"
+                          size="small">
+                          <i class="iconfont icon-edit06" title="账号更改" style="color:rgb(84, 80, 218);font-size:30px;"></i>
+                          </el-button>
+                <el-button @click="editItemPassword(scope.row)"
+                          type="text"
+                          size="small">
+                          <i class="iconfont icon-password" title="修改密码" style="color:#333;font-size:28px;"></i>
+                          </el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -101,41 +140,47 @@
               value-format="yyyy年 MM月 dd日 HH:mm:ss">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="年级" prop="grade" v-if="isStudent" align="left">
-            <el-select v-model="operateForm.grade" placeholder="请选择" size="medium" @change="selectTypeChange(operateForm.grade, operateForm.major)">
+          <el-form-item label="年级"
+                        prop="grade"
+                        v-if="isStudent"
+                        align="left"
+                        :rules="{ required: true, message: '请输入年级(数字)', trigger: 'blur' }">
+                        <el-input placeholder="年级" v-model="operateForm.grade"></el-input>
+          </el-form-item>
+          <el-form-item label="专业" prop="major" v-if="isStudent" align="left">
+            <el-select v-model="operateForm.major" placeholder="请选择" size="medium">
               <el-option
-                v-for="item in gradeType"
+                v-for="item in majorType"
                 :key="item"
                 :label="item"
                 :value="item">
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="专业" prop="major" v-if="isStudent" align="left">
-            <el-select v-model="operateForm.major" placeholder="请选择" size="medium" @change="selectTypeChange(operateForm.grade, operateForm.major)">
-              <el-option
-                v-for="item in majorType"
-                :key="item.name"
-                :label="item.name"
-                :value="item.name">
-              </el-option>
-            </el-select>
+          <el-form-item label="班级(数字)"
+                        prop="stu_class"
+                        :rules="{ required: true, message: '请输入班级(数字)', trigger: 'blur' }">
+            <el-input placeholder="班级" v-model="operateForm.stu_class">
+              <template slot="append"><span>班</span></template>
+            </el-input>
           </el-form-item>
-          <el-form-item label="班级" prop="stu_class" v-if="isStudent" align="left">
-            <el-select v-model="operateForm.stu_class" placeholder="请选择" size="medium">
-              <el-option
-                v-for="item in banJiType"
-                :key="item.value"
-                :label="item.label"
-                :value="item.label">
-              </el-option>
-            </el-select>
+          <el-form-item label="账号"
+                        prop="username"
+                        align="left"
+                        :rules="[
+                          { required: true, message: '请输入账号', trigger: 'blur' },
+                          { min: 6, max: 14, message: '长度在 6 到 14 个字符', trigger: 'blur' }
+                        ]">
+            <el-input v-model="operateForm.username"></el-input>
           </el-form-item>
-          <el-form-item label="账号" prop="username" align="left">
-            <el-input v-model="operateForm.username" required></el-input>
-          </el-form-item>
-          <el-form-item label="密码" prop="password" align="left">
-            <el-input v-model="operateForm.password" required></el-input>
+          <el-form-item label="密码"
+                        prop="password"
+                        align="left"
+                        :rules="[
+                          { required: true, message: '请输入密码', trigger: 'blur' },
+                          { min: 6, max: 14, message: '长度在 6 到 14 个字符', trigger: 'blur' }
+                        ]">
+            <el-input v-model="operateForm.password" type="password"></el-input>
           </el-form-item>
           <el-form-item label="权限管理" prop="user_permissions" align="left" v-if="permissionsList && !isStudent && isEdit">
             <el-transfer v-model="user_permissions"
@@ -161,9 +206,9 @@ export default {
   data () {
     return {
       section: '',
-      gradeType: [],
-      majorType: [],
-      banJiType: [],
+      grade: '',
+      major: '',
+      stu_class: '',
       tableData: [],
       operateForm: {},
       user_permissions: [],
@@ -193,11 +238,9 @@ export default {
   },
   computed: {
     ...mapState([
-      'permissions'
-    ]),
-    type () {
-      return this.$store.state.testData.type
-    }
+      'permissions',
+      'majorType'
+    ])
   },
   watch: {
     '$route': 'onRouteChange'
@@ -214,8 +257,19 @@ export default {
     },
     getPageData () {
       // 获取页面数据
-      let params = {
-        page: this.currentPage
+
+      let params
+      if (this.section === 'student') {
+        params = {
+          page: this.currentPage,
+          grade: this.grade || '',
+          major: this.major || '',
+          stu_class: this.stu_class || ''
+        }
+      } else {
+        params = {
+          page: this.currentPage
+        }
       }
 
       return Promise
@@ -265,8 +319,6 @@ export default {
             this.operateForm = this.processData(accountInfo.data)
             this.user_permissions = accountPermissions.data.user.user_permissions.map(item => item.id)
           }
-        })
-        .then(_ => {
           this.isLoading = false
         })
         .catch(error => {
@@ -275,26 +327,28 @@ export default {
         })
     },
     addItemSubmit () { // 确定添加纪录
-      this.$confirm('确定要添加该信息吗', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(_ => {
-          this.isLoading = true
-          let params = this.getParams()
-          return addAcademyData(this.section, params)
-          // 确定表单数据
-            .then(res => {
-              if (res.status === 200) {
-                this.$message.success('添加成功')
-              }
-            })
-            .then(_ => this.getPageData())
-            .then(_ => this.resetOperateForm())
-            .catch(error => this.showError(error))
+      if (this.checkOperateFormValid()) {
+        this.$confirm('确定要添加该信息吗', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
-        .catch(_ => {})
+          .then(_ => {
+            this.isLoading = true
+            let params = this.getParams()
+            return addAcademyData(this.section, params)
+            // 确定表单数据
+              .then(res => {
+                if (res.status === 200) {
+                  this.$message.success('添加成功')
+                }
+              })
+              .then(_ => this.getPageData())
+              .then(_ => this.resetOperateForm())
+              .catch(error => this.showError(error))
+          })
+          .catch(_ => {})
+      }
     },
     deleteItemSubmit (row) { // 删除记录
       this.$confirm('你确定要删除该记录！', {
@@ -316,31 +370,32 @@ export default {
         .catch(_ => {})
     },
     editItemSubmit () {
-      console.log(this.user_permissions)
-      this.$confirm('确定要修改该信息吗', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(_ => {
-          this.isLoading = true
-          let params = this.getParams()
-          let accountInfo = updateAcademyData(this.section, this.operateForm.pk, params)
-          console.log(this.user_permissions)
-          let accountPermissions = updateAcademyData(`${this.section}permission`, this.operateForm.pk, {
-            user_permissions: this.user_permissions
-          })
-          return Promise.all([accountInfo, accountPermissions])
-            .then(([accountInfo, accountPermissions]) => {
-              if (accountInfo.status === 200 && accountPermissions.status === 200) {
-                this.$message.success('修改成功')
-              }
-            })
-            .then(_ => this.getPageData())
-            .then(_ => this.resetOperateForm())
-            .catch(error => this.showError(error))
+      if (this.checkOperateFormValid()) {
+        this.$confirm('确定要修改该信息吗', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
-        .catch(_ => {})
+          .then(_ => {
+            this.isLoading = true
+            let params = this.getParams()
+            let accountInfo = updateAcademyData(this.section, this.operateForm.pk, params)
+
+            let accountPermissions = updateAcademyData(`${this.section}permission`, this.operateForm.pk, {
+              user_permissions: this.user_permissions
+            })
+            return Promise.all([accountInfo, accountPermissions])
+              .then(([accountInfo, accountPermissions]) => {
+                if (accountInfo.status === 200 && accountPermissions.status === 200) {
+                  this.$message.success('修改成功')
+                }
+              })
+              .then(_ => this.getPageData())
+              .then(_ => this.resetOperateForm())
+              .catch(error => this.showError(error))
+          })
+          .catch(_ => {})
+      }
     },
     editItemPassword (row) {
       this.$prompt('请输入新密码', '提示', {
@@ -399,16 +454,11 @@ export default {
           password: '',
           grade: '',
           major: '',
-          stu_class: '',
+          stu_class: 0,
           clientType: '学生'
         }
         this.user_permissions = []
-        this.gradeType = this.type.map(item => item.grade)
-        this.majorType = this.type[this.type.length - 1].major // 初始化专业类型
-        this.banJiType = this.majorType[0].banJi // 初始化专业的班级数量
-        this.operateForm.grade = this.gradeType[this.gradeType.length - 1]
-        this.operateForm.major = this.majorType[0].name
-        this.operateForm.stu_class = this.banJiType[0].label // 初始化班级 #1班#
+        this.operateForm.major = this.majorType[0]
       }
     },
     showError (error) {
@@ -432,11 +482,6 @@ export default {
           major: this.operateForm.major
         }
       }
-    },
-    selectTypeChange (grade, major) { // 年级和班级选择器改变的时候
-      this.majorType = this.type[this.gradeType.findIndex(item => item === grade)].major
-
-      this.banJiType = this.majorType[this.majorType.findIndex(item => item.name === major)].banJi
     },
     validateForm () { // 验证表单
       // 老师 1 学生 0
@@ -508,6 +553,17 @@ export default {
         }
       }
     },
+    checkOperateFormValid () {
+      let isValid
+      this.$refs['operateForm'].validate((valid) => {
+        if (valid) {
+        } else {
+          this.$message.warning('填入信息有误, 请按提示完成表单')
+        }
+        isValid = valid
+      })
+      return isValid
+    },
     // 当路由发生变化
     onRouteChange () {
       // 当前页面分类
@@ -520,6 +576,11 @@ export default {
 <style lang="scss" scoped>
 
 .page.modified-info {
+  .top-bar {
+    .el-input__inner {
+      height: 36px !important;
+    }
+  }
   .el-pagination{
     margin-top: 20px;
     margin-bottom: 10px;

@@ -4,7 +4,8 @@ import {
   SAVE_USER_INFO,
   LOGOUT,
   SHOW_IMAGE_PAGE,
-  HIDE_IMAGE_PAGE
+  HIDE_IMAGE_PAGE,
+  SAVE_TAGS
 } from './mutations-type'
 
 export default {
@@ -54,5 +55,10 @@ export default {
   // 关闭显示图片页面
   [HIDE_IMAGE_PAGE] (state) {
     state.showImage.imagePage = false
+  },
+
+  // 保存tags
+  [SAVE_TAGS] (state, tags) {
+    state.tags = tags
   }
 }

@@ -52,7 +52,6 @@ export default {
 
 .wrapper-inner {
   position: relative;
-  z-index: 1;
 
   &__content {
     margin-left: 2.4%;

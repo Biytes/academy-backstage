@@ -32,7 +32,7 @@ export default {
       return `width: ${this.width}px;height: ${this.height}px;`
     },
     ...mapState([
-      'token'
+      'userInfo'
     ])
   },
   mounted () {
@@ -51,15 +51,14 @@ export default {
       let config = {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': 'Token ' + this.token}
+          'Authorization': 'Token ' + this.userInfo.token}
       }
 
       this.axios.post('https://schooltest.zunway.pw/api/v1/image', params, config)
         .then(res => {
-          console.log(res)
+          console.log('image:', res)
           this.imageUrl = res.data.image
-          let value = res.data.id
-          this.$emit('update:syncImage', value)
+          this.$emit('update:syncImage', res.data.id)
           this.isLoading = false
         })
         .catch(_ => {
