@@ -115,6 +115,14 @@
               v-model="operateForm.preview">
             </el-input>
           </el-form-item>
+          <el-form-item label="预览图片:" prop="image" align="left">
+            <image-uploader :syncImage.sync="operateForm.image"
+                            ref="imageUploader"
+                            :imageUrl="operateForm.imageUrl"
+                            type="id"
+                            width="300"
+                            height="300"></image-uploader>
+          </el-form-item>
           <el-form-item label="附件" prop="file">
             <file-uploader :syncFileList.sync="operateForm.file"
                            ref="fileUploader">
@@ -136,7 +144,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
 export default {
   data () {
@@ -151,6 +159,7 @@ export default {
         title: '',
         created_time: '',
         updated_time: '',
+        image: '',
         file: [],
         content: '',
         ctr: ''
@@ -211,6 +220,8 @@ export default {
         title: item.title || null,
         created_time: item.created_time || null,
         updated_time: item.updated_time || null,
+        image: item.image || null,
+        imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}` || null,
         file: item.file || null,
         file_detail: item.file_detail || null,
         content: item.content || null,
@@ -254,6 +265,7 @@ export default {
           // TODO: 添加一条信息
           let params = {
             file: this.operateForm.file,
+            image: this.operateForm.image,
             title: this.operateForm.title,
             created_time: this.operateForm.created_time,
             preview: this.operateForm.preview,
@@ -311,6 +323,7 @@ export default {
     },
     previewData (res) {
       this.operateForm = this.processData(res.data)
+      this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
       this.$refs.fileUploader.initialData(this.operateForm.file_detail)
       this.$refs.editor.initialEditorContent(this.operateForm.content)
     },
@@ -322,6 +335,7 @@ export default {
       this.isEdit = false
       this.isAdd = false
       // 清空内容
+      this.$refs.imageUploader.clearUrl()
       this.$refs.editor.initialEditorContent('')
       this.$refs.fileUploader.initialData([])
     },
@@ -333,7 +347,10 @@ export default {
     catchData (value) {
       // 在这里接受子组件传过来的参数，赋值给data里的参数
       this.operateForm.content = value
-    }
+    },
+    ...mapMutations([
+      'showImagePage'
+    ])
   }
 }
 </script>
