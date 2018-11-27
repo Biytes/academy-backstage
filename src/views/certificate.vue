@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="page certificate">
     <div class="top-bar">
-      <el-row>
+      <el-row v-if="!isClientStudent">
         <el-col style="width: 200px">
           <el-input placeholder="请输入年级"
                     v-model="grade"
@@ -28,6 +28,9 @@
             <template slot="append"><span>班</span></template>
           </el-input>
         </el-col>
+      </el-row>
+      <el-row v-else style="color: #333; padding: 0 20px;">
+        {{ grade }} 级 {{ major }} 专业 {{ stu_class }} 班证书墙
       </el-row>
     </div>
     <el-card class="page-container">
@@ -94,10 +97,10 @@
           <el-form-item label="获奖得主:" prop="owner">
             <el-input v-model="operateForm.owner"></el-input>
           </el-form-item>
-          <el-form-item label="年级" prop="grade">
+          <el-form-item label="年级" prop="grade"  v-if="!isClientStudent">
             <el-input placeholder="年级" v-model="operateForm.grade"></el-input>
           </el-form-item>
-          <el-form-item label="专业" prop="major" align="left">
+          <el-form-item label="专业" prop="major" align="left" v-if="!isClientStudent">
             <el-select v-model="operateForm.major" placeholder="请选择专业" class="left">
               <el-option
                 v-for="item in majorType"
@@ -107,7 +110,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="班级" prop="stu_class">
+          <el-form-item label="班级" prop="stu_class" v-if="!isClientStudent">
             <el-input placeholder="班级" v-model="operateForm.stuClass">
               <template slot="append"><span>班</span></template>
             </el-input>
@@ -158,9 +161,9 @@ import { mapState, mapMutations } from 'vuex'
 export default {
   data () {
     return {
-      grade: '',
-      major: '',
-      stu_class: '',
+      grade: null,
+      major: null,
+      stu_class: null,
       tableData: [],
       section: '',
       operateForm: {
@@ -179,7 +182,7 @@ export default {
       currentPage: 1,
       pageSize: 6,
       total: 0,
-      isShowEditTagDialog: false,
+      isClientStudent: false,
       isWrite: true,
       isLoading: false,
       isAddPage: false,
@@ -190,12 +193,20 @@ export default {
   computed: {
     ...mapState([
       'permissions',
+      'userInfo',
       'majorType',
       'tags'
     ])
   },
   mounted () {
     this.section = this.$route.name
+    let userInfo = this.userInfo
+    if (userInfo.type === 2) {
+      this.isClientStudent = true
+      this.major = userInfo.major
+      this.grade = userInfo.grade
+      this.stu_class = userInfo.stu_class
+    }
     this.checkWritePermission()
     this.getTags()
     this.getPageData()
@@ -338,9 +349,9 @@ export default {
             image: this.operateForm.image,
             award_time: this.operateForm.awardTime,
             owner: this.operateForm.owner,
-            grade: this.operateForm.grade,
-            major: this.operateForm.major,
-            stu_class: this.operateForm.stuClass,
+            grade: this.isClientStudent ? this.grade : this.operateForm.grade,
+            major: this.isClientStudent ? this.major : this.operateForm.major,
+            stu_class: this.isClientStudent ? this.stu_class : this.operateForm.stuClass,
             tags: this.operateForm.tags
           }
 
@@ -436,9 +447,9 @@ export default {
         description: '',
         awardTime: '',
         owner: '',
-        grade: '',
-        major: '',
-        stuClass: '',
+        grade: this.isClientStudent ? this.grade : null,
+        major: this.isClientStudent ? this.major : null,
+        stuClass: this.isClientStudent ? this.stu_class: null,
         tags: []
       }
       this.$refs.imageUploader.clearUrl()
@@ -476,6 +487,10 @@ export default {
     font-family: "Microsoft Yahei";
     font-size: 16px;
     margin: 0 auto;
+
+    &-inner {
+      min-height: 328px;
+    }
 
     &-name {
       margin: 10px 0;
