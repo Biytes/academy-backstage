@@ -72,9 +72,9 @@ export default [{
       path: '/recruit/:category',
       component: _import('recruit')
     }, {
-      name: 'section',
-      path: '/section',
-      component: _import('section')
+      name: 'category',
+      path: '/category',
+      component: _import('category')
     }
   ]
 }]

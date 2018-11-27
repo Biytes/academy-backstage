@@ -18,10 +18,10 @@
     <el-tooltip class="item" effect="dark" content="增加" placement="top">
       <i class="iconfont icon-plus tags-operate-icon" id="addTags" @click="operateConfirm('add')"></i>
     </el-tooltip>
-    <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+    <el-tooltip class="item" effect="dark" content="编辑" placement="top" v-if="isEdit">
       <i class="iconfont icon-edit tags-operate-icon" id="editTags" @click="operateConfirm('edit')"></i>
     </el-tooltip>
-    <el-tooltip class="item" effect="dark" content="删除" placement="top">
+    <el-tooltip class="item" effect="dark" content="删除" placement="top" v-if="isDelete">
       <i class="iconfont icon-delete tags-operate-icon" id="deleteTags" @click="operateConfirm('delete')"></i>
     </el-tooltip>
     <el-dialog
@@ -121,8 +121,13 @@ export default {
       isLoading: false,
       tagName: null,
       style: null,
-      id: null,
+      id: null
     }
+  },
+  props: {
+    isAdd: Boolean,
+    isEdit: Boolean,
+    isDelete: Boolean
   },
   computed: {
     ...mapState([

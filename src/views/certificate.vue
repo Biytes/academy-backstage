@@ -133,7 +133,10 @@
           </el-form-item>
           <el-form-item label="证书类型:" prop="tags">
             <tags-editor :syncTagsList.sync="operateForm.tags"
-                         ref="tagsEditor"></tags-editor>
+                         ref="tagsEditor"
+                         :isAdd="true"
+                         :isEdit="!isClientStudent"
+                         :isDelete="!isClientStudent"></tags-editor>
           </el-form-item>
           <el-form-item label="证书描述:" prop="description">
             <el-input
@@ -449,7 +452,7 @@ export default {
         owner: '',
         grade: this.isClientStudent ? this.grade : null,
         major: this.isClientStudent ? this.major : null,
-        stuClass: this.isClientStudent ? this.stu_class: null,
+        stuClass: this.isClientStudent ? this.stu_class : null,
         tags: []
       }
       this.$refs.imageUploader.clearUrl()

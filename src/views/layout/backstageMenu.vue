@@ -271,7 +271,7 @@ export default {
         {
           index: '14',
           linkTitle: '菜单管理',
-          router: '/section'
+          router: '/category'
         }
       ]
     }

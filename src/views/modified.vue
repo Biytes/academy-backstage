@@ -302,7 +302,7 @@ export default {
         pk: item.user.pk || null,
         created_time: item.user.date_joined || null,
         password: null,
-        username: item.user.username|| null,
+        username: item.user.username || null,
         grade: item.grade || null,
         major: item.major || null,
         stu_class: item.stu_class || null,
