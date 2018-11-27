@@ -1,107 +1,103 @@
 <template lang="html">
-  <div class="page gallery">
+  <div class="page certificate">
     <div class="top-bar">
-      <span class="select-name">年级:</span>
-      <el-select v-model="gradeType.value" placeholder="请选择" size="mini" @change="selectChange()">
-        <el-option
-          v-for="item in gradeType.options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-      <span class="select-name">专业:</span>
-      <el-select v-model="majorType.value" placeholder="请选择" size="mini" @change="selectChange()">
-        <el-option
-          v-for="item in majorType.options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-      <span class="select-name">比赛类型:</span>
-      <el-select v-model="awardType.value" placeholder="请选择" size="mini" @change="selectChange()">
-        <el-option
-          v-for="item in awardType.options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
     </div>
     <el-card class="page-container">
-      <div v-for="(shelf, shelfIndex) in shelves" :key="shelfIndex" class="shelf" v-show="!addPage && !editPage">
-        <h3 class="shelf-name clearfloat">{{shelf.shelfName}}
+      <div class="shelf" v-show="!isAddPage && !isEditPage" v-loading="isLoading">
+        <h3 class="shelf-name clearfloat">
+          {{ this.section }}
           <div class="shelf-mode-control">
-            <span :class="{'shelf-mode-active': !shelf.editShelfMode}" @click="readMode(shelf)">Read</span>/
-            <span :class="{'shelf-mode-active': shelf.editShelfMode}" @click="editMode(shelf)">Edit</span>
+            <span :class="{'shelf-mode-active': !isEditMode}"
+                  @click="readMode">Read</span>
+            <span v-if="isWrite">/</span>
+            <span v-if="isWrite"
+                  :class="{'shelf-mode-active': isEditMode}"
+                  @click="editMode">Edit</span>
           </div>
         </h3>
         <ul class="shelf-inner">
-          <li v-for="(item, itemIndex) in shelf.Items" :key="itemIndex"  class="shelf-item">
+          <li v-for="item in tableData" :key="item.id"  class="shelf-item">
             <div class="shelf-item-info">
-              <img @click="showImagePage(item.imgUrl)" class="item-img" :src="item.imgUrl" alt="">
+              <img @click="showImagePage(item.imageUrl)" class="item-img" :src="item.imageUrl" alt="">
               <p class="item-name">
-                {{item.name}}
+                {{ item.name }}
               </p>
               <p class="item-owner clearfloat">
-                {{item.owner}}
-                <i class="item-icon-detail iconfont icon-detail" title="详情" @click="showDescription(item)" v-show="!shelf.editShelfMode"></i>
-                <a :href="item.imgUrl" download><i class="item-icon-download iconfont icon-download" title="下载" v-show="!shelf.editShelfMode"></i></a>
-                <i class="item-icon-edit iconfont icon-edit" title="编辑" @click="editItem(shelf, itemIndex)" v-show="shelf.editShelfMode"></i>
-                <i class="item-icon-delete iconfont icon-delete" title="删除" @click="deleteItem(shelf, itemIndex)" v-show="shelf.editShelfMode"></i>
+                {{ item.owner }}
+                <el-tooltip class="item" effect="dark" content="详情" placement="top">
+                  <i class="item-icon-detail iconfont icon-detail" title="详情" @click="showDescription(item)" v-show="!isEditMode"></i>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="下载" placement="top">
+                  <a :href="item.imageUrl" download style="float: right;"><i class="item-icon-download iconfont icon-download" title="下载" v-show="!isEditMode"></i></a>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                  <i class="item-icon-edit iconfont icon-edit" title="编辑" @click="editItem(item.id)" v-show="isEditMode"></i>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                  <i class="item-icon-delete iconfont icon-delete" title="删除" @click="deleteItemSubmit(item.id)" v-show="isEditMode"></i>
+                </el-tooltip>
               </p>
-              <p class="item-time clearfloat">获奖时间:<span>{{item.awardTime}}</span></p>
-              <div class="item-tags">                             <!--明天改-->
-                <span v-for="(tag, tagIndex) in tagsColor" v-show="contains(item.tags, tag.name)" :key="tagIndex" :style="tag.style" class="item-tag">{{tag.name}}</span>
+              <p class="item-time clearfloat">创建时间:<span>{{ item.created_time }}</span></p>
+              <div class="item-tags">
+                <span v-for="tag in tags" v-show="contains(tag.name, item.tags)" :key="tag.id" :style="`background: ${tag.style}`" class="item-tag">{{ tag.name }}</span>
               </div>
             </div>
           </li>
-          <li class="shelf-add-item" @click="showShelfAddItemPage(shelf)" v-show="shelf.editShelfMode">+</li>
+          <li class="shelf-add-item"
+              @click="addItem()"
+              v-if="isWrite"
+              v-show="isEditMode">+</li>
         </ul>
+        <el-pagination
+          background
+          :current-page.sync="currentPage"
+          :total="total"
+          :page-size="pageSize"
+          @current-change="getPageData"
+          layout="total, prev, pager, next, jumper">
+        </el-pagination>
       </div>
-      <div v-show="addPage || editPage">
+      <div v-show="isAddPage || isEditPage" v-loading="isLoading">
 
-        <el-form :model="addForm" ref="ruleForm" label-width="100px" class="demo-ruleForm add-page">
-          <el-form-item label="证书名称:" prop="name">
-            <el-input v-model="addForm.name"></el-input>
+        <el-form :model="operateForm" label-width="100px" class="demo-ruleForm add-page">
+          <el-form-item label="图片标题:" prop="name">
+            <el-input v-model="operateForm.name"></el-input>
           </el-form-item>
-          <el-form-item label="获奖得主:" prop="owner">
-            <el-input v-model="addForm.owner"></el-input>
-          </el-form-item>
-          <el-form-item label="得奖时间:" prop="awardTime" align="left">
+          <el-form-item label="照片创建时间:" prop="awardTime" align="left">
             <el-date-picker
-              v-model="addForm.awardTime"
+              v-model="operateForm.awardTime"
               align="right"
               type="date"
               placeholder="选择日期:"
               format="yyyy年 MM月 dd日"
-              value-format="yyyy-MM-dd"
-              :picker-options="datePicker">
+              value-format="yyyy-MM-dd">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="上传图片:" prop="imgUrl">
-            <label for="imgUrl" class="image-upload"><img id="showImg" :src="addForm.imgUrl" alt=""></label>
-            <input id="imgUrl" @change="changepic" type="file" ref="certicification_pic" />
+          <el-form-item label="上传图片:" prop="imageUrl" align="left">
+            <image-uploader :syncImage.sync="operateForm.image"
+                            ref="imageUploader"
+                            width="300"
+                            height="300"></image-uploader>
           </el-form-item>
-          <el-form-item label="证书类型:" prop="tags">
-            <el-checkbox-group v-model="addForm.tags" size="medium" style="display: inline-block;">
-              <el-checkbox-button v-for="tag in tags" :label="tag" :key="tag">{{tag}}</el-checkbox-button>
-            </el-checkbox-group>
-            <i class="iconfont icon-plus" id="addTags" @click="addTags()"></i>
+          <el-form-item label="照片标签:" prop="tags">
+            <tags-editor :syncTagsList.sync="operateForm.tags"
+                         ref="tagsEditor"
+                         :isAdd="true"
+                         :isEdit="true"
+                         :isDelete="true"></tags-editor>
           </el-form-item>
-          <el-form-item label="证书描述:" prop="description">
+          <el-form-item label="照片描述:" prop="description">
             <el-input
               type="textarea"
               :autosize="{ minRows: 6, maxRows: 6}"
               placeholder="请输入内容"
-              v-model="addForm.description">
+              v-model="operateForm.description">
             </el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="success" style="width:45%;" @click="shelfAddItem()" v-show="addPage">添加</el-button>
-            <el-button type="success" style="width:45%;" @click="shelfEditItem()" v-show="editPage">完成</el-button>
-            <el-button type="warning" style="width:45%;" @click="backToRead()">返回</el-button>
+            <el-button type="success" style="width:45%;" @click="addItemSubmit()" v-show="isAddPage">添加</el-button>
+            <el-button type="success" style="width:45%;" @click="editItemSubmit()" v-show="isEditPage">完成</el-button>
+            <el-button type="warning" style="width:45%;" @click="hideOperatePage()">返回</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -110,144 +106,120 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
+import { mapState, mapMutations } from 'vuex'
 
 export default {
   data () {
     return {
-      gradeType: {
-        options: [{
-          value: '2014',
-          label: '2014'
-        }, {
-          value: '2015',
-          label: '2015'
-        }, {
-          value: '2016',
-          label: '2016'
-        }, {
-          value: '2017',
-          label: '2017'
-        }, {
-          value: '2018',
-          label: '2018'
-        }],
-        value: ''
-      },
-      majorType: {
-        options: [{
-          value: '计算机科学与技术',
-          label: '计算机科学与技术'
-        }, {
-          value: '软件工程',
-          label: '软件工程'
-        }, {
-          value: '网络工程',
-          label: '网络工程'
-        }],
-        value: ''
-      },
-      awardType: {
-        options: [{
-          value: 'ACM',
-          label: 'ACM'
-        }, {
-          value: '蓝桥杯',
-          label: '蓝桥杯'
-        }, {
-          value: '省赛',
-          label: '省赛'
-        }],
-        value: ''
-      },
-      tags: ['LQB', 'ACM', '广州', '深圳'],
-      tagsColor: [{
-        name: 'ACM',
-        style: {
-          background: 'rgb(231, 172, 251)'
-        }
-      }, {
-        name: 'LQB',
-        style: {
-          background: 'rgb(65, 179, 244)'
-        }
-      }, {
-        name: '深圳',
-        style: {
-          background: 'rgb(87, 119, 209)'
-        }
-      }, {
-        name: '广州',
-        style: {
-          background: 'rgb(207, 90, 48)'
-        }
-      }],
-      addForm: {
+      tableData: [],
+      section: '',
+      category: '',
+      operateForm: {
+        id: '',
+        image: '',
+        imageUrl: '',
         name: '',
-        owner: '',
-        awardTime: '',
-        imgUrl: '',
-        tags: [''],
-        description: ''
+        description: '',
+        created_time: '',
+        tags: []
       },
-      addPage: false,
-      editPage: false,
-      editingShelfId: '',
-      editingItemIndex: '',
-      datePicker: {
-        disabledDate (time) {
-          return time.getTime() > Date.now()
-        },
-        shortcuts: [{
-          text: '今天',
-          onClick (picker) {
-            picker.$emit('pick', new Date())
-          }
-        }, {
-          text: '昨天',
-          onClick (picker) {
-            const date = new Date()
-            date.setTime(date.getTime() - 3600 * 1000 * 24)
-            picker.$emit('pick', date)
-          }
-        }, {
-          text: '一周前',
-          onClick (picker) {
-            const date = new Date()
-            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7)
-            picker.$emit('pick', date)
-          }
-        }]
-      }
+      currentPage: 1,
+      pageSize: 6,
+      total: 0,
+      isWrite: true,
+      isLoading: false,
+      isAddPage: false,
+      isEditPage: false,
+      isEditMode: false
     }
+  },
+  watch: {
+    '$route': 'onRouteChange'
   },
   computed: {
-    shelves () {
-      console.log(this.$route.params.id) // 利用id获取需要的数据
-      return this.$store.state.testData.shelves
-    }
+    ...mapState([
+      'permissions',
+      'tags'
+    ])
+  },
+  mounted () {
+    this.section = this.$route.name
+    this.category = this.$route.params.category
+    this.checkWritePermission()
+    this.getTags()
+    this.getPageData()
   },
   methods: {
+    getPageData () {
+      // 获取页面数据
+      let params = {
+        category: this.category,
+        page: this.currentPage
+      }
+
+      return Promise
+        .resolve()
+        .then(_ => {
+          this.isLoading = true
+          return getAcademyData(this.section, params)
+        })
+        .then(res => {
+          if (res.status === 200) {
+            let data = res.data
+            this.tableData = data.results.map(item => this.processData(item))
+            this.total = data.count
+            this.pageSize = this.total < 10 ? this.total : 10
+          }
+          this.isLoading = false
+        })
+        .catch(error => this.showError(error))
+    },
+    getTags () {
+      this.isLoading = true
+      return getAcademyData('certificatetag')
+        .then(res => {
+          console.log(res)
+          let tags = res.data.map(item => {
+            return {
+              id: item.id,
+              name: item.name,
+              style: item.style
+            }
+          })
+          return tags
+        })
+        .then(tags => {
+          this.saveTags(tags)
+          this.isLoading = false
+        })
+        .catch(error => this.showError(error))
+    },
+    processData (item) {
+      return {
+        id: item.id,
+        image: item.image || null,
+        imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}` || null,
+        name: item.name || null,
+        description: item.desc || null,
+        created_time: item.created_time || null,
+        tags: item.tags || null
+      }
+    },
+    checkWritePermission () {
+      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(this.section)) >= 0
+    },
     selectChange () {
       // 通过这个val 来判断
     },
-    readMode (shelf) {
-      shelf.editShelfMode = false
-    },
-    editMode (shelf) {
-      shelf.editShelfMode = true
-    },
-    showShelfAddItemPage (shelf) {
+    showAddItemPage () {
       this.$confirm('添加新证书', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.showAddPage(shelf)
-        this.$message({
-          type: 'success',
-          message: '请输入应填的信息!'
-        })
+        this.showAddPage()
+        this.$message.success('请输入应填的信息!')
       })
     },
     showDescription (item) {
@@ -263,183 +235,174 @@ export default {
         confirmButtonText: '确定'
       })
     },
-    showAddPage (shelf) {
-      this.addPage = true
-      this.editPage = false
-      this.editingShelfId = shelf.id
+    readMode () {
+      this.isEditMode = false
     },
-    shelfAddItem () {
+    editMode () {
+      this.isEditMode = true
+    },
+    addItem () {
       this.$confirm('确定要添加新证书吗', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.shelves[this.editingShelfId].Items.push({ // 赋值
-          name: this.addForm.name,
-          owner: this.addForm.owner,
-          awardTime: this.addForm.awardTime,
-          imgUrl: this.addForm.imgUrl,
-          tags: this.addForm.tags,
-          description: this.addForm.description
-        })
-        // 清除
-        this.clearForm()
-        this.$message({
-          type: 'success',
-          message: '添加成功'
-        })
-      }).catch(() => {
       })
+        .then(_ => {
+          this.resetOperateForm()
+          this.isAddPage = true
+        })
+        .catch(_ => {})
     },
-    shelfEditItem () {
+    editItem (id) {
+      this.isLoading = true
+      this.resetOperateForm()
+      this.isEditPage = true
+      editAcademyData(this.section, id)
+        .then(res => {
+          if (res.status === 200) {
+            this.operateForm = this.processData(res.data)
+            this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
+            this.$refs.tagsEditor.initialData(this.operateForm.tags)
+          }
+          this.isLoading = false
+        })
+        .catch(error => this.showError(error))
+    },
+    addItemSubmit () {
+      this.$confirm('确定要添加新证书吗', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(_ => {
+          this.isLoading = true
+          let params = {
+            category: this.category,
+            name: this.operateForm.name,
+            desc: this.operateForm.description,
+            image: this.operateForm.image,
+            created_time: this.operateForm.created_time,
+            tags: this.operateForm.tags
+          }
+
+          return addAcademyData(this.section, params)
+            .then(_ => {
+              this.$message.success('添加成功')
+            })
+            .then(_ => this.getPageData())
+            .then(_ => this.hideOperatePage())
+            .catch(error => this.showError(error))
+        })
+    },
+    editItemSubmit () {
+      this.$confirm('确定要添加新证书吗', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(_ => {
+          this.isLoading = true
+          let params = {
+            category: this.category,
+            name: this.operateForm.name,
+            desc: this.operateForm.description,
+            image: this.operateForm.image,
+            created_time: this.operateForm.created_time,
+            tags: this.operateForm.tags
+          }
+
+          return updateAcademyData(this.section, this.operateForm.id, params)
+            .then(_ => {
+              this.$message.success('编辑成功')
+            })
+            .then(_ => this.getPageData())
+            .then(_ => this.hideOperatePage())
+            .catch(error => this.showError(error))
+        })
+    },
+    deleteItemSubmit (id) {
       this.$confirm('确定保存本次编辑吗', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        var shelfId = this.editingShelfId
-        var itemId = this.editingItemIndex
-        for (let key in this.addForm) {
-          this.shelves[shelfId].Items[itemId][key] = this.addForm[key]
-        } // 遍历属性赋值
-        // 清除
-        this.clearForm()
-        this.$message({
-          type: 'success',
-          message: '编辑成功'
-        })
-      }).catch(() => {
       })
-    },
-    clearForm () {
-      this.addPage = false
-      this.editPage = false
-      this.addForm.name = ''
-      this.addForm.owner = ''
-      this.addForm.awardTime = ''
-      this.addForm.imgUrl = ' '
-      this.addForm.tags = ['']
-      this.addForm.description = ''
+        .then(_ => {
+          this.isLoading = true
+          return deleteAcademyData(this.section, id)
+            .then(_ => this.getPageData())
+            .catch(error => this.showError(error))
+        })
+        .catch(_ => {})
     },
     addTags () {
       this.$prompt('请输入新标签', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消'
-      }).then(({ value }) => {
-        console.log(value)
-        if (value === null) {
-          this.$message({
-            type: 'warning',
-            message: '输入错误, 标签不能为空, 请重新输入'
-          })
-        } else {
-          this.tags[this.tags.length] = value
-          this.tagsColor.push({
-            name: value,
-            style: 'background:' + this.randomColor()
-          })
-          this.$message({
-            type: 'success',
-            message: '新标签是: ' + value
-          })
-        }
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '取消输入'
+      })
+        .then(({ value }) => {
+          if (value === null) {
+            this.$message.warning('输入错误, 标签不能为空, 请重新输入')
+          } else {
+            let params = {
+              name: value,
+              style: 'background:' + this.randomColor()
+            }
+            return addAcademyData('certificatetag', params)
+              .then(res => {
+                if (res.status === 200) {
+                  this.$message.success('标签添加成功')
+                }
+              })
+              .then(_ => this.getTags())
+              .catch(error => this.showError(error))
+          }
         })
-      })
+        .catch(_ => {
+          this.$message('取消输入')
+        })
     },
-    backToRead () {
-      this.addPage = false
-      this.editPage = false
-      this.addForm.name = ''
-      this.addForm.owner = ''
-      this.addForm.awardTime = ''
-      this.addForm.imgUrl = ' '
-      this.addForm.tagArray = ['ACM']
-      this.addForm.description = ''
-      this.editingItemIndex = ''
-      this.editingShelfId = ''
+    hideOperatePage () {
+      this.isAddPage = false
+      this.isEditPage = false
+      this.resetOperateForm()
     },
-    contains (arr, obj) {
-      return arr.some(item => item === obj)
-    },
-    changepic (e) {
-      console.log(e)
-      // 获取img blob 格式 URL
-      var url = null
-      var file = e.target.files[0] // 也可以用下面的形式/
-      // var file = this.$refs['certicification_pic'].files[0]
-      /* window.URL = window.URL || window.webkitURL; */
-      if (window.createObjcectURL !== undefined) {
-        url = window.createOjcectURL(file)
-      } else if (window.URL !== undefined) {
-        url = window.URL.createObjectURL(file)
-      } else if (window.webkitURL !== undefined) {
-        url = window.webkitURL.createObjectURL(file)
+    resetOperateForm () {
+      this.operateForm = {
+        id: '',
+        imageUrl: '',
+        name: '',
+        description: '',
+        created_time: '',
+        tags: []
       }
-      this.addForm.imgUrl = url
+      this.$refs.imageUploader.clearUrl()
     },
-    // changeTimeFormat () {
-    //   var date = new Date(this.addForm.awardTime)
-    //   var y = date.getFullYear() // 获取年
-    //   var m = date.getMonth() + 1 // 获取月
-    //   var d = date.getDate() // 获取日
-    //   m = m < 10 ? '0' + m : m // 判断月是否大于10
-    //   d = d < 10 ? ('0' + d) : d // 判断日期是否大10
-    //   this.addForm.awardTime = y + '-' + m + '-' + d // 返回时间格式
-    // },
-    editItem (shelf, index) {
-      this.$confirm('确定要编辑证书吗', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.editingShelfId = shelf.id
-        this.editingItemIndex = index
-        for (let key in this.addForm) {
-          this.addForm[key] = shelf.Items[index][key]
-        } // 遍历属性
-        this.editPage = true
-      }).catch(() => {
-      })
+    // 辅助函数
+    contains (target, array) {
+      return array.findIndex(item => item === target) >= 0
     },
-    deleteItem (shelf, index) {
-      this.$confirm('确定要删除证书吗', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        console.log(index)
-        shelf.Items.splice(index, 1)
-      }).catch(() => {
-      })
+    showError (error) {
+      this.$message.error(error.data.msg)
+      console.log('error status:', error.status, 'error:', error)
+      this.isLoading = false
     },
-    random (max, min) {
-      if (typeof max !== 'number') {
-        return Math.random()
-      } else if (typeof min !== 'number') {
-        min = 0
-      }
-      return Math.random() * (max - min) + min
-    },
-    randomColor () {
-      var r = this.random(256) | 0
-      var g = this.random(256) | 0
-      var b = this.random(256) | 0
-      return 'rgb(' + r + ',' + g + ',' + b + ')'
+    // 当路由发生变化
+    onRouteChange () {
+      this.category = this.$route.params.category
+      this.currentPage = 1
+      this.resetOperateForm()
+      this.getPageData()
     },
     ...mapMutations([
-      'loading',
-      'showImagePage'
+      'showImagePage',
+      'saveTags'
     ])
   }
 }
 </script>
 
 <style lang="scss">
-.page.gallery {
+.page.certificate {
   text-align: left;
 
   .top-bar {
@@ -454,6 +417,10 @@ export default {
     font-family: "Microsoft Yahei";
     font-size: 16px;
     margin: 0 auto;
+
+    &-inner {
+      min-height: 328px;
+    }
 
     &-name {
       margin: 10px 0;
@@ -500,7 +467,7 @@ export default {
         padding: 15px 17px 5px;
 
         .item-img {
-          height:200px;
+          height:250px;
           width:auto;
         }
 
@@ -510,6 +477,9 @@ export default {
 
         .item-owner {
           font-size: 15px;
+          .iconfont {
+            padding: 0 5px;
+          }
         }
 
         .item-name {
@@ -602,65 +572,10 @@ export default {
     .item-description-text + .custom__input {
       height:150px;
     }
-
-    input[type="file"]#imgUrl {
-      width: 0.1px;
-      height: 0.1px;
-      opacity: 0;
-      overflow: hidden;
-      position: absolute;
-      z-index: -1;
-    }
-    #showImg {
-      display: inline-block;
-      vertical-align: bottom;
-      width: 300px;
-      height:300px;
-    }
-
-    .image-upload {
-      display: inline-block;
-      border:2px dashed grey;
-      color: grey;
-      vertical-align: bottom;
-      position: relative;
-      cursor: pointer;
-
-      &:after {
-        content: '+';
-        position: absolute;
-        font-size: 2.5rem;
-        color: grey;
-        top: calc(50% - 1.7rem);
-        left: calc(50% - 1.25rem);
-        z-index: 1;
-      }
-
-      &:hover {
-        border:2px dashed #000;
-        color: #000;
-      }
-
-      &-text,
-      .item-description-text {
-        vertical-align: top;
-      }
-    }
-
-    .img-container {
-      width: calc(80% - 55px);
-      padding-left: 55px;
-      text-align: left;
-    }
-
-    #addTags {
-      vertical-align: -webkit-baseline-middle;
-      cursor: pointer;
-      color:rgb(121, 124, 123);
-      &:hover {
-        color:rgb(37, 36, 36);
-      }
-    }
+  }
+  .el-pagination {
+    text-align: center;
+    margin-top: 20px;
   }
 }
 
