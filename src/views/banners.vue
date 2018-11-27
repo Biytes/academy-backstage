@@ -1,6 +1,5 @@
 <template lang="html">
   <div class="page banners-info">
-
     <div class="top-bar">
       <el-button v-if="isWrite"
                  @click="addItem"
@@ -53,18 +52,32 @@
             align="center">
             <template slot-scope="scope">
               <div>
-                <el-button
-                  @click.native.prevent="deleteItemSubmit(scope.row)"
-                  type="text"
-                  size="small">
-                  <i class="iconfont icon-delete table-button-delete"></i>
-                </el-button>
-                <el-button
-                  @click="editItem(scope.row)"
-                  type="text"
-                  size="small">
-                  <i class="iconfont icon-edit06 table-button-edit"></i>
-                </el-button>
+                <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                  <el-button
+                    v-if="isWrite"
+                    @click.native.prevent="deleteItemSubmit(scope.row)"
+                    type="text"
+                    size="small">
+                    <i class="iconfont icon-delete table-button-delete"></i>
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                  <el-button
+                    v-if="isWrite"
+                    @click="preview(scope.row, 'edit')"
+                    type="text"
+                    size="small">
+                    <i class="iconfont icon-edit table-button-edit"></i>
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="只读" placement="top">
+                  <el-button
+                    @click="preview(scope.row, 'read')"
+                    type="text"
+                    size="small">
+                    <i class="iconfont icon-readme table-button-read"></i>
+                  </el-button>
+                </el-tooltip>
               </div>
             </template>
           </el-table-column>
@@ -92,7 +105,7 @@
           <el-form-item label="标题" prop="title">
             <el-input v-model="operateForm.title"></el-input>
           </el-form-item>
-          <el-form-item label="教师图片:" prop="image" align="left">
+          <el-form-item label="banners:" prop="image" align="left">
             <image-uploader :syncImage.sync="operateForm.image"
                             ref="imageUploader"
                             type="id"
@@ -182,12 +195,12 @@ export default {
     },
     processData (item = {}) {
       return {
-        id: item.id,
-        title: item.title,
-        created_time: item.created_time,
-        imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}`,
-        image: item.image,
-        brief: item.brief
+        id: item.id || null,
+        title: item.title || null,
+        created_time: item.created_time || null,
+        imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}` || null,
+        image: item.image || null,
+        brief: item.brief || null
       }
     },
     checkWritePermission () {
@@ -199,30 +212,17 @@ export default {
       this.operateForm.created_time = new Date()
       this.isAdd = true
     },
-    editItem (row) { // 打开编辑页面
-      this.isEdit = true
+    previewItem (row, mode) { // 打开编辑页面
+      if (mode === 'edit') {
+        this.isEdit = true
+      } else {
+        this.isRead = true
+      }
       this.isLoading = true
       editAcademyData(this.section, row.id)
         .then(res => {
           if (res.status === 200) {
-            this.operateForm = this.processData(res.data)
-            this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
-          }
-          this.isLoading = false
-        })
-        .catch(error => {
-          this.showError(error)
-          this.resetOperateForm()
-        })
-    },
-    readItem (row, index) {
-      this.isRead = true
-      this.isLoading = true
-      editAcademyData(this.section, row.id)
-        .then(res => {
-          if (res.status === 200) {
-            this.operateForm = this.processData(res.data)
-            this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
+            this.previewData(res)
           }
           this.isLoading = false
         })
@@ -292,6 +292,10 @@ export default {
             .catch(error => this.showError(error))
         })
         .catch(_ => {})
+    },
+    previewData (res) {
+      this.operateForm = this.processData(res.data)
+      this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
     },
     showError (error) {
       this.$message.error(error.data.msg)

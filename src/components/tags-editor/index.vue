@@ -15,12 +15,18 @@
         :value="item.name">
       </el-option>
     </el-select>
-    <i class="iconfont icon-plus tags-operate-icon" id="addTags" @click="operateConfirm('add')"></i>
-    <i class="iconfont icon-edit tags-operate-icon" id="editTags" @click="operateConfirm('edit')"></i>
-    <i class="iconfont icon-delete tags-operate-icon" id="deleteTags" @click="operateConfirm('delete')"></i>
+    <el-tooltip class="item" effect="dark" content="增加" placement="top">
+      <i class="iconfont icon-plus tags-operate-icon" id="addTags" @click="operateConfirm('add')"></i>
+    </el-tooltip>
+    <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+      <i class="iconfont icon-edit tags-operate-icon" id="editTags" @click="operateConfirm('edit')"></i>
+    </el-tooltip>
+    <el-tooltip class="item" effect="dark" content="删除" placement="top">
+      <i class="iconfont icon-delete tags-operate-icon" id="deleteTags" @click="operateConfirm('delete')"></i>
+    </el-tooltip>
     <el-dialog
       class="file-uploader-dialog"
-      title="编辑标签"
+      title="操作标签"
       :visible.sync="isShowDialog"
       width="40%"
       align="left">
@@ -33,11 +39,29 @@
               </el-form-item>
             </el-col>
             <el-col :span="6" align="center">
-              <el-color-picker v-model="color"></el-color-picker>
+              <el-color-picker v-model="style"></el-color-picker>
             </el-col>
           </el-row>
         </div>
         <div v-if="dialogMode === 'edit'">
+          <el-row align="left" style="margin: 0 0 20px;">
+            <el-form-item label="请选择标签">
+              <el-select
+                v-model="id"
+                filterable
+                allow-create
+                default-first-option
+                placeholder="请选择证书标签"
+                @change="onEditingTagChange">
+                <el-option
+                  v-for="item in tags"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-row>
           <el-row>
             <el-col :span="16" align="left">
               <el-form-item label="标签名">
@@ -45,7 +69,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="8" align="center">
-              <el-color-picker v-model="color"></el-color-picker>
+              <el-color-picker v-model="style"></el-color-picker>
             </el-col>
           </el-row>
         </div>
@@ -73,7 +97,7 @@
                    @click="addTagSubmit">确 定</el-button>
         <el-button v-if="dialogMode === 'edit'"
                    type="primary"
-                   @click="addTagSubmit">确 定</el-button>
+                   @click="editTagSubmit">确 定</el-button>
         <el-button v-if="dialogMode === 'delete'"
                    type="danger"
                    @click="deleteTagSubmit">删 除</el-button>
@@ -84,7 +108,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
-import { getAcademyData, addAcademyData, deleteAcademyData } from '@api/index'
+import { getAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
 export default {
   name: 'tags-editor',
   data () {
@@ -96,7 +120,8 @@ export default {
       isShowDialog: false,
       isLoading: false,
       tagName: null,
-      color: null
+      style: null,
+      id: null,
     }
   },
   computed: {
@@ -109,7 +134,7 @@ export default {
       return getAcademyData(this.section)
         .then(res => {
           console.log(res)
-          return res.data.results.map(item => {
+          return res.data.map(item => {
             return {
               id: item.id,
               name: item.name,
@@ -146,7 +171,27 @@ export default {
       this.dialogMode = mode
       this.isShowDialog = true
     },
-    editItem (id) {
+    editTagSubmit (id) {
+      if (this.isTagDuplicate()) {
+        this.isLoading = true
+
+        let params = {
+          name: this.tagName,
+          style: this.style
+        }
+
+        updateAcademyData(this.section, this.id, params)
+          .then(res => {
+            if (res.status === 200) {
+              this.$message.success('修改成功')
+            }
+          })
+          .then(_ => this.getTags())
+          .then(_ => this.resetDialog())
+          .catch(error => this.showError(error))
+      } else {
+        this.$message.warning('标签已存在')
+      }
     },
     deleteTagSubmit () {
       let requests = []
@@ -162,12 +207,12 @@ export default {
         .catch(error => this.showError(error))
     },
     addTagSubmit () {
-      if (this.isTagExist()) {
+      if (this.isTagDuplicate()) {
         this.isLoading = true
 
         let params = {
           name: this.tagName,
-          style: this.color
+          style: this.style
         }
         addAcademyData(this.section, params)
           .then(res => {
@@ -186,15 +231,21 @@ export default {
       this.dialogMode = ''
       this.isShowDialog = false
       this.tagName = null
-      this.color = null
+      this.style = null
+      this.id = null
       this.deletedTags = []
       this.selectedTags = []
+    },
+    onEditingTagChange () {
+      let index = this.tags.findIndex(item => item.id === this.id)
+      this.tagName = this.tags[index].name
+      this.style = this.tags[index].style
     },
     syncTagsList () {
       this.$emit('update:syncTagsList', this.selectedTags)
     },
-    isTagExist () {
-      return this.tags.findIndex(item => item.name === this.tagName) === -1
+    isTagDuplicate () {
+      return this.tags.findIndex(item => item.name === this.tagName || item.style === this.style) === -1
     },
     showError (error) {
       this.$message.error(error.data.msg)

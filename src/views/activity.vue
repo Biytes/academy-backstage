@@ -55,26 +55,32 @@
             width="150"
             align="center">
             <template slot-scope="scope">
-              <el-button
-                v-if="isWrite"
-                @click.native.prevent="deleteItemSubmit(scope.row)"
-                type="text"
-                size="small">
-                <i class="iconfont icon-delete table-button-delete"></i>
-              </el-button>
-              <el-button
-                v-if="isWrite"
-                @click="editItem(scope.row)"
-                type="text"
-                size="small">
-                <i class="iconfont icon-edit06 table-button-edit"></i>
-              </el-button>
-              <el-button
-                @click="readItem(scope.row)"
-                type="text"
-                size="small">
-                <i class="iconfont icon-readme table-button-read"></i>
-              </el-button>
+              <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                <el-button
+                  v-if="isWrite"
+                  @click.native.prevent="deleteItemSubmit(scope.row)"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-delete table-button-delete"></i>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                <el-button
+                  v-if="isWrite"
+                  @click="previewItem(scope.row, 'edit')"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-edit table-button-edit"></i>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="只读" placement="top">
+                <el-button
+                  @click="previewItem(scope.row, 'read')"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-readme table-button-read"></i>
+                </el-button>
+              </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
@@ -201,11 +207,11 @@ export default {
     },
     processData (item = {}) {
       return {
-        id: item.id,
-        title: item.title,
-        desc: item.desc,
-        end_date: item.end_date,
-        start_date: item.start_date
+        id: item.id || null,
+        title: item.title || null,
+        desc: item.desc || null,
+        end_date: item.end_date || null,
+        start_date: item.start_date || null
       }
     },
     // 改变页面状态
@@ -214,30 +220,19 @@ export default {
       this.operateForm.created_time = new Date()
       this.isAdd = true
     },
-    editItem (row) { // 打开编辑页面
-      this.isEdit = true
+    previewItem (row, mode) { // 打开编辑页面
+      if (mode === 'edit') {
+        this.isEdit = true
+      } else {
+        this.isRead = true
+      }
       this.isLoading = true
       editAcademyData(this.section, row.id)
         .then(res => {
           if (res.status === 200) {
-            this.operateForm = this.processData(res.data)
-            this.isLoading = false
+            this.previewData(res)
           }
-        })
-        .catch(error => {
-          this.showError(error)
-          this.resetOperateForm()
-        })
-    },
-    readItem (row) {
-      this.isRead = true
-      this.isLoading = true
-      editAcademyData(this.section, row.id)
-        .then(res => {
-          if (res.status === 200) {
-            this.operateForm = this.processData(res.data)
-            this.isLoading = false
-          }
+          this.isLoading = false
         })
         .catch(error => {
           this.showError(error)
@@ -306,6 +301,9 @@ export default {
             .then(_ => this.resetOperateForm())
             .catch(error => this.showError(error))
         })
+    },
+    previewData (res) {
+      this.operateForm = this.processData(res.data)
     },
     resetOperateForm () {
       console.log('reset')

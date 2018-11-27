@@ -52,26 +52,32 @@
             width="150"
             align="center">
             <template slot-scope="scope">
-              <el-button
-                v-if="isWrite"
-                @click.native.prevent="deleteItemSubmit(scope.row)"
-                type="text"
-                size="small">
-                <i class="iconfont icon-delete table-button-delete"></i>
-              </el-button>
-              <el-button
-                v-if="isWrite"
-                @click="preViewItem(scope.row, 'edit')"
-                type="text"
-                size="small">
-                <i class="iconfont icon-edit table-button-edit"></i>
-              </el-button>
-              <el-button
-                @click="preViewItem(scope.row, 'edit')"
-                type="text"
-                size="small">
-                <i class="iconfont icon-readme table-button-read"></i>
-              </el-button>
+              <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                <el-button
+                  v-if="isWrite"
+                  @click.native.prevent="deleteItemSubmit(scope.row)"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-delete table-button-delete"></i>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                <el-button
+                  v-if="isWrite"
+                  @click="previewItem(scope.row, 'edit')"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-edit table-button-edit"></i>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="只读" placement="top">
+                <el-button
+                  @click="previewItem(scope.row, 'read')"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-readme table-button-read"></i>
+                </el-button>
+              </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
@@ -200,15 +206,15 @@ export default {
     },
     processData (item = {}) {
       return {
-        id: item.id,
-        preview: item.preview,
-        title: item.title,
-        created_time: item.created_time,
-        updated_time: item.updated_time,
-        file: item.file,
-        file_detail: item.file_detail,
-        content: item.content,
-        ctr: item.ctr
+        id: item.id || null,
+        preview: item.preview || null,
+        title: item.title || null,
+        created_time: item.created_time || null,
+        updated_time: item.updated_time || null,
+        file: item.file || null,
+        file_detail: item.file_detail || null,
+        content: item.content || null,
+        ctr: item.ctr || null
       }
     },
     // 改变页面状态
@@ -217,7 +223,7 @@ export default {
       this.operateForm.created_time = new Date()
       this.isAdd = true
     },
-    preViewItem (row, mode) { // 打开编辑页面
+    previewItem (row, mode) { // 打开编辑页面
       if (mode === 'edit') {
         this.isEdit = true
       } else {

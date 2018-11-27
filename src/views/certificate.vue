@@ -2,13 +2,14 @@
   <div class="page certificate">
     <div class="top-bar">
       <el-row>
-        <el-col :span="4">
+        <el-col style="width: 200px">
           <el-input placeholder="请输入年级"
                     v-model="grade"
                     size="mini"
+                    clearable
                     @keyup.enter.native="getPageData"></el-input>
         </el-col>
-        <el-col :span="5" :push="1">
+        <el-col style="width: 200px; padding: 1px 0 0; margin: 0 20px">
           <el-select v-model="major" placeholder="请选择专业" size="mini" @change="getPageData()" class="left">
             <el-option
               v-for="item in majorType"
@@ -18,10 +19,11 @@
             </el-option>
           </el-select>
         </el-col>
-        <el-col :span="4">
+        <el-col style="width: 200px">
           <el-input placeholder="请输入班级"
                     v-model="stu_class"
                     size="mini"
+                    clearables
                     @keyup.enter.native="getPageData">
             <template slot="append"><span>班</span></template>
           </el-input>
@@ -50,10 +52,18 @@
               </p>
               <p class="item-owner clearfloat">
                 {{ item.owner }}
-                <i class="item-icon-detail iconfont icon-detail" title="详情" @click="showDescription(item)" v-show="!isEditMode"></i>
-                <a :href="item.imageUrl" download><i class="item-icon-download iconfont icon-download" title="下载" v-show="!isEditMode"></i></a>
-                <i class="item-icon-edit iconfont icon-edit" title="编辑" @click="editItem(item.id)" v-show="isEditMode"></i>
-                <i class="item-icon-delete iconfont icon-delete" title="删除" @click="deleteItemSubmit(item.id)" v-show="isEditMode"></i>
+                <el-tooltip class="item" effect="dark" content="详情" placement="top">
+                  <i class="item-icon-detail iconfont icon-detail" title="详情" @click="showDescription(item)" v-show="!isEditMode"></i>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="下载" placement="top">
+                  <a :href="item.imageUrl" download style="float: right;"><i class="item-icon-download iconfont icon-download" title="下载" v-show="!isEditMode"></i></a>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                  <i class="item-icon-edit iconfont icon-edit" title="编辑" @click="editItem(item.id)" v-show="isEditMode"></i>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                  <i class="item-icon-delete iconfont icon-delete" title="删除" @click="deleteItemSubmit(item.id)" v-show="isEditMode"></i>
+                </el-tooltip>
               </p>
               <p class="item-time clearfloat">获奖时间:<span>{{ item.awardTime }}</span></p>
               <div class="item-tags">
@@ -87,8 +97,15 @@
           <el-form-item label="年级" prop="grade">
             <el-input placeholder="年级" v-model="operateForm.grade"></el-input>
           </el-form-item>
-          <el-form-item label="专业" prop="major">
-            <el-input placeholder="专业" v-model="operateForm.major"></el-input>
+          <el-form-item label="专业" prop="major" align="left">
+            <el-select v-model="operateForm.major" placeholder="请选择专业" class="left">
+              <el-option
+                v-for="item in majorType"
+                :key="item"
+                :label="item"
+                :value="item">
+              </el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="班级" prop="stu_class">
             <el-input placeholder="班级" v-model="operateForm.stuClass">
@@ -181,7 +198,7 @@ export default {
     this.section = this.$route.name
     this.checkWritePermission()
     this.getTags()
-      .then(_ => this.getPageData())
+    this.getPageData()
   },
   methods: {
     getPageData () {
@@ -214,13 +231,17 @@ export default {
       this.isLoading = true
       return getAcademyData('certificatetag')
         .then(res => {
-          let tags = res.data.results.map(item => {
+          console.log(res)
+          let tags = res.data.map(item => {
             return {
               id: item.id,
               name: item.name,
               style: item.style
             }
           })
+          return tags
+        })
+        .then(tags => {
           this.saveTags(tags)
           this.isLoading = false
         })
@@ -229,16 +250,16 @@ export default {
     processData (item) {
       return {
         id: item.id,
-        image: item.image,
-        imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}`,
-        name: item.name,
-        description: item.desc,
-        awardTime: item.award_time,
-        owner: item.owner,
-        grade: item.grade,
-        major: item.major,
-        stuClass: item.stu_class,
-        tags: item.tags
+        image: item.image || null,
+        imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}` || null,
+        name: item.name || null,
+        description: item.desc || null,
+        awardTime: item.award_time || null,
+        owner: item.owner || null,
+        grade: item.grade || null,
+        major: item.major || null,
+        stuClass: item.stu_class || null,
+        tags: item.tags || null
       }
     },
     checkWritePermission () {
@@ -511,6 +532,9 @@ export default {
 
         .item-owner {
           font-size: 15px;
+          .iconfont {
+            padding: 0 5px;
+          }
         }
 
         .item-name {

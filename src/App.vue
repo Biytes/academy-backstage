@@ -11,12 +11,20 @@ export default {
   name: 'App',
   data () {
     return {
+      isFirstTimeLogin: ''
     }
   },
   mounted () {
-    this.checkTokenValid()
+    // 如果为undefined就是第一次登陆
+    this.isFirstTimeLogin = localStorage.getItem('isFirstTimeLogin')
+
+    // 如果是第一次登陆就不验证
+    if (this.isFirstTimeLogin) {
+      this.checkTokenValid()
+    }
   },
   methods: {
+    // 确保token是否有效，如果无效就回到登陆界面，如果有效就执行登陆
     checkTokenValid () {
       let userInfo = getStorageExpirable('userInfo')
       userInfo = JSON.parse(userInfo)
@@ -28,7 +36,7 @@ export default {
       } else {
         this.$message.warning('token 过期')
         let path = '/'
-        this.$router.push({ path, replace: true })
+        this.$router.push({ path })
       }
     },
     ...mapMutations([

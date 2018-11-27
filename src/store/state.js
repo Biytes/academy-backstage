@@ -2,7 +2,10 @@ export default {
   userInfo: {
     type: '0', // 0为管理员 1为老师 2为学生
     token: '',
-    username: 'admin'
+    username: 'admin',
+    stu_class: '',
+    major: '',
+    grade: ''
   },
   permissions: '',
   isLogin: false, // 是否登录成功

@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { checkAuth } from '@api/index'
+import { checkAuth, editAcademyData } from '@api/index'
 import { mapState, mapMutations } from 'vuex'
 import { setStorageExpirable } from '@utils/index'
 
@@ -65,23 +65,50 @@ export default {
         password: this.password,
         type: this.type
       }
-
       try {
-        let res = await checkAuth(params)
-
-        res = res.data // 把数据取出来
-
-        let userInfo = JSON.stringify(res)
-        setStorageExpirable('userInfo', userInfo, 200 * 60 * 1000)
-
+        let tokenInfo = await checkAuth(params)
+        tokenInfo = tokenInfo.data // 把数据取出来
+        this.saveToken(tokenInfo.token)
+        let userInfo
         // 存储信息
-        this.saveUserInfo(res)
 
+        // 区分学生和其他账号的存储
+        if (tokenInfo.user.type === 2) {
+          try {
+            this.isLoading = true
+            let studentInfo = await editAcademyData('student', tokenInfo.user.id)
+            userInfo = {
+              id: tokenInfo.user.id,
+              type: tokenInfo.user.type,
+              token: tokenInfo.token,
+              user_permissions: tokenInfo.user.user_permissions,
+              grade: studentInfo.data.grade,
+              major: studentInfo.data.major,
+              stu_class: studentInfo.data.stu_class
+            }
+          } catch (e) {
+            console.log(e)
+            this.$message.error('用户信息获取失败')
+          } finally {
+          }
+        } else {
+          userInfo = {
+            id: tokenInfo.user.id,
+            type: tokenInfo.user.type,
+            token: tokenInfo.token,
+            user_permissions: tokenInfo.user.user_permissions
+          }
+        }
+        // 从这里开始所有的数据都被整合到userInfo里
+        setStorageExpirable('userInfo', JSON.stringify(userInfo), 200 * 60 * 1000)
+        this.saveUserInfo(userInfo)
         this.login()
 
         this.$message.success('登陆成功')
 
-        let path = res.user.type === 2 ? '/certificate' : '/collegeIntro/about'
+        localStorage.setItem('isFirstTimeLogin', 1)
+
+        let path = userInfo.type === 2 ? '/certificate' : '/collegeIntro/about'
 
         this.$router.push({ path })
       } catch (e) {
@@ -93,7 +120,8 @@ export default {
     },
     ...mapMutations([
       'login',
-      'saveUserInfo'
+      'saveUserInfo',
+      'saveToken'
     ])
   }
 }

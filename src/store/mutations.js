@@ -5,7 +5,8 @@ import {
   LOGOUT,
   SHOW_IMAGE_PAGE,
   HIDE_IMAGE_PAGE,
-  SAVE_TAGS
+  SAVE_TAGS,
+  SAVE_TOKEN
 } from './mutations-type'
 
 export default {
@@ -21,17 +22,14 @@ export default {
   },
 
   // 保存用户信息Token
-  [SAVE_USER_INFO] (state, res) {
-    let user = res.user
-
-    let userInfo = {
-      name: user.username,
-      token: res.token,
-      type: user.type
-    }
-
+  [SAVE_USER_INFO] (state, userInfo) {
     state.userInfo = userInfo
-    state.permissions = user.user_permissions.filter(item => item.codename.indexOf('write') >= 0)
+    state.permissions = userInfo.user_permissions.filter(item => item.codename.indexOf('write') >= 0)
+  },
+
+  // 保存Token
+  [SAVE_TOKEN] (state, token) {
+    state.userInfo.token = token
   },
 
   // 登出 logout 清除状态
@@ -57,7 +55,7 @@ export default {
     state.showImage.imagePage = false
   },
 
-  // 保存tags
+  // 保存tags 全局标签
   [SAVE_TAGS] (state, tags) {
     state.tags = tags
   }

@@ -67,6 +67,14 @@ export default [{
       name: 'banners',
       path: '/banners',
       component: _import('banners')
+    }, {
+      name: 'recruit',
+      path: '/recruit/:category',
+      component: _import('recruit')
+    }, {
+      name: 'section',
+      path: '/section',
+      component: _import('section')
     }
   ]
 }]

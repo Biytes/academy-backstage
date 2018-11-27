@@ -52,26 +52,32 @@
             width="150"
             align="center">
             <template slot-scope="scope">
-              <el-button
-                v-if="isWrite"
-                @click.native.prevent="deleteItemSubmit(scope.row)"
-                type="text"
-                size="small">
-                <i class="iconfont icon-delete table-button-delete"></i>
-              </el-button>
-              <el-button
-                v-if="isWrite"
-                @click="preViewItem(scope.row, 'edit')"
-                type="text"
-                size="small">
-                <i class="iconfont icon-edit table-button-edit"></i>
-              </el-button>
-              <el-button
-                @click="preViewItem(scope.row, 'edit')"
-                type="text"
-                size="small">
-                <i class="iconfont icon-readme table-button-read"></i>
-              </el-button>
+              <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                <el-button
+                  v-if="isWrite"
+                  @click.native.prevent="deleteItemSubmit(scope.row)"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-delete table-button-delete"></i>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                <el-button
+                  v-if="isWrite"
+                  @click="previewItem(scope.row, 'edit')"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-edit table-button-edit"></i>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="只读" placement="top">
+                <el-button
+                  @click="previewItem(scope.row, 'read')"
+                  type="text"
+                  size="small">
+                  <i class="iconfont icon-readme table-button-read"></i>
+                </el-button>
+              </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
@@ -109,6 +115,14 @@
               v-model="operateForm.preview">
             </el-input>
           </el-form-item>
+          <el-form-item label="预览图片:" prop="image" align="left">
+            <image-uploader :syncImage.sync="operateForm.image"
+                            ref="imageUploader"
+                            :imageUrl="operateForm.imageUrl"
+                            type="id"
+                            width="300"
+                            height="300"></image-uploader>
+          </el-form-item>
           <el-form-item label="附件" prop="file">
             <file-uploader :syncFileList.sync="operateForm.file"
                            ref="fileUploader">
@@ -130,7 +144,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
 export default {
   data () {
@@ -146,6 +160,7 @@ export default {
         title: '',
         created_time: '',
         updated_time: '',
+        image: '',
         file: [],
         content: '',
         ctr: ''
@@ -206,15 +221,17 @@ export default {
     },
     processData (item = {}) {
       return {
-        id: item.id,
-        preview: item.preview,
-        title: item.title,
-        created_time: item.created_time,
-        updated_time: item.updated_time,
-        file: item.file,
-        file_detail: item.file_detail,
-        content: item.content,
-        ctr: item.ctr
+        id: item.id || null,
+        preview: item.preview || null,
+        title: item.title || null,
+        created_time: item.created_time || null,
+        updated_time: item.updated_time || null,
+        image: item.image || null,
+        imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}` || null,
+        file: item.file || null,
+        file_detail: item.file_detail || null,
+        content: item.content || null,
+        ctr: item.ctr || null
       }
     },
     // 改变页面状态
@@ -223,7 +240,7 @@ export default {
       this.operateForm.created_time = new Date()
       this.isAdd = true
     },
-    preViewItem (row, mode) { // 打开编辑页面
+    previewItem (row, mode) { // 打开编辑页面
       if (mode === 'edit') {
         this.isEdit = true
       } else {
@@ -254,6 +271,7 @@ export default {
           // TODO: 添加一条信息
           let params = {
             category: this.category,
+            image: this.operateForm.image,
             file: this.operateForm.file,
             title: this.operateForm.title,
             created_time: this.operateForm.created_time,
@@ -312,17 +330,18 @@ export default {
     },
     previewData (res) {
       this.operateForm = this.processData(res.data)
+      this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
       this.$refs.fileUploader.initialData(this.operateForm.file_detail)
       this.$refs.editor.initialEditorContent(this.operateForm.content)
     },
     resetOperateForm () {
       console.log('reset')
       this.operateForm = this.processData({})
-
       this.isRead = false
       this.isEdit = false
       this.isAdd = false
       // 清空内容
+      this.$refs.imageUploader.clearUrl()
       this.$refs.editor.initialEditorContent('')
       this.$refs.fileUploader.initialData([])
     },
@@ -341,7 +360,10 @@ export default {
       this.currentPage = 1
       this.resetOperateForm()
       this.getPageData()
-    }
+    },
+    ...mapMutations([
+      'showImagePage'
+    ])
   }
 }
 </script>

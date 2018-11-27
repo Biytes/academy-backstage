@@ -98,21 +98,27 @@
             label="操作">
             <template slot-scope="scope">
               <div>
-                <el-button @click.native.prevent="deleteItemSubmit(scope.row)"
-                          type="text"
-                          size="small">
-                          <i class="iconfont icon-delete" title="删除账号" style="color:red;font-size:30px;"></i>
-                          </el-button>
-                <el-button @click="editItem(scope.row)"
-                          type="text"
-                          size="small">
-                          <i class="iconfont icon-edit06" title="账号更改" style="color:rgb(84, 80, 218);font-size:30px;"></i>
-                          </el-button>
-                <el-button @click="editItemPassword(scope.row)"
-                          type="text"
-                          size="small">
-                          <i class="iconfont icon-password" title="修改密码" style="color:#333;font-size:28px;"></i>
-                          </el-button>
+                <el-tooltip class="item" effect="dark" content="删除账号" placement="top">
+                  <el-button @click.native.prevent="deleteItemSubmit(scope.row)"
+                            type="text"
+                            size="small">
+                            <i class="iconfont icon-delete" title="删除账号" style="color:red;font-size:30px;"></i>
+                            </el-button>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="编辑账号(必须修改密码)" placement="top">
+                  <el-button @click="editItem(scope.row)"
+                            type="text"
+                            size="small">
+                            <i class="iconfont icon-edit" title="账号更改" style="color:rgb(84, 80, 218);font-size:30px;"></i>
+                            </el-button>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="修改密码(快捷修改密码)" placement="top">
+                  <el-button @click="editItemPassword(scope.row)"
+                            type="text"
+                            size="small">
+                            <i class="iconfont icon-password" title="修改密码" style="color:#333;font-size:28px;"></i>
+                            </el-button>
+                </el-tooltip>
               </div>
             </template>
           </el-table-column>
@@ -293,13 +299,13 @@ export default {
     // 处理数据
     processData (item) {
       return {
-        pk: item.user.pk,
-        created_time: item.user.date_joined,
-        password: '',
-        username: item.user.username,
-        grade: item.grade || '',
-        major: item.major || '',
-        stu_class: item.stu_class || '',
+        pk: item.user.pk || null,
+        created_time: item.user.date_joined || null,
+        password: null,
+        username: item.user.username|| null,
+        grade: item.grade || null,
+        major: item.major || null,
+        stu_class: item.stu_class || null,
         clientType: this.section === 'teacher' ? '老师' : '学生'
       }
     },

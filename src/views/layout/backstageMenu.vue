@@ -107,7 +107,7 @@ export default {
         },
         {
           index: '3',
-          linkTitle: '学生信息',
+          linkTitle: '学生工作',
           subMenuItems: [
             {
               index: '3-1',
@@ -214,16 +214,32 @@ export default {
               router: '/modified/student'
             }
           ]
+        },
+        {
+          index: '8',
+          linkTitle: '招生就业',
+          subMenuItems: [
+            {
+              index: '8-1',
+              linkTitle: '招生信息',
+              router: '/recruit/recruitInfo'
+            },
+            {
+              index: '8-2',
+              linkTitle: '就业信息',
+              router: '/recruit/employeInfo'
+            }
+          ]
         }
       ],
       elSingleMenuItems: [
         {
-          index: '8',
+          index: '9',
           linkTitle: '教师队伍',
           router: '/teacherInfo'
         },
         {
-          index: '9',
+          index: '10',
           linkTitle: '新闻中心',
           router: '/collegeNews'
         },
@@ -238,19 +254,24 @@ export default {
         //   router: '/reportBlog'
         // },
         {
-          index: '12',
+          index: '11',
           linkTitle: '活动发布',
           router: '/activity'
         },
         {
-          index: '13',
+          index: '12',
           linkTitle: '学院证书',
           router: '/certificate'
         },
         {
-          index: '14',
+          index: '13',
           linkTitle: 'Banners',
           router: '/banners'
+        },
+        {
+          index: '14',
+          linkTitle: '菜单管理',
+          router: '/section'
         }
       ]
     }
