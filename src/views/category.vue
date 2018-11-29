@@ -45,21 +45,22 @@
             sortable>
           </el-table-column>
           <el-table-column
-            prop="name"
-            label="路径"
-            align="center">
-          </el-table-column>
-          <el-table-column
             prop="title"
             label="标题"
-            min-width="350"
+            min-width="200"
             align="center">
           </el-table-column>
           <el-table-column
             prop="section"
             label="所属模块"
             align="center"
-            width="200">
+            width="250">
+          </el-table-column>
+          <el-table-column
+            prop="name"
+            label="路径"
+            align="center"
+            width="250">
           </el-table-column>
           <el-table-column
             fixed="right"
@@ -126,7 +127,14 @@
             <el-input v-model="operateForm.name"></el-input>
           </el-form-item>
           <el-form-item label="所属模块" prop="section">
-            <el-input v-model="operateForm.section"></el-input>
+            <el-select v-model="operateForm.section" placeholder="请选择模块" size="middle"  class="left">
+              <el-option
+                v-for="item in allSection"
+                :key="item.id"
+                :label="item.title"
+                :value="item.name">
+              </el-option>
+            </el-select>
           </el-form-item>
           <el-form-item class="operate-button">
             <el-button v-show="isEdit " type="success" @click="editItemSubmit">完成</el-button>
@@ -141,7 +149,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 import { getAcademyData, editAcademyData, addAcademyData, updateAcademyData, deleteAcademyData } from '@api/index'
 export default {
   data () {
@@ -151,6 +159,7 @@ export default {
       section: '',
       tableData: [],
       allCategory: [],
+      allSection: [],
       operateForm: {
         id: null,
         created_time: null,
@@ -198,7 +207,9 @@ export default {
           if (res.status === 200) {
             let data = res.data
             this.allCategory = data.map(item => this.processData(item))
+            this.allSection = this.allCategory.filter(item => !item.section)
             this.searchCategory()
+            this.createMenu()
             this.total = data.length
             this.pageSize = data.length
           }
@@ -207,9 +218,7 @@ export default {
         .catch(error => this.showError(error))
     },
     searchCategory () {
-      this.isLoading = true
       this.tableData = this.allCategory.filter(item => this.matchSection(item) || this.matchName(item) || this.matchTitle(item))
-      this.isLoading = false
     },
     matchSection (item) {
       if (item.section) {
@@ -354,7 +363,52 @@ export default {
     catchData (value) {
       // 在这里接受子组件传过来的参数，赋值给data里的参数
       this.operateForm.content = value
-    }
+    },
+    createMenu () {
+      // 只有单个的模块
+      let singleSection = this.allSection.filter(item => this.allCategory.findIndex(category => category.section === item.name) < 0)
+
+      // 有子菜单的模块
+      let multiSection = this.allSection.filter(item => this.allCategory.findIndex(category => category.section === item.name) >= 0)
+
+      let multiSideBarMenu = multiSection.map(item => {
+        let section = item.name
+        let subMenuItem = this.allCategory.filter(category => category.section === section)
+        subMenuItem = subMenuItem.map(menuItem => {
+          return {
+            id: menuItem.id,
+            title: menuItem.title,
+            name: menuItem.name,
+            path: `/${section}/${menuItem.name}`
+          }
+        })
+        return {
+          id: item.id,
+          title: item.title,
+          path: `${subMenuItem[0].path}`,
+          name: item.name,
+          subMenuItem
+        }
+      })
+
+      let singleSideBarMenu = singleSection.map(item => {
+        return {
+          id: item.id,
+          title: item.title,
+          name: item.name,
+          path: `/${item.name}`
+        }
+      })
+
+      let sideBarMenu = {
+        singleSideBarMenu,
+        multiSideBarMenu
+      }
+      this.saveSideBarMenu(sideBarMenu)
+    },
+    ...mapMutations([
+      'saveSideBarMenu'
+    ])
   }
 }
 </script>

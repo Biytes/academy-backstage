@@ -17,23 +17,23 @@ export default [{
       component: _import('certificate')
     }, {
       name: 'collegeintro',
-      path: '/collegeIntro/:category',
+      path: '/collegeintro/:category',
       component: _import('collegeIntro')
     }, {
       name: 'educationnews',
-      path: '/educationNews/:category',
+      path: '/educationnews/:category',
       component: _import('educationNews')
     }, {
       name: 'studentnews',
-      path: '/studentNews/:category',
+      path: '/studentnews/:category',
       component: _import('studentNews')
     }, {
       name: 'partynews',
-      path: '/partyNews/:category',
+      path: '/partynews/:category',
       component: _import('partyNews')
     }, {
       name: 'cooperateinfo',
-      path: '/cooperateInfo/:category',
+      path: '/cooperateinfo/:category',
       component: _import('cooperateInfo')
     }, {
       name: 'gallery',

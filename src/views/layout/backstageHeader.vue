@@ -62,12 +62,14 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.logout()
-
-        this.$router.push({ path: '/' })
-        this.$message.warning('用户已注销')
       })
+        .then(() => {
+          this.logout()
+
+          this.$router.push({ path: '/' })
+          this.$message.warning('用户已注销')
+        })
+        .catch(_ => {})
     },
     ...mapMutations([
       'logout'
@@ -84,7 +86,6 @@ export default {
   background: #222222;
   padding:0 15px;
   position: relative;
-  z-index: 4;
   &-menu-icon {
     height:100%;
     width:130px;

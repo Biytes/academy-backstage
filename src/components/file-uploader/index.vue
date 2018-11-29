@@ -75,14 +75,14 @@ export default {
   },
   methods: {
     changeFile (e) {
-      console.log(e)
+      console.log('File-Event Target: ', e)
       // 获取img blob 格式 URL
       var file = e.target.files[0] // 也可以用下面的形式/
       // var file = this.$refs['certicification_pic'].files[0]
 
       this.tempFile = file
       this.fileName = file.name
-      console.log(file)
+      console.log('File Info:', file)
     },
     showUploadDialog () {
       this.isShowUploadDialog = true
@@ -125,7 +125,7 @@ export default {
         })
         .catch(error => {
           this.$message.error('上传失败')
-          console.log(error)
+          this.$message.error(error)
           this.isLoading = false
         })
     },

@@ -14,20 +14,22 @@
         router>
 
         <section v-if="userInfo.type !== 2">
-          <el-submenu v-for="elMenuItem in elParentMenuItems" :key="`${elMenuItem.index}`" :index="elMenuItem.index">
+          <el-submenu v-for="multiItem in multiSideBarMenu" :key="multiItem.id" :index="multiItem.path">
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span>{{ elMenuItem.linkTitle }}</span>
+              <span>{{ multiItem.title }}</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item v-for="subMenuItem in elMenuItem.subMenuItems" :index="subMenuItem.router" :key="`${subMenuItem.index}`" >
-                {{ subMenuItem.linkTitle }}
+              <el-menu-item v-for="subItem in multiItem.subMenuItem" :index="subItem.path" :key="subItem.id" >
+                {{ subItem.title }}
               </el-menu-item>
             </el-menu-item-group>
           </el-submenu>
-          <el-menu-item v-for="elMenuItem in elSingleMenuItems" :key="`${elMenuItem.index}`" :index="elMenuItem.router">
+          <el-menu-item v-for="singleItem in singleSideBarMenu"
+                        :key="singleItem.id"
+                        :index="singleItem.path">
             <i class="el-icon-menu"></i>
-            <span>{{ elMenuItem.linkTitle }}</span>
+            <span>{{ singleItem.title }}</span>
           </el-menu-item>
         </section>
 
@@ -47,247 +49,115 @@
 <script>
 
 import { mapState, mapMutations } from 'vuex'
-
+import { getAcademyData } from '@api/index'
 export default {
   data () {
     return {
       isCollapse: true,
-      elParentMenuItems: [
-        {
-          index: '1',
-          linkTitle: '学院信息',
-          subMenuItems: [
-            {
-              index: '1-1',
-              linkTitle: '学院简介',
-              router: '/collegeIntro/about'
-            },
-            {
-              index: '1-2',
-              linkTitle: '机构建设',
-              router: '/collegeIntro/facility'
-            },
-            {
-              index: '1-3',
-              linkTitle: '师资建设',
-              router: '/collegeIntro/teacher'
-            },
-            {
-              index: '1-4',
-              linkTitle: '专业设置',
-              router: '/collegeIntro/major'
-            }
-          ]
-        },
-        {
-          index: '2',
-          linkTitle: '教学信息',
-          subMenuItems: [
-            {
-              index: '2-1',
-              linkTitle: '教学文件',
-              router: '/educationNews/file'
-            },
-            {
-              index: '2-2',
-              linkTitle: '资源下载',
-              router: '/educationNews/download'
-            },
-            {
-              index: '2-3',
-              linkTitle: '实验中心规章',
-              router: '/educationNews/protocol'
-            },
-            {
-              index: '2-4',
-              linkTitle: '教学管理',
-              router: '/educationNews/management'
-            }
-          ]
-        },
-        {
-          index: '3',
-          linkTitle: '学生工作',
-          subMenuItems: [
-            {
-              index: '3-1',
-              linkTitle: '工作动态',
-              router: '/studentNews/condition'
-            },
-            {
-              index: '3-2',
-              linkTitle: '班团风采',
-              router: '/studentNews/moment'
-            },
-            {
-              index: '3-3',
-              linkTitle: '新生军训',
-              router: '/studentNews/militaryTraining'
-            },
-            {
-              index: '3-4',
-              linkTitle: '实践创新',
-              router: '/studentNews/practice'
-            },
-            {
-              index: '3-5',
-              linkTitle: '学风建设',
-              router: '/studentNews/motto'
-            },
-            {
-              index: '3-6',
-              linkTitle: '学生荣誉',
-              router: '/studentNews/glory'
-            }
-          ]
-        },
-        {
-          index: '4',
-          linkTitle: '党建信息',
-          subMenuItems: [
-            {
-              index: '4-1',
-              linkTitle: '党建工作',
-              router: '/partyNews/work'
-            },
-            {
-              index: '4-2',
-              linkTitle: '机构设置',
-              router: '/partyNews/facility'
-            },
-            {
-              index: '4-3',
-              linkTitle: '组织生活',
-              router: '/partyNews/organization'
-            },
-            {
-              index: '4-4',
-              linkTitle: '入党指引',
-              router: '/partyNews/instruction'
-            }
-          ]
-        },
-        {
-          index: '5',
-          linkTitle: '对外合作',
-          subMenuItems: [
-            {
-              index: '5-1',
-              linkTitle: '国际合作',
-              router: '/cooperateInfo/international'
-            },
-            {
-              index: '5-2',
-              linkTitle: '校企合作',
-              router: '/cooperateInfo/enterprise'
-            }
-          ]
-        },
-        {
-          index: '6',
-          linkTitle: '学院相册',
-          subMenuItems: [
-            {
-              index: '6-1',
-              linkTitle: '实验中心',
-              router: '/gallery/lab'
-            },
-            {
-              index: '6-2',
-              linkTitle: '中荷交流',
-              router: '/gallery/netherland'
-            }
-          ]
-        },
-        {
-          index: '7',
-          linkTitle: '账号管理',
-          subMenuItems: [
-            {
-              index: '7-1',
-              linkTitle: '老师',
-              router: '/modified/teacher'
-            },
-            {
-              index: '7-2',
-              linkTitle: '学生',
-              router: '/modified/student'
-            }
-          ]
-        },
-        {
-          index: '8',
-          linkTitle: '招生就业',
-          subMenuItems: [
-            {
-              index: '8-1',
-              linkTitle: '招生信息',
-              router: '/recruit/recruitInfo'
-            },
-            {
-              index: '8-2',
-              linkTitle: '就业信息',
-              router: '/recruit/employeInfo'
-            }
-          ]
-        }
-      ],
-      elSingleMenuItems: [
-        {
-          index: '9',
-          linkTitle: '教师队伍',
-          router: '/teacherInfo'
-        },
-        {
-          index: '10',
-          linkTitle: '新闻中心',
-          router: '/collegeNews'
-        },
-        // {
-        //   index: '10',
-        //   linkTitle: '友情链接',
-        //   router: '/friendlyLink'
-        // },
-        // {
-        //   index: '11',
-        //   linkTitle: '微博发布',
-        //   router: '/reportBlog'
-        // },
-        {
-          index: '11',
-          linkTitle: '活动发布',
-          router: '/activity'
-        },
-        {
-          index: '12',
-          linkTitle: '学院证书',
-          router: '/certificate'
-        },
-        {
-          index: '13',
-          linkTitle: 'Banners',
-          router: '/banners'
-        },
-        {
-          index: '14',
-          linkTitle: '菜单管理',
-          router: '/category'
-        }
-      ]
+      isLoading: false,
+      allCategory: [],
+      allSection: []
     }
   },
   computed: {
     ...mapState([
-      'userInfo'
+      'userInfo',
+      'singleSideBarMenu',
+      'multiSideBarMenu'
     ])
   },
+  mounted () {
+    this.getMenuData()
+  },
   methods: {
-    handleOpen (key, keyPath) {
+    handleOpen () {
+
     },
-    handleClose (key, keyPath) {
+    handleClose () {
+
+    },
+    getMenuData () {
+      // 获取Category数据
+
+      return Promise
+        .resolve()
+        .then(_ => {
+          this.isLoading = true
+          return getAcademyData('category')
+        })
+        .then(res => {
+          console.log(res)
+          if (res.status === 200) {
+            let data = res.data
+            this.allCategory = data.map(item => this.processData(item))
+            this.allSection = this.allCategory.filter(item => !item.section)
+            this.createMenu()
+          }
+          this.isLoading = false
+        })
+        .catch(error => this.showError(error))
+    },
+    processData (item = {}) {
+      return {
+        id: item.id || null,
+        created_time: item.created_time || null,
+        name: item.name || null,
+        title: item.title || null,
+        section: item.section || null
+      }
+    },
+    createMenu () {
+      // 只有单个的模块
+      let singleSection = this.allSection.filter(item => this.allCategory.findIndex(category => category.section === item.name) < 0)
+      if (this.userInfo.type !== 0) {
+        singleSection.splice(singleSection.findIndex(item => item.id === 15), 1)
+      }
+      // 有子菜单的模块
+      let multiSection = this.allSection.filter(item => this.allCategory.findIndex(category => category.section === item.name) >= 0)
+
+      let multiSideBarMenu = multiSection.map(item => {
+        let section = item.name
+        let subMenuItem = this.allCategory.filter(category => category.section === section)
+        subMenuItem = subMenuItem.map(menuItem => {
+          return {
+            id: menuItem.id,
+            title: menuItem.title,
+            name: menuItem.name,
+            path: `/${section}/${menuItem.name}`
+          }
+        })
+        return {
+          id: item.id,
+          title: item.title,
+          name: item.name,
+          path: `${subMenuItem[0].path}`,
+          subMenuItem
+        }
+      })
+
+      let singleSideBarMenu = singleSection.map(item => {
+        return {
+          id: item.id,
+          title: item.title,
+          name: item.name,
+          path: `/${item.name}`
+        }
+      })
+
+      let sideBarMenu = {
+        singleSideBarMenu,
+        multiSideBarMenu
+      }
+
+      this.saveSideBarMenu(sideBarMenu)
+    },
+    showError (error) {
+      this.$message.error(error)
+      console.log('error status:', error.status, 'error:', error)
+      this.isLoading = false
     },
     ...mapMutations([
-
+      'saveSideBarMenu'
     ])
   }
 }

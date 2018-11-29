@@ -6,7 +6,8 @@ import {
   SHOW_IMAGE_PAGE,
   HIDE_IMAGE_PAGE,
   SAVE_TAGS,
-  SAVE_TOKEN
+  SAVE_TOKEN,
+  SAVE_SIDEBAR_MENU
 } from './mutations-type'
 
 export default {
@@ -58,5 +59,12 @@ export default {
   // 保存tags 全局标签
   [SAVE_TAGS] (state, tags) {
     state.tags = tags
+  },
+
+  // 保存侧栏菜单
+
+  [SAVE_SIDEBAR_MENU] (state, sideBarMenu) {
+    state.singleSideBarMenu = sideBarMenu.singleSideBarMenu
+    state.multiSideBarMenu = sideBarMenu.multiSideBarMenu
   }
 }

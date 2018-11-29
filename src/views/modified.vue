@@ -164,6 +164,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="班级(数字)"
+                        v-if="isStudent"
                         prop="stu_class"
                         :rules="{ required: true, message: '请输入班级(数字)', trigger: 'blur' }">
             <el-input placeholder="班级" v-model="operateForm.stu_class">
@@ -177,7 +178,7 @@
                           { required: true, message: '请输入账号', trigger: 'blur' },
                           { min: 6, max: 14, message: '长度在 6 到 14 个字符', trigger: 'blur' }
                         ]">
-            <el-input v-model="operateForm.username"></el-input>
+            <el-input v-model="operateForm.username" :disabled="isEdit"></el-input>
           </el-form-item>
           <el-form-item label="密码"
                         prop="password"
@@ -486,76 +487,6 @@ export default {
           grade: this.operateForm.grade,
           stu_class: this.operateForm.stu_class,
           major: this.operateForm.major
-        }
-      }
-    },
-    validateForm () { // 验证表单
-      // 老师 1 学生 0
-      if (this.operateForm.clientType) { // 选项为老师的时候
-        // 验证账号密码长度
-        let username = this.operateForm.username.length
-        if (username < 3 && username > 15) { // 判断用户名长度
-          this.$message({
-            type: 'error',
-            message: '用户名不符合规格(3-15)'
-          })
-          return false
-        } else {
-          let password = this.operateForm.password.length
-          if (password < 3 && password > 15) {
-            this.$message({
-              type: 'error',
-              message: '密码不符合规格(3-15)'
-            })
-            return false
-          } else {
-            return true // 符合规格
-          }
-        }
-      } else { // 选项为学生的时候
-        // 验证账号密码长度
-        let username = this.operateForm.username.length
-        if (username < 3 && username > 15) { // 判断用户名长度
-          this.$message({
-            type: 'error',
-            message: '用户名不符合规格(3-15)'
-          })
-          return false
-        } else {
-          let password = this.operateForm.password.length
-          if (password < 3 && password > 15) { // 判断密码长度
-            this.$message({
-              type: 'error',
-              message: '密码不符合规格(3-15)'
-            })
-            return false
-          } else {
-            if (!this.operateForm.grade) { // 当年级为空的时候
-              this.$message({
-                type: 'error',
-                message: '年级不能为空'
-              })
-              return false
-            } else {
-              if (!this.operateForm.major) { // 专业为空时
-                this.$message({
-                  type: 'error',
-                  message: '专业不能为空'
-                })
-                return false
-              } else {
-                if (!this.operateForm.stu_class) { // 班级为空时
-                  this.$message({
-                    type: 'error',
-                    message: '班级不能为空'
-                  })
-                  return false
-                } else {
-                  return true // 班级 专业 年级都不为空
-                }
-              }
-            }
-          }
         }
       }
     },

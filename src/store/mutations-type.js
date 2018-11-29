@@ -15,3 +15,5 @@ export const HIDE_IMAGE_PAGE = 'hideImagePage'
 export const SAVE_TAGS = 'saveTags'
 
 export const SAVE_TOKEN = 'saveToken'
+
+export const SAVE_SIDEBAR_MENU = 'saveSideBarMenu'

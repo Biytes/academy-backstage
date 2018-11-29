@@ -203,7 +203,6 @@ export default {
       this.isLoading = true
       for (let i = 0; i < this.deletedTags.length; i++) {
         requests.push(deleteAcademyData(this.section, this.deletedTags[i]))
-        console.log(requests)
       }
       Promise.all(requests)
         .then(_ => this.$message.success('删除成功'))
