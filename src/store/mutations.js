@@ -46,7 +46,7 @@ export default {
 
   // 切换图片
   [SHOW_IMAGE_PAGE] (state, image) {
-    state.showImage.currentImg = image
+    state.showImage.currentImage = image
     state.showImage.imagePage = true
   },
 

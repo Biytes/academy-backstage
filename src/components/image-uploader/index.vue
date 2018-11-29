@@ -1,6 +1,10 @@
 <template lang="html">
   <div class="image-uploader" v-loading="isLoading">
-    <label for="imageUrl" :class="[imageUrl ? '' : 'is-empty', 'image-upload']" :style="style"><img id="showImage" :src="imageUrl" alt="" :style="style"></label>
+    <label for="imageUrl"
+           :class="[imageUrl ? '' : 'is-empty', 'image-upload']"
+           :style="style">
+      <img id="showImage" :src="imageUrl" alt="" :style="style"/>>
+    </label>
     <input id="imageUrl" @change="changePic" type="file" accept="image/png, image/gif, image/jpeg, image/jpg" ref="upload_pic" />
   </div>
 </template>
@@ -99,6 +103,9 @@ export default {
       border:2px dashed #000;
       color: #000;
     }
+    &:after {
+      z-index: 1;
+    }
   }
 
   .image-upload {
@@ -116,7 +123,7 @@ export default {
       color: grey;
       top: calc(50% - 1.7rem);
       left: calc(50% - 1.25rem);
-      z-index: 1;
+      z-index: -1;
     }
   }
 }

@@ -122,7 +122,7 @@
             <el-button v-show="isEdit " type="success" @click="editItemSubmit">完成</el-button>
             <el-button v-show="isAdd" type="success" @click="addItemSubmit">添加</el-button>
             <el-button v-show="isRead" type="success" @click="resetOperateForm" class="read-button">返回</el-button>
-            <el-button v-show="!isRead" type="danger" @click="resetOperateForm">重置</el-button>
+            <el-button v-show="!isRead" type="warning" @click="resetOperateForm">返回</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -212,7 +212,6 @@ export default {
     // 控制page状态
     addItem () {
       this.resetOperateForm()
-      this.$refs.editor.initialEditorContent(this.operateForm.content)
       this.isAdd = true
     },
     previewItem (row, mode) { // 打开编辑页面
@@ -316,8 +315,9 @@ export default {
       this.operateForm.content = value
     },
     resetOperateForm () {
-      this.operateForm = this.processData()
+      this.operateForm = this.processData({})
       this.$refs.imageUploader.clearUrl()
+      this.$refs.editor.initialEditorContent('')
       this.isEdit = false
       this.isAdd = false
       this.isRead = false

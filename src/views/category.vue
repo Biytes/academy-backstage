@@ -59,7 +59,7 @@
             prop="section"
             label="所属模块"
             align="center"
-            width="100">
+            width="200">
           </el-table-column>
           <el-table-column
             fixed="right"
@@ -150,6 +150,7 @@ export default {
       isWrite: true,
       section: '',
       tableData: [],
+      allCategory: [],
       operateForm: {
         id: null,
         created_time: null,
@@ -183,8 +184,7 @@ export default {
     getPageData () {
       // 获取页面数据
       let params = {
-        page: this.currentPage,
-        section: this.searchKey
+        page: this.currentPage
       }
 
       return Promise
@@ -197,13 +197,40 @@ export default {
           console.log(res)
           if (res.status === 200) {
             let data = res.data
-            this.tableData = data.results.map(item => this.processData(item))
-            this.total = data.count
-            this.pageSize = this.total < 10 ? this.total : 10
+            this.allCategory = data.map(item => this.processData(item))
+            this.searchCategory()
+            this.total = data.length
+            this.pageSize = data.length
           }
           this.isLoading = false
         })
         .catch(error => this.showError(error))
+    },
+    searchCategory () {
+      this.isLoading = true
+      this.tableData = this.allCategory.filter(item => this.matchSection(item) || this.matchName(item) || this.matchTitle(item))
+      this.isLoading = false
+    },
+    matchSection (item) {
+      if (item.section) {
+        return item.section.indexOf(this.searchKey) >= 0
+      } else {
+        return false
+      }
+    },
+    matchName (item) {
+      if (item.name) {
+        return item.name.indexOf(this.searchKey) >= 0
+      } else {
+        return false
+      }
+    },
+    matchTitle (item) {
+      if (item.title) {
+        return item.title.indexOf(this.searchKey) >= 0
+      } else {
+        return false
+      }
     },
     checkWritePermission () {
       this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0

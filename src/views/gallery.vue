@@ -5,7 +5,7 @@
     <el-card class="page-container">
       <div class="shelf" v-show="!isAddPage && !isEditPage" v-loading="isLoading">
         <h3 class="shelf-name clearfloat">
-          {{ this.section }}
+          {{ this.category }}
           <div class="shelf-mode-control">
             <span :class="{'shelf-mode-active': !isEditMode}"
                   @click="readMode">Read</span>

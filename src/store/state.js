@@ -11,7 +11,7 @@ export default {
   isLogin: false, // 是否登录成功
   loading: false,
   showImage: {
-    currentImg: '',
+    currentImage: '',
     imagePage: false
   },
   tags: [],
