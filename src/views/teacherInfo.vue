@@ -186,7 +186,7 @@ export default {
           console.log(res)
           if (res.status === 200) {
             let data = res.data
-            this.tableData = data.results.map(item => this.processData(item))
+            this.tableData = data.map(item => this.processData(item))
             this.total = data.count
             this.pageSize = this.total < 10 ? this.total : 10
           }

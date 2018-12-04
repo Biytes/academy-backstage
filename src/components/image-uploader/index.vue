@@ -3,7 +3,7 @@
     <label for="imageUrl"
            :class="[imageUrl ? '' : 'is-empty', 'image-upload']"
            :style="style">
-      <img id="showImage" :src="imageUrl" alt="" :style="style"/>>
+      <img id="showImage" :src="imageUrl" alt="" :style="style"/>
     </label>
     <input id="imageUrl" @change="changePic" type="file" accept="image/png, image/gif, image/jpeg, image/jpg" ref="upload_pic" />
   </div>
