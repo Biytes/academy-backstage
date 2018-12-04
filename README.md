@@ -1,8 +1,8 @@
 # academy
 
-将该项目与demo放在同一根目录下
-  [#demo](https://gitee.com/13651021745/myAcademy)
-  [#backstage](https://gitee.com/13651021745/backstage)
+将该项目与demo放在同一根目录下  
+  [#demo](https://gitee.com/13651021745/myAcademy)  
+  [#backstage](https://gitee.com/13651021745/backstage)  
 即your root
 	-demo
 	-backstage
