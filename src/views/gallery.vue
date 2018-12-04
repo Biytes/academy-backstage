@@ -38,9 +38,9 @@
                 </el-tooltip>
               </p>
               <p class="item-time clearfloat">创建时间:<span>{{ item.created_time }}</span></p>
-              <div class="item-tags">
+              <!-- <div class="item-tags">
                 <span v-for="tag in tags" v-show="contains(tag.name, item.tags)" :key="tag.id" :style="`background: ${tag.style}`" class="item-tag">{{ tag.name }}</span>
-              </div>
+              </div> -->
             </div>
           </li>
           <li class="shelf-add-item"
@@ -79,13 +79,13 @@
                             width="300"
                             height="300"></image-uploader>
           </el-form-item>
-          <el-form-item label="照片标签:" prop="tags">
+          <!-- <el-form-item label="照片标签:" prop="tags">
             <tags-editor :syncTagsList.sync="operateForm.tags"
                          ref="tagsEditor"
                          :isAdd="true"
                          :isEdit="true"
                          :isDelete="true"></tags-editor>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="照片描述:" prop="description">
             <el-input
               type="textarea"
@@ -121,8 +121,8 @@ export default {
         imageUrl: '',
         name: '',
         description: '',
-        created_time: '',
-        tags: []
+        created_time: ''
+        // tags: []
       },
       currentPage: 1,
       pageSize: 6,
@@ -139,15 +139,15 @@ export default {
   },
   computed: {
     ...mapState([
-      'permissions',
-      'tags'
+      'permissions'
+      // 'tags'
     ])
   },
   mounted () {
     this.section = this.$route.name
     this.category = this.$route.params.category
     this.checkWritePermission()
-    this.getTags()
+    // this.getTags()
     this.getPageData()
   },
   methods: {
@@ -175,26 +175,26 @@ export default {
         })
         .catch(error => this.showError(error))
     },
-    getTags () {
-      this.isLoading = true
-      return getAcademyData('certificatetag')
-        .then(res => {
-          console.log(res)
-          let tags = res.data.map(item => {
-            return {
-              id: item.id,
-              name: item.name,
-              style: item.style
-            }
-          })
-          return tags
-        })
-        .then(tags => {
-          this.saveTags(tags)
-          this.isLoading = false
-        })
-        .catch(error => this.showError(error))
-    },
+    // getTags () {
+    //   this.isLoading = true
+    //   return getAcademyData('certificatetag')
+    //     .then(res => {
+    //       console.log(res)
+    //       let tags = res.data.map(item => {
+    //         return {
+    //           id: item.id,
+    //           name: item.name,
+    //           style: item.style
+    //         }
+    //       })
+    //       return tags
+    //     })
+    //     .then(tags => {
+    //       this.saveTags(tags)
+    //       this.isLoading = false
+    //     })
+    //     .catch(error => this.showError(error))
+    // },
     processData (item) {
       return {
         id: item.id,
@@ -202,8 +202,8 @@ export default {
         imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}` || null,
         name: item.name || null,
         description: item.desc || null,
-        created_time: item.created_time || null,
-        tags: item.tags || null
+        created_time: item.created_time || null
+        // tags: item.tags || null
       }
     },
     checkWritePermission () {
@@ -213,7 +213,7 @@ export default {
       // 通过这个val 来判断
     },
     showAddItemPage () {
-      this.$confirm('添加新证书', {
+      this.$confirm('添加新照片', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -242,7 +242,7 @@ export default {
       this.isEditMode = true
     },
     addItem () {
-      this.$confirm('确定要添加新证书吗', {
+      this.$confirm('确定要添加新图片吗', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -262,14 +262,14 @@ export default {
           if (res.status === 200) {
             this.operateForm = this.processData(res.data)
             this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
-            this.$refs.tagsEditor.initialData(this.operateForm.tags)
+            // this.$refs.tagsEditor.initialData(this.operateForm.tags)
           }
           this.isLoading = false
         })
         .catch(error => this.showError(error))
     },
     addItemSubmit () {
-      this.$confirm('确定要添加新证书吗', {
+      this.$confirm('确定要添加新照片吗', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -281,8 +281,8 @@ export default {
             name: this.operateForm.name,
             desc: this.operateForm.description,
             image: this.operateForm.image,
-            created_time: this.operateForm.created_time,
-            tags: this.operateForm.tags
+            created_time: this.operateForm.created_time
+            // tags: this.operateForm.tags
           }
 
           return addAcademyData(this.section, params)
@@ -295,7 +295,7 @@ export default {
         })
     },
     editItemSubmit () {
-      this.$confirm('确定要添加新证书吗', {
+      this.$confirm('确定要添加新照片吗', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -307,8 +307,8 @@ export default {
             name: this.operateForm.name,
             desc: this.operateForm.description,
             image: this.operateForm.image,
-            created_time: this.operateForm.created_time,
-            tags: this.operateForm.tags
+            created_time: this.operateForm.created_time
+            // tags: this.operateForm.tags
           }
 
           return updateAcademyData(this.section, this.operateForm.id, params)
@@ -334,33 +334,33 @@ export default {
         })
         .catch(_ => {})
     },
-    addTags () {
-      this.$prompt('请输入新标签', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消'
-      })
-        .then(({ value }) => {
-          if (value === null) {
-            this.$message.warning('输入错误, 标签不能为空, 请重新输入')
-          } else {
-            let params = {
-              name: value,
-              style: 'background:' + this.randomColor()
-            }
-            return addAcademyData('certificatetag', params)
-              .then(res => {
-                if (res.status === 200) {
-                  this.$message.success('标签添加成功')
-                }
-              })
-              .then(_ => this.getTags())
-              .catch(error => this.showError(error))
-          }
-        })
-        .catch(_ => {
-          this.$message('取消输入')
-        })
-    },
+    // addTags () {
+    //   this.$prompt('请输入新标签', '提示', {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消'
+    //   })
+    //     .then(({ value }) => {
+    //       if (value === null) {
+    //         this.$message.warning('输入错误, 标签不能为空, 请重新输入')
+    //       } else {
+    //         let params = {
+    //           name: value,
+    //           style: 'background:' + this.randomColor()
+    //         }
+    //         return addAcademyData('certificatetag', params)
+    //           .then(res => {
+    //             if (res.status === 200) {
+    //               this.$message.success('标签添加成功')
+    //             }
+    //           })
+    //           .then(_ => this.getTags())
+    //           .catch(error => this.showError(error))
+    //       }
+    //     })
+    //     .catch(_ => {
+    //       this.$message('取消输入')
+    //     })
+    // },
     hideOperatePage () {
       this.isAddPage = false
       this.isEditPage = false
@@ -372,8 +372,8 @@ export default {
         imageUrl: '',
         name: '',
         description: '',
-        created_time: '',
-        tags: []
+        created_time: ''
+        // tags: []
       }
       this.$refs.imageUploader.clearUrl()
     },
@@ -394,8 +394,8 @@ export default {
       this.getPageData()
     },
     ...mapMutations([
-      'showImagePage',
-      'saveTags'
+      'showImagePage'
+      // 'saveTags'
     ])
   }
 }
@@ -490,7 +490,6 @@ export default {
 
         .item-icon {
           &-detail {
-            display: inline-block;
             font-size: 20px;
             vertical-align: bottom;
             cursor: pointer;
@@ -499,7 +498,6 @@ export default {
           }
 
           &-download {
-            display: inline-block;
             font-size: 20px;
             vertical-align: bottom;
             cursor: pointer;
@@ -508,7 +506,6 @@ export default {
           }
 
           &-edit {
-            display: inline-block;
             font-size: 20px;
             vertical-align: bottom;
             cursor: pointer;
@@ -517,7 +514,6 @@ export default {
           }
 
           &-delete {
-            display: inline-block;
             font-size: 20px;
             vertical-align: bottom;
             cursor: pointer;

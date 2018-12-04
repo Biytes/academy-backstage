@@ -13,9 +13,9 @@
           <el-select v-model="major" placeholder="请选择专业" size="mini" @change="getPageData()" class="left">
             <el-option
               v-for="item in majorType"
-              :key="item"
-              :label="item"
-              :value="item">
+              :key="item.value"
+              :label="item.title"
+              :value="item.value">
             </el-option>
           </el-select>
         </el-col>
@@ -103,10 +103,11 @@
           <el-form-item label="专业" prop="major" align="left" v-if="!isClientStudent">
             <el-select v-model="operateForm.major" placeholder="请选择专业" class="left">
               <el-option
-                v-for="item in majorType"
-                :key="item"
-                :label="item"
-                :value="item">
+                v-for="(item, index) in majorType"
+                v-if="index !== 0"
+                :key="item.value"
+                :label="item.title"
+                :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>

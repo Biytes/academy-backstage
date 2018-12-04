@@ -17,5 +17,20 @@ export default {
     imagePage: false
   },
   tags: [],
-  majorType: ['计算机科学与技术', '软件工程', '网络工程', '信息与计算科学']
+  majorType: [{
+    title: '所有',
+    value: ''
+  }, {
+    title: '计算机科学与技术',
+    value: '计算机科学与技术'
+  }, {
+    title: '软件工程',
+    value: '软件工程'
+  }, {
+    title: '网络工程',
+    value: '网络工程'
+  }, {
+    title: '信息与计算科学',
+    value: '信息与计算科学'
+  }]
 }
