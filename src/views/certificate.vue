@@ -59,7 +59,7 @@
                   <i class="item-icon-detail iconfont icon-detail" title="详情" @click="showDescription(item)" v-show="!isEditMode"></i>
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" content="下载" placement="top">
-                  <a :href="item.imageUrl" download style="float: right;"><i class="item-icon-download iconfont icon-download" title="下载" v-show="!isEditMode"></i></a>
+                  <a :href="item.imageUrl" target="_blank" download style="float: right;"><i class="item-icon-download iconfont icon-download" title="下载" v-show="!isEditMode"></i></a>
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" content="编辑" placement="top">
                   <i class="item-icon-edit iconfont icon-edit" title="编辑" @click="editItem(item.id)" v-show="isEditMode"></i>

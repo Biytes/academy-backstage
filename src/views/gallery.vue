@@ -20,15 +20,14 @@
             <div class="shelf-item-info">
               <img @click="showImagePage(item.imageUrl)" class="item-img" :src="item.imageUrl" alt="">
               <p class="item-name">
-                {{ item.name }}
+                {{ item.title }}
               </p>
               <p class="item-owner clearfloat">
-                {{ item.owner }}
                 <el-tooltip class="item" effect="dark" content="详情" placement="top">
                   <i class="item-icon-detail iconfont icon-detail" title="详情" @click="showDescription(item)" v-show="!isEditMode"></i>
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" content="下载" placement="top">
-                  <a :href="item.imageUrl" download style="float: right;"><i class="item-icon-download iconfont icon-download" title="下载" v-show="!isEditMode"></i></a>
+                  <a :href="item.imageUrl" target="_blank" download style="float: right;"><i class="item-icon-download iconfont icon-download" title="下载" v-show="!isEditMode"></i></a>
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" content="编辑" placement="top">
                   <i class="item-icon-edit iconfont icon-edit" title="编辑" @click="editItem(item.id)" v-show="isEditMode"></i>
@@ -60,12 +59,12 @@
       <div v-show="isAddPage || isEditPage" v-loading="isLoading">
 
         <el-form :model="operateForm" label-width="100px" class="demo-ruleForm add-page">
-          <el-form-item label="图片标题:" prop="name">
-            <el-input v-model="operateForm.name"></el-input>
+          <el-form-item label="图片标题:" prop="title">
+            <el-input v-model="operateForm.title"></el-input>
           </el-form-item>
-          <el-form-item label="照片创建时间:" prop="awardTime" align="left">
+          <el-form-item label="照片创建时间:" prop="created_time" align="left">
             <el-date-picker
-              v-model="operateForm.awardTime"
+              v-model="operateForm.created_time"
               align="right"
               type="date"
               placeholder="选择日期:"
@@ -119,7 +118,7 @@ export default {
         id: '',
         image: '',
         imageUrl: '',
-        name: '',
+        title: '',
         description: '',
         created_time: ''
         // tags: []
@@ -200,7 +199,7 @@ export default {
         id: item.id,
         image: item.image || null,
         imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}` || null,
-        name: item.name || null,
+        title: item.title || null,
         description: item.desc || null,
         created_time: item.created_time || null
         // tags: item.tags || null
@@ -225,7 +224,7 @@ export default {
     showDescription (item) {
       const h = this.$createElement
       this.$msgbox({
-        title: item.name + '   ' + item.owner,
+        title: item.title,
         message: h('p', null, item.description),
         // [
         //   h('span', null, '内容可以是 '),
@@ -278,7 +277,7 @@ export default {
           this.isLoading = true
           let params = {
             category: this.category,
-            name: this.operateForm.name,
+            title: this.operateForm.title,
             desc: this.operateForm.description,
             image: this.operateForm.image,
             created_time: this.operateForm.created_time
@@ -293,6 +292,7 @@ export default {
             .then(_ => this.hideOperatePage())
             .catch(error => this.showError(error))
         })
+        .catch(_ => {})
     },
     editItemSubmit () {
       this.$confirm('确定要添加新照片吗', {
@@ -304,7 +304,7 @@ export default {
           this.isLoading = true
           let params = {
             category: this.category,
-            name: this.operateForm.name,
+            title: this.operateForm.title,
             desc: this.operateForm.description,
             image: this.operateForm.image,
             created_time: this.operateForm.created_time
@@ -319,6 +319,7 @@ export default {
             .then(_ => this.hideOperatePage())
             .catch(error => this.showError(error))
         })
+        .catch(_ => {})
     },
     deleteItemSubmit (id) {
       this.$confirm('确定保存本次编辑吗', {
@@ -370,7 +371,7 @@ export default {
       this.operateForm = {
         id: '',
         imageUrl: '',
-        name: '',
+        title: '',
         description: '',
         created_time: ''
         // tags: []
