@@ -220,7 +220,7 @@ export default {
         file: item.file || [],
         file_detail: item.file_detail || [],
         content: item.content || null,
-        ctr: item.ctr || null
+        ctr: item.ctr || 0
       }
     },
     // 改变页面状态

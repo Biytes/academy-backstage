@@ -11,13 +11,13 @@
         </el-col>
         <el-col :span="22">
           <el-row v-if="isStudent">
-            <el-col :span="4">
+            <el-col style="width: 200px">
               <el-input placeholder="请输入年级"
                         v-model="grade"
                         size="mini"
                         @keyup.enter.native="getPageData"></el-input>
             </el-col>
-            <el-col :span="5" :push="1">
+            <el-col style="width: 200px; padding: 1px 0 0; margin: 0 20px">
               <el-select v-model="major" placeholder="请选择专业" size="mini" @change="getPageData" class="left">
                 <el-option
                   v-for="item in majorType"
@@ -27,7 +27,7 @@
                 </el-option>
               </el-select>
             </el-col>
-            <el-col :span="4">
+            <el-col style="width: 200px">
               <el-input placeholder="请输入班级"
                         v-model="stu_class"
                         size="mini"
