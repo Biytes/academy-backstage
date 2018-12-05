@@ -11,13 +11,13 @@
       <i class="iconfont icon-accessibility"></i>
     </div>
 
-    <div class="backstage-header-search right">
+    <!-- <div class="backstage-header-search right">
       <customInput type="text"
                    label="Search"
                    pattern="clean"
                    placeholder="Search Something ...">
                    </customInput>
-    </div>
+    </div> -->
 
     <ul class="backstage-header-dropdown-menu" v-show="isShowHeaderSubMenu">
       <div v-if="isLogin">

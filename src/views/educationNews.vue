@@ -2,16 +2,28 @@
   <div class="page college-intro">
 
     <div class="top-bar">
-      <el-button v-if="isWrite"
-                 @click="addItem"
-                 type="text"
-                 size="small"
-                 class="top-bar-button-right right pointer"><i class="iconfont icon-plus"></i></el-button>
-      <el-button v-if="isWrite"
-                 @click="resetOperateForm"
+      <el-row>
+        <el-col :span="1">
+          <el-button @click="resetOperateForm"
                  type="text"
                  size="small"
                  class="top-bar-button-left left pointer"><i class="iconfont icon-arrowsleftline"></i></el-button>
+        </el-col>
+        <el-col :span="22">
+          <el-row>
+            <el-col style="width: 300px">
+              <el-input placeholder="请输入要搜索的关键字"
+                        v-model="searchKey"
+                        size="mini"
+                        @keyup.enter.native="getPageData"></el-input>
+            </el-col>
+          </el-row>
+        </el-col>
+        <el-button @click="addItem"
+          type="text"
+          size="small"
+          class="top-bar-button-right right pointer"><i class="iconfont icon-plus"></i></el-button>
+      </el-row>
     </div>
 
     <el-card class="page-container">
@@ -165,6 +177,7 @@ export default {
         content: '',
         ctr: ''
       },
+      searchKey: '',
       currentPage: 1,
       total: 0,
       pageSize: 10,
@@ -195,7 +208,8 @@ export default {
       // 获取页面数据
       let params = {
         category: this.category,
-        page: this.currentPage
+        page: this.currentPage,
+        search: this.searchKey
       }
 
       return Promise
