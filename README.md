@@ -1,19 +1,11 @@
 # academy
 
 将该项目与demo放在同一根目录下  
-<<<<<<< HEAD
-  [#demo] (https://gitee.com/13651021745/myAcademy)  
-  [#backstage](https://gitee.com/13651021745/backstage)  
-即your root  
-	-demo  
-	-backstage  
-=======
   [#demo](https://gitee.com/13651021745/myAcademy)  
   [#backstage](https://gitee.com/13651021745/backstage)  
 即your root
 	-demo
 	-backstage
->>>>>>> c8cfd5b6a244ba869f94bdc08d7c686f3cd8b569
 ==============================
 执行以下命令
 
