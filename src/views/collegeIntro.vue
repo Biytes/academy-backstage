@@ -217,8 +217,8 @@ export default {
         title: item.title || null,
         created_time: item.created_time || null,
         updated_time: item.updated_time || null,
-        file: item.file || null,
-        file_detail: item.file_detail || null,
+        file: item.file || [],
+        file_detail: item.file_detail || [],
         content: item.content || null,
         ctr: item.ctr || null
       }

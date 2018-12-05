@@ -274,7 +274,7 @@ export default {
         grade: item.grade || null,
         major: item.major || null,
         stuClass: item.stu_class || null,
-        tags: item.tags || null
+        tags: item.tags || []
       }
     },
     checkWritePermission () {

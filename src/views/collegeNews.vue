@@ -222,8 +222,8 @@ export default {
         updated_time: item.updated_time || null,
         image: item.image || null,
         imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}` || null,
-        file: item.file || null,
-        file_detail: item.file_detail || null,
+        file: item.file || [],
+        file_detail: item.file_detail || [],
         content: item.content || null,
         ctr: item.ctr || null
       }
