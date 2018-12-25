@@ -22,7 +22,7 @@ const createLintingRule = () => ({
 module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: {
-    app: './src/main.js'
+    app: ['babel-polyfill', './src/main.js']
   },
   output: {
     path: config.build.assetsRoot,
@@ -37,8 +37,15 @@ module.exports = {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
       '@img': resolve('src/assets/img'),
-      '@views': resolve('src/views/backstage'),
-      '@css': resolve('static/css')
+      '@views': resolve('src/views'),
+      '@css': resolve('static/css'),
+      '@static': resolve('static'),
+      '@store': resolve('src/store'),
+      '@router': resolve('src/router'),
+      '@components': resolve('src/components'),
+      '@mock': resolve('src/mock'),
+      '@api': resolve('src/runtime/api'),
+      '@utils': resolve('src/runtime/utils')
     }
   },
   module: {
@@ -61,6 +68,10 @@ module.exports = {
           limit: 10000,
           name: utils.assetsPath('img/[name].[hash:7].[ext]')
         }
+      },
+      {
+        test: /\.scss$/,
+        loaders: ["style", "css", "sass"]
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,

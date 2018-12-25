@@ -1,0 +1,80 @@
+* {
+  box-sizing: border-box;
+}
+
+.container{
+  width: 100%;
+}
+
+ul {
+  list-style:none;
+  margin: 0;
+  padding:0;
+  text-align: left;
+}
+
+a {
+  text-decoration: none;
+}
+
+.page-container {
+  height: 80vh;
+  padding: 10px;
+  overflow: auto;
+}
+
+.page-container::-webkit-scrollbar {
+  width: 5px;
+  height: 8px;
+  background-color: #655d5d;
+}
+
+.page-container::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #f4f4f4;
+}
+
+.page-container::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+  background-color: #655d5d;
+}
+
+.left{
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.clearfloat:after {
+  display: block;
+  clear: both;
+  content: "";
+  visibility: hidden;
+  height: 0
+}
+.clearfloat {
+  zoom: 1
+}
+
+
+.table-button-delete{
+  color:red;
+  font-size:25px;
+}
+
+.table-button-edit{
+  color:rgb(84, 80, 218);
+  font-size:25px;
+}
+
+.table-button-read{
+  font-size:25px;
+}

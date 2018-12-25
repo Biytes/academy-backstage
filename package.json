@@ -5,17 +5,22 @@
   "author": "computer-association",
   "private": true,
   "scripts": {
-    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js --open",
     "start": "npm run dev",
     "lint": "eslint --ext .js,.vue src",
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
     "element-ui": "^2.2.1",
+    "es6-promise": "^4.2.5",
+    "http-proxy-middleware": "^0.19.0",
     "jquery": "^3.3.1",
-    "material-design-icons": "^3.0.1",
+    "node-sass": "^4.9.3",
+    "sass-loader": "^7.1.0",
     "vue": "^2.5.2",
+    "vue-axios": "^2.1.3",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
     "wangeditor": "^3.1.1"
@@ -34,6 +39,7 @@
     "chalk": "^2.0.1",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.0",
+    "cz-conventional-changelog": "^2.1.0",
     "eslint": "^4.15.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-friendly-formatter": "^3.0.0",
@@ -47,6 +53,7 @@
     "file-loader": "^1.1.4",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "html-webpack-plugin": "^2.30.1",
+    "mockjs": "^1.0.1-beta3",
     "node-notifier": "^5.1.2",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
     "ora": "^1.2.0",
@@ -75,5 +82,10 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
 }

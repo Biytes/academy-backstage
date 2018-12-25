@@ -1,21 +1,22 @@
-# demo
+# academy
 
-> backstage-demo
+将该项目与demo放在同一根目录下  
+  [#demo](https://gitee.com/13651021745/myAcademy)  
+  [#backstage](https://gitee.com/13651021745/backstage)  
+即your root
+	-demo
+	-backstage
+==============================
+执行以下命令
 
-## Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+	npm install
+	
+	npm run dev
+	
+	npm run build
+	
+	然后打开在demo的dist文件夹下的index.html就可以直接访问
+	
+	当两个项目都跑完这两条命令后才可以从demo 进入backstage的入口在
+	
+	进入backstage的入口在 footer的 @copyright 的 @
