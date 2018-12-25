@@ -59,13 +59,52 @@ export const http = (type, url, params = {}) => Promise
         throw new Error('未指明异步请求的请求方式！')
     }
   })
-  .then(res => res)
-  .catch(error => {
-    error = error.response
-    // 当token expired的时候 重新回login界面
-    if (error.status === 401) {
-      router.push('/login')
+
+// 添加响应拦截器
+axios.interceptors.response.use(
+  response => {
+    return Promise.resolve(response)
+  },
+  error => {
+    // 对响应错误做点什么
+    let errorMsg
+    if (error && error.response) {
+      switch (error.response.status) {
+        case 400:
+          errorMsg = '请求错误(400)'
+          break
+        case 401:
+          errorMsg = '未授权，请重新登录(401)'
+          router.push('/login')
+          break
+        case 403:
+          errorMsg = '没有权限访问(403)'
+          break
+        case 404:
+          errorMsg = '请求地址出错(404)'
+          break
+        case 500:
+          errorMsg = '服务器错误(500)'
+          break
+        case 502:
+          errorMsg = '网关错误(502)'
+          break
+        case 503:
+          errorMsg = '服务不可用(503)'
+          break
+        case 504:
+          errorMsg = '网关超时(504)'
+          break
+        case 505:
+          errorMsg = 'HTTP版本不受支持(505)'
+          break
+      }
+
+      return Promise.reject(errorMsg)
     } else {
-      throw error
+      errorMsg = '网络开小差~'
     }
-  })
+
+    return Promise.reject(error.response.data)
+  }
+)

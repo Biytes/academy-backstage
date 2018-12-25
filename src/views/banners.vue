@@ -64,7 +64,7 @@
                 <el-tooltip class="item" effect="dark" content="编辑" placement="top">
                   <el-button
                     v-if="isWrite"
-                    @click="preview(scope.row, 'edit')"
+                    @click="previewItem(scope.row, 'edit')"
                     type="text"
                     size="small">
                     <i class="iconfont icon-edit table-button-edit"></i>
@@ -72,7 +72,7 @@
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" content="只读" placement="top">
                   <el-button
-                    @click="preview(scope.row, 'read')"
+                    @click="previewItem(scope.row, 'read')"
                     type="text"
                     size="small">
                     <i class="iconfont icon-readme table-button-read"></i>
@@ -204,7 +204,7 @@ export default {
       }
     },
     checkWritePermission () {
-      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
+      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`) >= 0)
     },
     // 控制page状态
     addItem () {

@@ -225,7 +225,7 @@ export default {
         .catch(error => this.showError(error))
     },
     checkWritePermission () {
-      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`)) >= 0
+      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}` >= 0))
     },
     processData (item = {}) {
       return {

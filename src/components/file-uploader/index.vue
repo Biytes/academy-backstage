@@ -79,7 +79,7 @@ export default {
       // 获取img blob 格式 URL
       var file = e.target.files[0] // 也可以用下面的形式/
       // var file = this.$refs['certicification_pic'].files[0]
-
+      console.log(file.substring(0, file.lastIndexOf('.')))
       this.tempFile = file
       this.fileName = file.name
       console.log('File Info:', file)
