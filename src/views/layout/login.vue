@@ -108,7 +108,7 @@ export default {
 
         localStorage.setItem('isFirstTimeLogin', 1)
 
-        let path = userInfo.type === 2 ? '/certificate' : '/collegeIntro/about'
+        let path = userInfo.type === 2 ? '/certificate' : '/studentnews/condition'
 
         this.$router.push({ path })
       } catch (e) {

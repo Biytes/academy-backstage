@@ -14,13 +14,13 @@
         router>
 
         <section v-if="userInfo.type !== 2">
-          <el-submenu v-for="multiItem in multiSideBarMenu" :key="multiItem.id" :index="multiItem.path">
+          <el-submenu v-for="multiItem in multiSideBarMenu" v-if="multiItem.id !== 1" :key="multiItem.id" :index="multiItem.path">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>{{ multiItem.title }}</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item v-for="subItem in multiItem.subMenuItem" :index="subItem.path" :key="subItem.id" >
+              <el-menu-item v-for="subItem in multiItem.subMenuItem" :index="subItem.path" :key="subItem.id">
                 {{ subItem.title }}
               </el-menu-item>
             </el-menu-item-group>
@@ -173,14 +173,14 @@ $height: 85vh;
 }
 
 #backstage-menu::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    // -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     border-radius: 10px;
     background-color: #f4f4f4;
 }
 
 #backstage-menu::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    // -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
     background-color: #655d5d;
 }
 

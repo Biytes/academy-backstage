@@ -105,6 +105,9 @@
           <el-form-item label="标题" prop="title">
             <el-input v-model="operateForm.title"></el-input>
           </el-form-item>
+          <el-form-item label="链接" prop="link">
+            <el-input v-model="operateForm.link"></el-input>
+          </el-form-item>
           <el-form-item label="banners:" prop="image" align="left">
             <image-uploader :syncImage.sync="operateForm.image"
                             ref="imageUploader"
@@ -200,7 +203,8 @@ export default {
         created_time: item.created_time || null,
         imageUrl: `https://schooltest.zunway.pw/media/${item.image_url}` || null,
         image: item.image || null,
-        brief: item.brief || null
+        brief: item.brief || null,
+        link: item.link || null
       }
     },
     checkWritePermission () {
@@ -242,7 +246,8 @@ export default {
           let params = {
             title: this.operateForm.title,
             image: this.operateForm.image,
-            brief: this.operateForm.brief
+            brief: this.operateForm.brief,
+            link: this.link || null
           }
           return addAcademyData(this.section, params)
             .then(_ => {
