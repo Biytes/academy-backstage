@@ -110,7 +110,7 @@ export default {
       // 只有单个的模块
       let singleSection = this.allSection.filter(item => this.allCategory.findIndex(category => category.section === item.name) < 0)
       if (this.userInfo.type !== 0) {
-        singleSection.splice(singleSection.findIndex(item => item.id === 15), 1)
+        singleSection.splice(singleSection.findIndex(item => item.id === 13), 1)
       }
       // 有子菜单的模块
       let multiSection = this.allSection.filter(item => this.allCategory.findIndex(category => category.section === item.name) >= 0)
