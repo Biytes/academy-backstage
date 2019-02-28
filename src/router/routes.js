@@ -5,9 +5,6 @@ export default [{
   component: _import('layout/login'),
   alias: '/login'
 }, {
-  path: '/component',
-  component: _import('componentTest')
-}, {
   path: '/backstage',
   component: _import('layout/backstage'),
   children: [

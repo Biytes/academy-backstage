@@ -7,6 +7,11 @@ import router from '@router'
 
 Vue.use(VueAxios, axios)
 
+// var service=axios.create({
+//   baseURL:process.env.BASE_API,
+//   timeout:5000
+// })
+
 // 处理get方法的参数转换成url (待优化)
 // TODO: 待优化
 const stringify = function (url, params) {
@@ -25,6 +30,10 @@ Vue.prototype.$axios = axios
 
 // 给所有请求头部加上token
 axios.interceptors.request.use(
+
+  // if(store.getters.token){
+  //     config.headers['TOKEN']=getCookie('TOKEN')
+  // }
   config => {
     // 在所有请求头部添加token值
     const token = 'Token ' + store.state.userInfo.token

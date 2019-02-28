@@ -83,6 +83,7 @@ export default {
               token: tokenInfo.token,
               user_permissions: tokenInfo.user.user_permissions,
               grade: studentInfo.data.grade,
+              username: tokenInfo.username,
               major: studentInfo.data.major,
               stu_class: studentInfo.data.stu_class
             }
@@ -96,6 +97,7 @@ export default {
             id: tokenInfo.user.id,
             type: tokenInfo.user.type,
             token: tokenInfo.token,
+            username: tokenInfo.user.username,
             user_permissions: tokenInfo.user.user_permissions
           }
         }

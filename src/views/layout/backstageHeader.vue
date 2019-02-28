@@ -21,10 +21,10 @@
 
     <ul class="backstage-header-dropdown-menu" v-show="isShowHeaderSubMenu">
       <div v-if="isLogin">
-        <li class="dropdown-menu-item"><a href="#"><i class="iconfont icon-person"></i>My Profile</a></li>
-        <li class="dropdown-menu-item"><a href="#"><i class="iconfont icon-setting"></i>Setting</a></li>
+        <!-- <li class="dropdown-menu-item"><router-link to='/profile' tag="a"><i class="iconfont icon-person"></i>账号信息</router-link></li> -->
+        <!-- <li class="dropdown-menu-item"><a href="#"><i class="iconfont icon-setting"></i>Setting</a></li> -->
         <li class="dropdown-menu-item--divider"></li>
-        <li class="dropdown-menu-item" @click="logOutConfirm"><a><i class="iconfont icon-poweroff"></i>Logout</a></li>
+        <li class="dropdown-menu-item" @click="logOutConfirm"><a><i class="iconfont icon-poweroff"></i>登出</a></li>
       </div>
       <div v-else>
         <li class="dropdown-menu-item"><router-link to='/' tag="a">Login</router-link></li>
