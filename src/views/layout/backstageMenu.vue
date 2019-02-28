@@ -107,11 +107,15 @@ export default {
       }
     },
     createMenu () {
+      // 当账号类型为老师的时候 除去账号管理里老师的入口
+      if (this.userInfo.type !== 0) {
+        this.allSection.splice(this.allSection.findIndex(item => item.id === 13), 1)
+        this.allSection.splice(this.allSection.findIndex(item => item.id === 35), 1)
+      }
+
       // 只有单个的模块
       let singleSection = this.allSection.filter(item => this.allCategory.findIndex(category => category.section === item.name) < 0)
-      if (this.userInfo.type !== 0) {
-        singleSection.splice(singleSection.findIndex(item => item.id === 13), 1)
-      }
+
       // 有子菜单的模块
       let multiSection = this.allSection.filter(item => this.allCategory.findIndex(category => category.section === item.name) >= 0)
 
