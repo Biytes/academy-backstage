@@ -110,7 +110,7 @@ export default {
       // 当账号类型为老师的时候 除去账号管理里老师的入口
       if (this.userInfo.type !== 0) {
         this.allSection.splice(this.allSection.findIndex(item => item.id === 13), 1)
-        this.allSection.splice(this.allSection.findIndex(item => item.id === 35), 1)
+        this.allCategory.splice(this.allCategory.findIndex(item => item.id === 34), 1)
       }
 
       // 只有单个的模块

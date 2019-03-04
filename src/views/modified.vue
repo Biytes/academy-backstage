@@ -227,22 +227,28 @@ export default {
       isLoading: false,
       isEdit: false,
       isAdd: false,
-      permissionsList: ''
+      permissionsList: '',
+      allPermissions: ''
     }
   },
-  mounted () {
+  async mounted () {
     // 当前页面分类
     // 初始化数据
     this.initialPageData()
-    const permissions = this.permissions
-    var data = []
-    for (let i = 0; i < permissions.length; i++) {
-      data.push({
-        key: permissions[i].id,
-        label: permissions[i].codename
+    try {
+      let { data } = await getAcademyData('permission')
+
+      data = data.filter(item => item.codename.indexOf('write') >= 0)
+
+      this.permissionsList = data.map(item => {
+        return {
+          key: item.id,
+          label: item.codename
+        }
       })
+    } catch (error) {
+      console.log(error)
     }
-    this.permissionsList = data
   },
   computed: {
     ...mapState([
