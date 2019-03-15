@@ -47,6 +47,9 @@
             label="个人简介"
             min-width="300"
             align="center">
+            <template slot-scope="scope">
+              <p v-html="scope.row.brief" />
+            </template>
           </el-table-column>
           <el-table-column
             fixed="right"
@@ -109,9 +112,19 @@
                             width="300"
                             height="300"></image-uploader>
           </el-form-item>
-          <el-form-item label="简洁简介" prop="brief">
-            <el-input type="textarea" v-model="operateForm.brief"></el-input>
+          <el-form-item label="内容简介" prop="brief">
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 6, maxRows: 6}"
+              placeholder="请输入内容"
+              v-model="operateForm.brief">
+            </el-input>
+            <div
+              style="color: #999;font-size: 16px; text-align: left;"
+              v-text="'注: <br> 只是换行 不要去更改'"
+            />
           </el-form-item>
+
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="operateForm.email"></el-input>
           </el-form-item>
@@ -242,10 +255,12 @@ export default {
       })
         .then(_ => {
           this.loading = true
+          let brief = this.operateForm.brief.replace(/\n/g, '<br>')
+          brief = brief.replace(/\s/g, '&nbsp;')
           let params = {
             name: this.operateForm.name,
             position: this.operateForm.position,
-            brief: this.operateForm.brief,
+            brief,
             email: this.operateForm.email,
             image: this.operateForm.image,
             content: this.operateForm.content
@@ -288,6 +303,9 @@ export default {
       })
         .then(_ => {
           this.isLoading = true
+          let brief = this.operateForm.brief.replace(/\n/g, '<br>')
+          brief = brief.replace(/\s/g, '&nbsp;')
+          this.operateForm.brief = brief
           return updateAcademyData(this.section, this.operateForm.id, this.operateForm)
             .then(res => {
               if (res.status === 200) {
