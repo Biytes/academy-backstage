@@ -156,7 +156,7 @@ export default {
       this.saveSideBarMenu(sideBarMenu)
     },
     showError (error) {
-      this.$message.error(error)
+      this.$message.error(JSON.stringify(error))
       console.log('error status:', error.status, 'error:', error)
       this.isLoading = false
     },

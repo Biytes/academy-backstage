@@ -115,6 +115,7 @@ export default {
         this.$router.push({ path })
       } catch (e) {
         console.log(e)
+        this.$message.error(JSON.stringify(e))
         this.$message.error('用户信息不正确')
       } finally {
         this.isLoading = false

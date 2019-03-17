@@ -69,7 +69,7 @@ export default {
           this.$router.push({ path: '/' })
           this.$message.warning('用户已注销')
         })
-        .catch(_ => {})
+        .catch(error => this.$message.error(JSON.stringify(error)))
     },
     ...mapMutations([
       'logout'

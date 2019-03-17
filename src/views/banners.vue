@@ -303,7 +303,7 @@ export default {
       this.$refs.imageUploader.catchData(this.operateForm.imageUrl)
     },
     showError (error) {
-      this.$message.error(error.data.msg)
+      this.$message.error(JSON.stringify(error))
       console.log('error status:', error.status, 'error:', error)
       this.isLoading = false
     },

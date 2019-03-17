@@ -463,7 +463,7 @@ export default {
       return array.findIndex(item => item === target) >= 0
     },
     showError (error) {
-      this.$message.error(error.data.msg)
+      this.$message.error(JSON.stringify(error))
       console.log('error status:', error.status, 'error:', error)
       this.isLoading = false
     },

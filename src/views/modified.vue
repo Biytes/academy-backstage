@@ -105,7 +105,7 @@
                             <i class="iconfont icon-delete" title="删除账号" style="color:red;font-size:30px;"></i>
                             </el-button>
                 </el-tooltip>
-                <el-tooltip class="item" effect="dark" content="编辑账号(必须修改密码)" placement="top">
+                <el-tooltip class="item" effect="dark" content="编辑账号" placement="top">
                   <el-button @click="editItem(scope.row)"
                             type="text"
                             size="small">
@@ -185,7 +185,7 @@
                         prop="password"
                         align="left"
                         :rules="[
-                          { required: true, message: '请输入密码', trigger: 'blur' },
+                          { required: false, message: '请输入密码', trigger: 'blur' },
                           { min: 6, max: 14, message: '长度在 6 到 14 个字符', trigger: 'blur' }
                         ]">
             <el-input v-model="operateForm.password" type="password"></el-input>
@@ -473,10 +473,11 @@ export default {
         }
         this.user_permissions = []
         this.operateForm.major = this.majorType[0]
+        this.isLoading = false
       }
     },
     showError (error) {
-      this.$message.error(error.data.msg)
+      this.$message.error(JSON.stringify(error))
       console.log('error status:', error.status, 'error:', error)
       this.isLoading = false
     },
