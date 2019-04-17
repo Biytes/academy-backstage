@@ -208,7 +208,7 @@ export default {
       }
     },
     checkWritePermission () {
-      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`) >= 0)
+      this.isWrite = this.permissions.findIndex(item => item.codename.indexOf(`write_${this.section}`) >= 0) >= 0
     },
     // 控制page状态
     addItem () {

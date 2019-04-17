@@ -108,7 +108,8 @@ export default {
 
         this.$message.success('登陆成功')
 
-        localStorage.setItem('isFirstTimeLogin', 1)
+        // 第一次
+        localStorage.setItem('isBackstageFirstTimeLogin', 1)
 
         let path = userInfo.type === 2 ? '/certificate' : '/studentnews/condition'
 

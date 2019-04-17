@@ -16,10 +16,10 @@ export default {
   },
   mounted () {
     // 如果为undefined就是第一次登陆
-    this.isFirstTimeLogin = localStorage.getItem('isFirstTimeLogin')
+    this.isFirstTimeLogin = localStorage.getItem('isBackstageFirstTimeLogin')
 
     // 如果是第一次登陆就不验证
-    if (this.isFirstTimeLogin) {
+    if (this.isFirstTimeLogin === 1) {
       this.checkTokenValid()
     }
   },

@@ -148,6 +148,15 @@ export default {
         }
       })
 
+      // 如果用户权限不包括编辑学生账号和教师账号，直接不显示账号管理
+      if (
+        this.userInfo.user_permissions.findIndex(item => item.id === 49) < 0 && // 教师账号编辑的权限的id
+        this.userInfo.user_permissions.findIndex(item => item.id === 42) < 0 && // 学生账号编辑的权限的id
+        multiSideBarMenu.findIndex(item => item.id === 6) >= 0
+      ) {
+        multiSideBarMenu.splice(multiSideBarMenu.findIndex(item => item.id === 6), 1)
+      }
+
       let sideBarMenu = {
         singleSideBarMenu,
         multiSideBarMenu
