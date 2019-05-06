@@ -45,8 +45,8 @@ export default {
   data () {
     return {
       isLoading: false,
-      username: 'jinhai',
-      password: '123456',
+      username: '',
+      password: '',
       type: 0
     }
   },
@@ -137,6 +137,7 @@ export default {
 .page.login {
   .login-container{
     width:400px;
+    padding: 50px;
     margin: auto;
     margin-top: 100px;
     color: #000;
@@ -187,7 +188,7 @@ export default {
 
   @media (min-width: 1200px) and (max-width: 1366px) {
     .login-container {
-      width: 300px;
+      min-width: 300px;
 
       .el-radio-group {
         margin-left: 30px;
