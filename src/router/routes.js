@@ -9,31 +9,31 @@ export default [{
   component: _import('layout/backstage'),
   children: [
     {
-      name: 'certificate',
+      name: 'certificate', // 学生证书
       path: '/certificate',
       component: _import('certificate')
     }, {
-      name: 'collegeintro',
+      name: 'collegeintro', // 学院信息 demo是写死的
       path: '/collegeintro/:category',
       component: _import('collegeIntro')
     }, {
-      name: 'educationnews',
+      name: 'educationnews', // 教学新闻
       path: '/educationnews/:category',
       component: _import('educationNews')
     }, {
-      name: 'studentnews',
+      name: 'studentnews', // 学生信息
       path: '/studentnews/:category',
       component: _import('studentNews')
     }, {
-      name: 'partynews',
+      name: 'partynews', // 党建工作
       path: '/partynews/:category',
       component: _import('partyNews')
     }, {
-      name: 'cooperateinfo',
+      name: 'cooperateinfo', // 对外合作
       path: '/cooperateinfo/:category',
       component: _import('cooperateInfo')
     }, {
-      name: 'gallery',
+      name: 'gallery', // 学院相册
       path: '/gallery/:category',
       component: _import('gallery')
     }, {
@@ -44,6 +44,10 @@ export default [{
       name: 'teacherinfo',
       path: '/teacherInfo',
       component: _import('teacherInfo')
+    }, {
+      name: 'ieet',
+      path: '/ieet',
+      component: _import('ieet')
     }, {
       name: 'friendlylink',
       path: '/friendlyLink',

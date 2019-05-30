@@ -19,7 +19,7 @@ export default {
     this.isFirstTimeLogin = localStorage.getItem('isBackstageFirstTimeLogin')
 
     // 如果是第一次登陆就不验证
-    if (this.isFirstTimeLogin === 1) {
+    if (this.isFirstTimeLogin === '1') {
       this.checkTokenValid()
     }
   },
